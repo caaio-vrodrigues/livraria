@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.infrastructure.entity;
+package caio.portfolio.livraria.infrastructure.entity.country;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

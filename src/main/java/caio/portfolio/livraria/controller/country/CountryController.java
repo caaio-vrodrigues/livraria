@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import caio.portfolio.livraria.infrastructure.entity.Country;
+import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.service.CountryService;
 import lombok.RequiredArgsConstructor;
 

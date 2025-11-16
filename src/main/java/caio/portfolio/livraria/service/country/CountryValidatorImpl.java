@@ -5,18 +5,12 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.service.country.model.CountryValidator;
 
 @Service
 public class CountryValidatorImpl implements CountryValidator {
 	
 	private static final Set<String> VALID_ISO_CODES = Set.of(Locale.getISOCountries());
-
-	@Override
-	public void validateProperties(CreateCountryDTO dto) {
-		
-	}
 
 	@Override
 	public String processIsoAlpha2Code(String isoAlpha2Code) {

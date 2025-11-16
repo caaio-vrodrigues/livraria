@@ -38,7 +38,9 @@ public class CountryService {
 	}
 	
 	@Transactional(readOnly=true)
-	public List<Country> getAllCountries(){
-		return repo.findAll();
+	public List<ResponseCountryDTO> getAllCountries(){
+		return repo.findAll().stream()
+			.map(responseCountryDTOCreator::toResponseCountryDTO)
+			.toList();
 	}
 }

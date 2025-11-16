@@ -25,6 +25,11 @@ public class CountryValidatorImpl implements CountryValidator {
 	@Override
 	public String resolveNameByIsoAlpha2Code(String isoAlpha2Code) {
 		String validIsoAlpha2Code = processIsoAlpha2Code(isoAlpha2Code);
+		return getNameByValidatedAndNormalizedIsoAlpha2Code(validIsoAlpha2Code);
+	}
+
+	@Override
+	public String getNameByValidatedAndNormalizedIsoAlpha2Code(String validIsoAlpha2Code) {
 		Locale countryLocale = new Locale.Builder().setRegion(validIsoAlpha2Code).build();
 		return countryLocale.getDisplayName(Locale.ENGLISH);
 	}

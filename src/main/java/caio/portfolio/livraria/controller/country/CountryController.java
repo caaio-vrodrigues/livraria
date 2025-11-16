@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import caio.portfolio.livraria.infrastructure.entity.country.Country;
+import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.service.country.CountryService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +19,7 @@ public class CountryController {
 	private final CountryService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Country>> findAllCountries(){
+	public ResponseEntity<List<ResponseCountryDTO>> findAllCountries(){
 		return ResponseEntity.ok(service.getAllCountries());
 	}
 }

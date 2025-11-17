@@ -6,18 +6,20 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import caio.portfolio.livraria.service.country.model.CountryValidator;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CountryValidatorImpl implements CountryValidator {
 	
-	private static final Set<String> VALID_ISO_CODES = Set.of(Locale.getISOCountries());
+	private final Set<String> validIsoCodes;
 
 	@Override
 	public String processIsoAlpha2Code(String isoAlpha2Code) {
 		boolean isIsoAlpha2CodeNullOrBlank = isoAlpha2Code == null || isoAlpha2Code.isBlank();
 		if(isIsoAlpha2CodeNullOrBlank) throw new IllegalArgumentException("O campo 'isoAlpha2Code' não pode estar vazio");
 		String normalizedIsoAlpha2Code = isoAlpha2Code.trim().toUpperCase();
-		boolean validIsoAlpha2Code = VALID_ISO_CODES.contains(normalizedIsoAlpha2Code);
+		boolean validIsoAlpha2Code = validIsoCodes.contains(normalizedIsoAlpha2Code);
 		if(!validIsoAlpha2Code) throw new IllegalArgumentException("O código '"+isoAlpha2Code+"' não corresponde a um código válido.");
 		return normalizedIsoAlpha2Code;
 	}

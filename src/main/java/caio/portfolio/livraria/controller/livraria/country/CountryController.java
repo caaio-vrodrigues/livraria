@@ -43,8 +43,13 @@ public class CountryController {
 	
 	@GetMapping("/{isoAlpha2Code}")
 	public ResponseEntity<ResponseCountryDTO> findCountryByIsoAlpha2Code(
-		@Valid @PathVariable String isoAlpha2Code
+		@PathVariable String isoAlpha2Code
 	) {
 		return ResponseEntity.ok(service.getCountryByIsoAlpha2Code(isoAlpha2Code));
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<ResponseCountryDTO> findCountryById(@PathVariable Integer id){
+		return ResponseEntity.ok(null);
 	}
 }

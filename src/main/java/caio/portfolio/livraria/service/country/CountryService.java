@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import caio.portfolio.livraria.exception.custom.CountryNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
@@ -22,6 +23,12 @@ public class CountryService {
 	private final CountryRepository repo;
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
+	
+	private Country resolveFindCountryByIsoAlpha2Code(String validIsoAlpha2Code, String originalCode) {
+	    return repo.findByIsoAlpha2Code(validIsoAlpha2Code)
+	        .orElseThrow(() -> new CountryNotFoundException(
+	            "País não encontrado para o 'isoAlpha2Code': " + originalCode));
+	}
 	
 	@Transactional
 	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
@@ -53,5 +60,16 @@ public class CountryService {
 		return repo.findAll().stream()
 			.map(responseCountryDTOCreator::toResponseCountryDTO)
 			.toList();
+	}
+	
+	@Transactional(readOnly=true)
+	public ResponseCountryDTO getCountryByIsoAlpha2Code(String isoAlpha2Code) {
+		String validIsoAlpha2Code = countryValidator.resolveNameByIsoAlpha2Code(isoAlpha2Code);
+		Country country = resolveFindCountryByIsoAlpha2Code(validIsoAlpha2Code, isoAlpha2Code);
+		return ResponseCountryDTO.builder()
+			.id(country.getId())
+			.isoAlpha2Code(country.getIsoAlpha2Code())
+			.name(country.getName())
+			.build();
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,5 +39,12 @@ public class CountryController {
 	@GetMapping
 	public ResponseEntity<List<ResponseCountryDTO>> findAllCountries(){
 		return ResponseEntity.ok(service.getAllCountries());
+	}
+	
+	@GetMapping("/{isoAlpha2Code}")
+	public ResponseEntity<ResponseCountryDTO> findCountryByIsoAlpha2Code(
+		@Valid @PathVariable String isoAlpha2Code
+	) {
+		return ResponseEntity.ok(service.getCountryByIsoAlpha2Code(isoAlpha2Code));
 	}
 }

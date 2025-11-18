@@ -1,0 +1,1 @@
+INSERT INTO country (iso_alpha2_code, name) VALUES ('BR', 'Brazil');

@@ -85,7 +85,7 @@ class CountryServiceTest {
 	 
 	 @Test
 	 @DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'isoAlpha2Code' não existente")
-	 void getCountryByIsoAlpha2Code_usesOriginalCodeInErrorMessage() {
+	 void getCountryByIsoAlpha2Code_returnsException() {
 	     Mockito.when(countryValidator.processIsoAlpha2Code(rawBrazilCode)).thenReturn(validBrazilCode);
 	     Mockito.when(repo.findByIsoAlpha2Code(validBrazilCode)).thenReturn(Optional.empty());
 	     Assertions.assertThrows(

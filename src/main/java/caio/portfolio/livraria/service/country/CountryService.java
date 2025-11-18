@@ -25,8 +25,12 @@ public class CountryService {
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
 	
 	private Country resolveFindCountryByIsoAlpha2Code(String validIsoAlpha2Code, String originalCode) {
-	    return repo.findByIsoAlpha2Code(validIsoAlpha2Code)
-	        .orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'isoAlpha2Code': "+originalCode));
+	    return repo.findByIsoAlpha2Code(validIsoAlpha2Code).orElseThrow(() -> 
+	    	new CountryNotFoundException("País não encontrado para o 'isoAlpha2Code': "+originalCode));
+	}
+	
+	private Country resolveFindCountryById(Integer id) {
+	    return repo.findById(id).orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'id': "+id));
 	}
 	
 	@Transactional
@@ -65,6 +69,16 @@ public class CountryService {
 	public ResponseCountryDTO getCountryByIsoAlpha2Code(String isoAlpha2Code) {
 		String validIsoAlpha2Code = countryValidator.processIsoAlpha2Code(isoAlpha2Code);
 		Country country = resolveFindCountryByIsoAlpha2Code(validIsoAlpha2Code, isoAlpha2Code);
+		return ResponseCountryDTO.builder()
+			.id(country.getId())
+			.isoAlpha2Code(country.getIsoAlpha2Code())
+			.name(country.getName())
+			.build();
+	}
+	
+	@Transactional(readOnly=true)
+	public ResponseCountryDTO getCountryById(Integer id){
+		Country country = resolveFindCountryById(id);
 		return ResponseCountryDTO.builder()
 			.id(country.getId())
 			.isoAlpha2Code(country.getIsoAlpha2Code())

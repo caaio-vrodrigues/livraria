@@ -41,19 +41,24 @@ class CountryServiceTest {
 
 	private static final String RAW_BRAZIL_CODE = "br ";
 	private static final String VALID_BRAZIL_CODE = "BR";
+	private static final Integer BRAZIL_ID = 1;
 	private static final String BRAZIL_NAME = "Brazil";
+	private static final String VALID_IRELAND_CODE = "IR";
+	private static final String IRELAND_NAME = "Ireland";
+	private static final Integer IRELAND_ID = 2;
+	private static final Integer NON_EXISTING_ID = 100;
 	
 	private static final Country BRAZIL = Country.builder()
-        .id(1).isoAlpha2Code("BR").name("Brazil").build();
+        .id(BRAZIL_ID).isoAlpha2Code(VALID_BRAZIL_CODE).name(BRAZIL_NAME).build();
 	
 	private static final ResponseCountryDTO RESPONSE_BRAZILDTO = ResponseCountryDTO.builder()
-        .id(1).isoAlpha2Code("BR").name("Brazil").build();
+        .id(BRAZIL_ID).isoAlpha2Code(VALID_BRAZIL_CODE).name(BRAZIL_NAME).build();
 	
 	private static final Country IRELAND = Country.builder()
-	    .id(2).isoAlpha2Code("IR").name("Ireland").build();
+	    .id(IRELAND_ID).isoAlpha2Code(VALID_IRELAND_CODE).name(IRELAND_NAME).build();
 		
 	private static final ResponseCountryDTO RESPONSE_IRELANDDTO = ResponseCountryDTO.builder()
-        .id(2).isoAlpha2Code("IR").name("Ireland").build();
+        .id(IRELAND_ID).isoAlpha2Code(VALID_IRELAND_CODE).name(IRELAND_NAME).build();
 	
 	private static final CreateCountryDTO CREATE_COUNTRYDTO = CreateCountryDTO.builder()
 	    .isoAlpha2Code(RAW_BRAZIL_CODE)
@@ -75,7 +80,7 @@ class CountryServiceTest {
 	@Test
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'id' não existente")
 	void getCountryById_returnsException() {
-		when(repo.findById(100)).thenReturn(Optional.empty());
+		when(repo.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 		assertThrows(
 			CountryNotFoundException.class,
             () -> service.getCountryById(100)
@@ -89,8 +94,8 @@ class CountryServiceTest {
 		when(repo.findByIsoAlpha2Code(VALID_BRAZIL_CODE)).thenReturn(Optional.of(BRAZIL));
 		when(responseCountryDTOCreator.toResponseCountryDTO(BRAZIL)).thenReturn(RESPONSE_BRAZILDTO);
 		ResponseCountryDTO result = service.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
-		assertEquals("BR", result.getIsoAlpha2Code());
-		assertEquals("Brazil", result.getName());
+		assertEquals(VALID_BRAZIL_CODE, result.getIsoAlpha2Code());
+		assertEquals(BRAZIL_NAME, result.getName());
 	}
 	 
 	@Test
@@ -115,8 +120,8 @@ class CountryServiceTest {
 		List<ResponseCountryDTO> result = service.getAllCountries();
 		assertNotNull(result);
 		assertEquals(2, result.size());
-		assertEquals("BR", result.get(0).getIsoAlpha2Code());
-		assertEquals("IR", result.get(1).getIsoAlpha2Code());
+		assertEquals(VALID_BRAZIL_CODE, result.get(0).getIsoAlpha2Code());
+		assertEquals(VALID_IRELAND_CODE, result.get(1).getIsoAlpha2Code());
 	}
 	 
 	@Test
@@ -140,8 +145,8 @@ class CountryServiceTest {
 	        .thenReturn(RESPONSE_BRAZILDTO);
 	    CountryResultImplDTO result = service.createOrFindCountry(CREATE_COUNTRYDTO);
 	    assertNotNull(result);
-	    assertEquals("BR", result.getCountry().getIsoAlpha2Code());
-	    assertEquals("Brazil", result.getCountry().getName());
+	    assertEquals(VALID_BRAZIL_CODE, result.getCountry().getIsoAlpha2Code());
+	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
 	    assertFalse(result.isCreated());
 	}
 	 
@@ -158,8 +163,8 @@ class CountryServiceTest {
 	        .thenReturn(RESPONSE_BRAZILDTO);
 	    CountryResultImplDTO result = service.createOrFindCountry(CREATE_COUNTRYDTO);
 	    assertNotNull(result);
-	    assertEquals("BR", result.getCountry().getIsoAlpha2Code());
-	    assertEquals("Brazil", result.getCountry().getName());
+	    assertEquals(VALID_BRAZIL_CODE, result.getCountry().getIsoAlpha2Code());
+	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
 	    assertTrue(result.isCreated());
 	    verify(repo, times(1)).saveAndFlush(any(Country.class));
 	}

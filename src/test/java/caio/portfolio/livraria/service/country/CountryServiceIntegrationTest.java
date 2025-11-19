@@ -2,7 +2,12 @@ package caio.portfolio.livraria.service.country;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +48,8 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve retornar país ao buscar com 'id' existente")
 	void getCountryById_returnsCountry() {
 		ResponseCountryDTO brazilRespDTO = service.getCountryById(1);
-		Assertions.assertNotNull(brazilRespDTO);
-		Assertions.assertEquals(BRAZIL_VALID_CODE, brazilRespDTO.getIsoAlpha2Code());
+		assertNotNull(brazilRespDTO);
+		assertEquals(BRAZIL_VALID_CODE, brazilRespDTO.getIsoAlpha2Code());
 	}
 	
 	@Test
@@ -52,7 +57,7 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/insert_country_list.sql")
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'id' inexistente")
 	void getCountryById_returnsException() {
-		Assertions.assertThrows(
+		assertThrows(
 			CountryNotFoundException.class, 
 			() -> service.getCountryById(1000)
 		);
@@ -64,8 +69,8 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve retornar país ao buscar com 'isoAlpha2Code' existente")
 	void getCountryByIsoAlpha2Code_returnsCountry() {
 		ResponseCountryDTO result = service.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
-		Assertions.assertEquals(BRAZIL_VALID_CODE, result.getIsoAlpha2Code());
-		Assertions.assertEquals(BRAZIL_NAME, result.getName());
+		assertEquals(BRAZIL_VALID_CODE, result.getIsoAlpha2Code());
+		assertEquals(BRAZIL_NAME, result.getName());
 	}
 	 
 	@Test
@@ -73,7 +78,7 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/insert_country_list.sql")
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'isoAlpha2Code' não existente")
 	void getCountryByIsoAlpha2Code_returnsException() {
-	    Assertions.assertThrows(
+	    assertThrows(
            CountryNotFoundException.class,
            () -> service.getCountryByIsoAlpha2Code(NON_EXISTENT_COUNTRY_CODE)
 	    );
@@ -84,7 +89,7 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/insert_country_list.sql")
 	@DisplayName("Deve retornar 'IllegalArgumentException' ao buscar com 'isoAlpha2Code' inválido")
 	void getCountryByIsoAlpha2Code_returnsIllegalArgExcep() {
-	    Assertions.assertThrows(
+	    assertThrows(
            IllegalArgumentException.class,
            () -> service.getCountryByIsoAlpha2Code(INVALID_COUNTRY_CODE)
 	    );
@@ -96,10 +101,10 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve retornar lista de dto's de países quando existem países cadastrados")
 	void getAllCountries_returnsResponseCountryDTOList() {
 		List<ResponseCountryDTO> result = service.getAllCountries();
-		Assertions.assertNotNull(result);
-		Assertions.assertEquals(10, result.size());
-		Assertions.assertEquals(BRAZIL_VALID_CODE, result.get(0).getIsoAlpha2Code());
-		Assertions.assertEquals(UNITED_STATES_VALID_CODE, result.get(1).getIsoAlpha2Code());
+		assertNotNull(result);
+		assertEquals(10, result.size());
+		assertEquals(BRAZIL_VALID_CODE, result.get(0).getIsoAlpha2Code());
+		assertEquals(UNITED_STATES_VALID_CODE, result.get(1).getIsoAlpha2Code());
 	}
 	 
 	@Test
@@ -107,9 +112,9 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve retornar lista vazia quando não existem países cadastrados")
 	void getAllCountries_returnsEmptyList() {
 		List<ResponseCountryDTO> result = service.getAllCountries();
-		Assertions.assertNotNull(result);
-		Assertions.assertTrue(result.isEmpty());
-		Assertions.assertEquals(0, result.size());
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+		assertEquals(0, result.size());
 	}
 	
 	@Test
@@ -118,10 +123,10 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve retornar país existente quando 'isoAlpha2Code' já está cadastrado")
 	void createOrFindCountry_returnsExistingCountry() {
 		CountryResultImplDTO result = service.createOrFindCountry(CREATE_BRAZIL_DTO);
-	    Assertions.assertNotNull(result);
-	    Assertions.assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
-	    Assertions.assertEquals(BRAZIL_NAME, result.getCountry().getName());
-	    Assertions.assertFalse(result.isCreated());
+	    assertNotNull(result);
+	    assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
+	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
+	    assertFalse(result.isCreated());
 	}
 	 
 	@Test
@@ -130,12 +135,11 @@ class CountryServiceIntegrationTest {
 	void createOrFindCountry_createsNewCountry() {
 		long initialCount = repo.count();
 		CountryResultImplDTO result = service.createOrFindCountry(CREATE_BRAZIL_DTO);
-	    Assertions.assertNotNull(result);
-	    Assertions.assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
-	    Assertions.assertEquals(BRAZIL_NAME, result.getCountry().getName());
-	    Assertions.assertTrue(result.isCreated());
-	    Assertions.assertTrue(result.isCreated());
-	    Assertions.assertEquals(initialCount + 1, repo.count());
+	    assertNotNull(result);
+	    assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
+	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
+	    assertTrue(result.isCreated());
+	    assertEquals(initialCount + 1, repo.count());
 	}
 	 
 	@Test
@@ -145,6 +149,6 @@ class CountryServiceIntegrationTest {
 	void createOrFindCountry_doesNotSaveWhenCountryExists() {
 		long initialCount = repo.count();
 		service.createOrFindCountry(CREATE_BRAZIL_DTO);
-		Assertions.assertEquals(initialCount, repo.count());
+		assertEquals(initialCount, repo.count());
 	}
 }

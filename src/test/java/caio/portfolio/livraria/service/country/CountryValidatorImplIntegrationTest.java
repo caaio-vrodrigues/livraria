@@ -1,8 +1,9 @@
 package caio.portfolio.livraria.service.country;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,24 @@ class CountryValidatorImplIntegrationTest {
 
 	@Autowired CountryValidator validator;
 	
+	private static final String BRAZIL_NAME = "Brazil";
+	private static final String VALID_BRAZIL_CODE = "BR";
+	private static final String RAW_BRAZIL_CODE = "br ";
+	private static final String VALID_IRELAND_CODE = "IR";
+	private static final String RAW_IRELAND_CODE = "ir ";
+	private static final String INVALID_COUNTRY_CODE = "UR";
+	
 	@Test
 	@DisplayName("Deve retornar 'isoAlpha2Code' normalizado para valor válido")
     void processIsoAlpha2Code_returnsValidIsoAlpha2Code() {
-		assertEquals("BR", validator.processIsoAlpha2Code("BR"));
-        assertEquals("FR", validator.processIsoAlpha2Code("FR"));
+		assertEquals(VALID_BRAZIL_CODE, validator.processIsoAlpha2Code(RAW_BRAZIL_CODE));
+        assertEquals(VALID_IRELAND_CODE, validator.processIsoAlpha2Code(RAW_IRELAND_CODE));
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento nulo")
 	void processIsoAlpha2Code_throwsExceptionForNull() {
-        Assertions.assertThrows(
+        assertThrows(
         	IllegalArgumentException.class, 
         	() -> validator.processIsoAlpha2Code(null));
     }
@@ -39,7 +47,7 @@ class CountryValidatorImplIntegrationTest {
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento vazio")
     void processIsoAlpha2Code_throwsExceptionForBlank() {
-		Assertions.assertThrows(
+		assertThrows(
 			IllegalArgumentException.class, 
 			() -> validator.processIsoAlpha2Code("  "));
     }
@@ -47,30 +55,30 @@ class CountryValidatorImplIntegrationTest {
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento inválido")
     void processIsoAlpha2Code_throwsExceptionForInvalidCode() {
-        IllegalArgumentException exception = Assertions.assertThrows(
+        IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class, 
-            () -> validator.processIsoAlpha2Code("UR")
+            () -> validator.processIsoAlpha2Code(INVALID_COUNTRY_CODE)
         );
-        Assertions.assertTrue(exception.getMessage().contains("UR"));
+        assertTrue(exception.getMessage().contains(INVALID_COUNTRY_CODE));
     }
 	
 	@Test
 	@DisplayName("Deve retornar nome de país ao receber 'isoAlpha2Code' para validação")
 	void resolveNameByIsoAlpha2Code_returnsCountryName() {
-		assertEquals("Brazil", validator.resolveNameByIsoAlpha2Code("BR"));
+		assertEquals(BRAZIL_NAME, validator.resolveNameByIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 	
 	@Test
 	@DisplayName("Deve propagar exceção ao receber código inválido")
 	void resolveNameByIsoAlpha2Code_throwsExceptionForInvalidCode() {
-		Assertions.assertThrows(
+		assertThrows(
 			IllegalArgumentException.class,
-			() -> validator.resolveNameByIsoAlpha2Code("UR"));
+			() -> validator.resolveNameByIsoAlpha2Code(INVALID_COUNTRY_CODE));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar nome de país após receber 'isoAlpha2Code' já validado")
 	void getNameByValidatedAndNormalizedIsoAlpha2Code_returnsCountryName() {
-		assertEquals("Brazil", validator.getNameByValidatedAndNormalizedIsoAlpha2Code("BR"));
+		assertEquals(BRAZIL_NAME, validator.getNameByValidatedAndNormalizedIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 }

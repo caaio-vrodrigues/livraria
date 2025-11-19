@@ -1,10 +1,12 @@
 package caio.portfolio.livraria.service.country;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,25 +20,37 @@ class CountryValidatorImplTest {
 	@InjectMocks 
 	private CountryValidatorImpl validator;
 	
-	private Set<String> testCodes;
+	private static final String RAW_BRAZIL_CODE = "br ";
+	private static final String BRAZIL_NAME = "Brazil";
+	private static final String VALID_BRAZIL_CODE = "BR";
+	private static final String VALID_ITALY_CODE = "IT";
+	private static final String VALID_ARGENTINA_CODE = "AR";
+	private static final String VALID_FRANCE_CODE = "FR";
+	private static final String RAW_FRANCE_CODE = "fr ";
+	private static final String INVALID_COUNTRY_CODE = "UR";
+	
+	private static final Set<String> CODES_LIST = new HashSet<>();
 	
 	@BeforeEach
 	void setUp() {
-		testCodes = Set.of("BR", "IT", "AR", "FR");
-		validator = new CountryValidatorImpl(testCodes);
+		CODES_LIST.add(VALID_BRAZIL_CODE);
+		CODES_LIST.add(VALID_ITALY_CODE);
+		CODES_LIST.add(VALID_ARGENTINA_CODE);
+		CODES_LIST.add(VALID_FRANCE_CODE);
+		validator = new CountryValidatorImpl(CODES_LIST);
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'isoAlpha2Code' normalizado caso seja um valor válido")
     void processIsoAlpha2Code_returnsValidIsoAlpha2Code() {
-        assertEquals("BR", validator.processIsoAlpha2Code("br"));
-        assertEquals("FR", validator.processIsoAlpha2Code(" fr "));
+        assertEquals(VALID_BRAZIL_CODE, validator.processIsoAlpha2Code(RAW_BRAZIL_CODE));
+        assertEquals(VALID_FRANCE_CODE, validator.processIsoAlpha2Code(RAW_FRANCE_CODE));
     }
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento nulo")
 	void processIsoAlpha2Code_throwsExceptionForNull() {
-        Assertions.assertThrows(
+        assertThrows(
         	IllegalArgumentException.class, 
         	() -> validator.processIsoAlpha2Code(null));
     }
@@ -44,7 +58,7 @@ class CountryValidatorImplTest {
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento vazio")
     void processIsoAlpha2Code_throwsExceptionForBlank() {
-		Assertions.assertThrows(
+		assertThrows(
 			IllegalArgumentException.class, 
 			() -> validator.processIsoAlpha2Code("  "));
     }
@@ -52,30 +66,30 @@ class CountryValidatorImplTest {
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' ao enviar argumento inválido")
     void processIsoAlpha2Code_throwsExceptionForInvalidCode() {
-        IllegalArgumentException exception = Assertions.assertThrows(
+        IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class, 
-            () -> validator.processIsoAlpha2Code("UR")
+            () -> validator.processIsoAlpha2Code(INVALID_COUNTRY_CODE)
         );
-        Assertions.assertTrue(exception.getMessage().contains("UR"));
+        assertTrue(exception.getMessage().contains(INVALID_COUNTRY_CODE));
     }
 	
 	@Test
 	@DisplayName("Deve retornar nome de país ao receber 'isoAlpha2Code' para validação")
 	void resolveNameByIsoAlpha2Code_returnsCountryName() {
-		assertEquals("Brazil", validator.resolveNameByIsoAlpha2Code("BR"));
+		assertEquals(BRAZIL_NAME, validator.resolveNameByIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 	
 	@Test
 	@DisplayName("Deve propagar exceção ao receber código inválido")
 	void resolveNameByIsoAlpha2Code_throwsExceptionForInvalidCode() {
-		Assertions.assertThrows(
+		assertThrows(
 			IllegalArgumentException.class,
-			() -> validator.resolveNameByIsoAlpha2Code("UR"));
+			() -> validator.resolveNameByIsoAlpha2Code(INVALID_COUNTRY_CODE));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar nome de país após receber 'isoAlpha2Code' já validado")
 	void getNameByValidatedAndNormalizedIsoAlpha2Code_returnsCountryName() {
-		assertEquals("Brazil", validator.getNameByValidatedAndNormalizedIsoAlpha2Code("BR"));
+		assertEquals(BRAZIL_NAME, validator.getNameByValidatedAndNormalizedIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 }

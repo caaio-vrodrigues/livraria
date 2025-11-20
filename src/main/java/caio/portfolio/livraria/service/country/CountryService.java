@@ -3,6 +3,7 @@ package caio.portfolio.livraria.service.country;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,16 @@ public class CountryService {
 	    return repo.findById(id).orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'id': "+id));
 	}
 	
+	private void saveAndDealingConcurrency(Country country) {
+		try {
+			repo.saveAndFlush(country);
+		}
+		catch(DataIntegrityViolationException e) {
+			Optional<Country> concurrentlyCreatedCountry = repo.findByIsoAlpha2Code(country.getIsoAlpha2Code());
+			if(concurrentlyCreatedCountry.isEmpty()) throw new RuntimeException("Falah ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
+		}
+	}
+	
 	@Transactional
 	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
 		String validIsoAlpha2Code = countryValidator.processIsoAlpha2Code(createCountryDTO.getIsoAlpha2Code());
@@ -50,7 +61,7 @@ public class CountryService {
 			.isoAlpha2Code(validIsoAlpha2Code)
 			.name(validCountryName)
 			.build();
-		repo.saveAndFlush(newCountry);
+		saveAndDealingConcurrency(newCountry);
 		ResponseCountryDTO respCountryDTO = responseCountryDTOCreator.toResponseCountryDTO(newCountry);
 		return CountryResultImplDTO.builder()
 			.country(respCountryDTO)

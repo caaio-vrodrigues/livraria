@@ -7,7 +7,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.CountryNotFoundException;
+import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
+import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
@@ -40,7 +41,7 @@ public class CountryService {
 		}
 		catch(DataIntegrityViolationException e) {
 			Optional<Country> concurrentlyCreatedCountry = repo.findByIsoAlpha2Code(country.getIsoAlpha2Code());
-			if(concurrentlyCreatedCountry.isEmpty()) throw new RuntimeException("Falah ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
+			if(concurrentlyCreatedCountry.isEmpty()) throw new ConcurrentCountryException("Falha ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
 		}
 	}
 	

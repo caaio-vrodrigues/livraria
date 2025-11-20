@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.exception.custom;
+package caio.portfolio.livraria.exception.custom.country;
 
 public class CountryNotFoundException extends RuntimeException {
 

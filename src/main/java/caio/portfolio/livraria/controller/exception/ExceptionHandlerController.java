@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -52,6 +53,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(ConcurrentCountryException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ResponseEntity<Object> handleConcurrentCountryException(
+		ConcurrentCountryException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.CONFLICT,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Falha ao tentar salvar país devido a concorrência durante persistência de dados"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
 	
 	@ExceptionHandler(HandlerMethodValidationException.class)

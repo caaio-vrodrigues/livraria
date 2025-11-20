@@ -35,13 +35,14 @@ public class CountryService {
 	    return repo.findById(id).orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'id': "+id));
 	}
 	
-	private void saveAndDealingConcurrency(Country country) {
+	private Country saveAndDealingConcurrency(Country country) {
 		try {
-			repo.saveAndFlush(country);
+			return repo.saveAndFlush(country);
 		}
 		catch(DataIntegrityViolationException e) {
 			Optional<Country> concurrentlyCreatedCountry = repo.findByIsoAlpha2Code(country.getIsoAlpha2Code());
 			if(concurrentlyCreatedCountry.isEmpty()) throw new ConcurrentCountryException("Falha ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
+			return concurrentlyCreatedCountry.get();
 		}
 	}
 	
@@ -62,7 +63,7 @@ public class CountryService {
 			.isoAlpha2Code(validIsoAlpha2Code)
 			.name(validCountryName)
 			.build();
-		saveAndDealingConcurrency(newCountry);
+		newCountry = saveAndDealingConcurrency(newCountry);
 		ResponseCountryDTO respCountryDTO = responseCountryDTOCreator.toResponseCountryDTO(newCountry);
 		return CountryResultImplDTO.builder()
 			.country(respCountryDTO)
@@ -85,8 +86,15 @@ public class CountryService {
 	}
 	
 	@Transactional(readOnly=true)
-	public ResponseCountryDTO getCountryById(Integer id){
+	public ResponseCountryDTO getResponseCountryDTOById(Integer id){
 		Country country = resolveFindCountryById(id);
 		return responseCountryDTOCreator.toResponseCountryDTO(country);
+	}
+	
+	@Transactional(readOnly=true)
+	public Country getCountryById(Integer id) {
+		Optional<Country> countryOptional = repo.findById(id);
+		if(countryOptional.isEmpty()) throw new CountryNotFoundException("País não encontrado para o 'id': "+id);
+		return countryOptional.get();
 	}
 }

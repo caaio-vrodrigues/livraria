@@ -55,6 +55,6 @@ public class CountryController {
 		@Positive(message="ID deve ser um número maior que '0'") 
 		Integer id
 	) {
-		return ResponseEntity.ok(service.getCountryById(id));
+		return ResponseEntity.ok(service.getResponseCountryDTOById(id));
 	}
 }

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of="isoAlpha2Code")
 @Builder
 public class Country {
 

@@ -14,6 +14,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateAuthorDTO {
+	
+	@NotBlank(message="O campo 'alias' não pode estar vazio")
+	private String alias;
 
 	@NotBlank(message="O campo 'fullName' não pode estar vazio")
 	private String fullName;

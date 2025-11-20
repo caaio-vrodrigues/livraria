@@ -19,6 +19,9 @@ public class ResponseAuthorDTO {
 	
 	@NotNull(message="O campo 'id' não pode ser nulo")
 	private Long id;
+	
+	@NotBlank(message="O campo 'alias' não pode estar vazio")
+	private String alias;
 
 	@NotBlank(message="O campo 'fullName' não pode estar vazio")
 	private String fullName;

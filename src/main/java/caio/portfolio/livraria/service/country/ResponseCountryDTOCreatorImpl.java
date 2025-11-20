@@ -1,12 +1,12 @@
 package caio.portfolio.livraria.service.country;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
 
-@Service
+@Component
 public class ResponseCountryDTOCreatorImpl implements ResponseCountryDTOCreator {
 
 	@Override

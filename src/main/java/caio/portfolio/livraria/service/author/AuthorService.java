@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,5 +63,10 @@ public class AuthorService {
 	public ResponseAuthorDTO getAuthorById(Long id) {
 		return responseAuthorDTOCreator.toResponseAuthorDTO(repo.findById(id).orElseThrow(() -> 
 			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': "+id)));
+	}
+
+	public ResponseAuthorDTO getAuthorByAlias(String alias) {
+		// TODO
+		return null;
 	}
 }

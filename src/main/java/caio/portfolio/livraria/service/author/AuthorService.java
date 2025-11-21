@@ -55,4 +55,9 @@ public class AuthorService {
 			.map(responseAuthorDTOCreator::toResponseAuthorDTO)
 			.toList();
 	}
+
+	public ResponseAuthorDTO getAuthorById(Long id) {
+		// TODO 
+		return null;
+	}
 }

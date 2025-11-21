@@ -72,7 +72,7 @@ class CountryServiceTest {
 		when(repo.findById(1)).thenReturn(Optional.of(BRAZIL));
 		when(responseCountryDTOCreator.toResponseCountryDTO(BRAZIL))
 			.thenReturn(RESPONSE_BRAZILDTO);
-		ResponseCountryDTO result = service.getCountryById(1);
+		ResponseCountryDTO result = service.getResponseCountryDTOById(1);
 		assertNotNull(result);
 		assertEquals(1, result.getId());
 	 }

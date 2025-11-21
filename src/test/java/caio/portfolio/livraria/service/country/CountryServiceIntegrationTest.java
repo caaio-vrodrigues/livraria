@@ -47,7 +47,7 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/insert_country_list.sql")
 	@DisplayName("Deve retornar país ao buscar com 'id' existente")
 	void getCountryById_returnsCountry() {
-		ResponseCountryDTO brazilRespDTO = service.getCountryById(1);
+		ResponseCountryDTO brazilRespDTO = service.getResponseCountryDTOById(1);
 		assertNotNull(brazilRespDTO);
 		assertEquals(BRAZIL_VALID_CODE, brazilRespDTO.getIsoAlpha2Code());
 	}

@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.author;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,5 +45,9 @@ public class AuthorService {
 			.build();
 		newAuthor = saveAndHandleConcurrentyAuthor(newAuthor);
 		return responseAuthorDTOCreator.toResponseAuthorDTO(newAuthor);
+	}
+
+	public List<ResponseAuthorDTO> getAllAuthors() {
+		return null;
 	}
 }

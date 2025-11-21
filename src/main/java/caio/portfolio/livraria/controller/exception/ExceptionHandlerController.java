@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
+import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +55,36 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(ConcurrentAuthorException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ResponseEntity<Object> handleConcurrentAuthorException(
+		ConcurrentAuthorException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.CONFLICT,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Não foi possível criar um novo autor por violação de concorrência"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+	}
+	
+	@ExceptionHandler(AuthorNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ResponseEntity<Object> handleAuthorNotFoundException(
+		AuthorNotFoundException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.NOT_FOUND,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Não foi possível encontrar um autor para o argumento fornecido"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(AuthorAlreadyExistsException.class)

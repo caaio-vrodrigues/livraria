@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
+import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
@@ -30,7 +32,7 @@ public class AuthorService {
 		}
 		catch(DataIntegrityViolationException e) {
 			Optional<Author> authorOptional = repo.findByAlias(author.getAlias());
-			if(authorOptional.isEmpty()) throw new RuntimeException("Falha ao tentar criar autor com 'alias': "+author.getAlias()+"; 'fullName': "+author.getFullName()+"; 'birthday': "+author.getBirthday()+"; 'countryId': "+author.getCountry().getId());
+			if(authorOptional.isEmpty()) throw new ConcurrentAuthorException("Falha ao tentar criar autor com 'alias': "+author.getAlias()+"; 'fullName': "+author.getFullName()+"; 'birthday': "+author.getBirthday()+"; 'countryId': "+author.getCountry().getId());
 			return authorOptional.get();
 		}
 	}
@@ -59,6 +61,6 @@ public class AuthorService {
 	@Transactional(readOnly=true)
 	public ResponseAuthorDTO getAuthorById(Long id) {
 		return responseAuthorDTOCreator.toResponseAuthorDTO(repo.findById(id).orElseThrow(() -> 
-			new RuntimeException("Não foi possível encontrar um autor com 'id': "+id)));
+			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': "+id)));
 	}
 }

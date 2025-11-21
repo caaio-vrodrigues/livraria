@@ -26,7 +26,10 @@ public class CountryService {
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
 	
-	private Country resolveFindCountryByIsoAlpha2Code(String validIsoAlpha2Code, String originalCode) {
+	private Country resolveFindCountryByIsoAlpha2Code(
+		String validIsoAlpha2Code, 
+		String originalCode
+	) {
 	    return repo.findByIsoAlpha2Code(validIsoAlpha2Code).orElseThrow(() -> 
 	    	new CountryNotFoundException("País não encontrado para o 'isoAlpha2Code': "+originalCode));
 	}
@@ -40,35 +43,53 @@ public class CountryService {
 			return repo.saveAndFlush(country);
 		}
 		catch(DataIntegrityViolationException e) {
-			Optional<Country> concurrentlyCreatedCountry = repo.findByIsoAlpha2Code(country.getIsoAlpha2Code());
+			Optional<Country> concurrentlyCreatedCountry = repo
+				.findByIsoAlpha2Code(country.getIsoAlpha2Code());
 			if(concurrentlyCreatedCountry.isEmpty()) throw new ConcurrentCountryException("Falha ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
 			return concurrentlyCreatedCountry.get();
 		}
 	}
 	
-	@Transactional
-	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
-		String validIsoAlpha2Code = countryValidator.processIsoAlpha2Code(createCountryDTO.getIsoAlpha2Code());
-		Optional<Country> countryOptional = repo.findByIsoAlpha2Code(validIsoAlpha2Code);
+	private CountryResultImplDTO returnResultWithExistentCountry(String isoAlpha2Code) {
+		Optional<Country> countryOptional = repo.findByIsoAlpha2Code(isoAlpha2Code);
 		boolean countryAlreadyExists = countryOptional.isPresent();
 		if(countryAlreadyExists) {
-			ResponseCountryDTO respCountryDTO = responseCountryDTOCreator.toResponseCountryDTO(countryOptional.get());
+			ResponseCountryDTO respCountryDTO = responseCountryDTOCreator
+				.toResponseCountryDTO(countryOptional.get());
 			return CountryResultImplDTO.builder()
 				.country(respCountryDTO)
 				.created(false)
 				.build();
 		}
-		String validCountryName = countryValidator.getNameByValidatedAndNormalizedIsoAlpha2Code(validIsoAlpha2Code);
+		return null;
+	}
+	
+	private CountryResultImplDTO returnResultWithNewCountry(String isoAlpha2Code) {
+		String validCountryName = countryValidator
+			.getNameByValidatedAndNormalizedIsoAlpha2Code(isoAlpha2Code);
 		Country newCountry = Country.builder()
-			.isoAlpha2Code(validIsoAlpha2Code)
+			.isoAlpha2Code(isoAlpha2Code)
 			.name(validCountryName)
 			.build();
 		newCountry = saveAndDealingConcurrency(newCountry);
-		ResponseCountryDTO respCountryDTO = responseCountryDTOCreator.toResponseCountryDTO(newCountry);
+		ResponseCountryDTO respCountryDTO = responseCountryDTOCreator
+			.toResponseCountryDTO(newCountry);
 		return CountryResultImplDTO.builder()
 			.country(respCountryDTO)
 			.created(true)
 			.build();
+	}
+	
+	@Transactional
+	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
+		String validIsoAlpha2Code = countryValidator
+			.processIsoAlpha2Code(createCountryDTO.getIsoAlpha2Code());
+		CountryResultImplDTO resullWithExistentCountry = 
+			returnResultWithExistentCountry(validIsoAlpha2Code);
+		if(resullWithExistentCountry != null) return resullWithExistentCountry;
+		CountryResultImplDTO resullWithCreatedCountry = 
+			returnResultWithNewCountry(validIsoAlpha2Code);
+		return resullWithCreatedCountry;
 	}
 	
 	@Transactional(readOnly=true)
@@ -81,7 +102,9 @@ public class CountryService {
 	@Transactional(readOnly=true)
 	public ResponseCountryDTO getCountryByIsoAlpha2Code(String isoAlpha2Code) {
 		String validIsoAlpha2Code = countryValidator.processIsoAlpha2Code(isoAlpha2Code);
-		Country country = resolveFindCountryByIsoAlpha2Code(validIsoAlpha2Code, isoAlpha2Code);
+		Country country = resolveFindCountryByIsoAlpha2Code(
+			validIsoAlpha2Code, 
+			isoAlpha2Code);
 		return responseCountryDTOCreator.toResponseCountryDTO(country);
 	}
 	

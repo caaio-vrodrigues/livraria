@@ -14,6 +14,7 @@ import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
+import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
 import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
 import caio.portfolio.livraria.service.country.CountryService;
@@ -70,5 +71,10 @@ public class AuthorService {
 		Optional<Author> authorOptional = repo.findByAlias(alias);
 		if(authorOptional.isEmpty()) throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'alias': '"+alias+"'");
 		return responseAuthorDTOCreator.toResponseAuthorDTO(authorOptional.get());
+	}
+
+	public ResponseAuthorDTO updateAuthor(Long id, UpdateAuthorDTO dto) {
+		// TODO
+		return null;
 	}
 }

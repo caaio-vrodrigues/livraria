@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
@@ -34,8 +35,7 @@ public class AuthorService {
 	
 	public ResponseAuthorDTO createAuthor(CreateAuthorDTO dto) {
 		Optional<Author> authorOptional = repo.findByAlias(dto.getAlias());
-		if(authorOptional.isPresent()) 
-			return responseAuthorDTOCreator.toResponseAuthorDTO(authorOptional.get());
+		if(authorOptional.isPresent()) throw new AuthorAlreadyExistsException("'alias': '"+dto.getAlias()+"' já está sendo utilizado pelo autor: '"+authorOptional.get().getFullName()+"'");
 		Author newAuthor = Author.builder()
 			.alias(dto.getAlias())
 			.fullName(dto.getFullName())

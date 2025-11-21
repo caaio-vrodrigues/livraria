@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.controller.livraria.country;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,6 @@ public class AuthorController {
 	
 	@PostMapping
 	public ResponseEntity<ResponseAuthorDTO> newAuthor(@Valid @RequestBody CreateAuthorDTO dto){
-		return ResponseEntity.ok(service.createAuthor(dto));
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.createAuthor(dto));
 	}
 }

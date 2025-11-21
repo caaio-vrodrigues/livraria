@@ -56,8 +56,9 @@ public class AuthorService {
 			.toList();
 	}
 
+	@Transactional(readOnly=true)
 	public ResponseAuthorDTO getAuthorById(Long id) {
-		// TODO 
-		return null;
+		return responseAuthorDTOCreator.toResponseAuthorDTO(repo.findById(id).orElseThrow(() -> 
+			new RuntimeException("Não foi possível encontrar um autor com 'id': "+id)));
 	}
 }

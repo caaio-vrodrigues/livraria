@@ -33,7 +33,7 @@ public class AuthorService {
 		}
 		catch(DataIntegrityViolationException e) {
 			Optional<Author> authorOptional = repo.findByAlias(author.getAlias());
-			if(authorOptional.isEmpty()) throw new ConcurrentAuthorException("Falha ao tentar criar autor com 'alias': "+author.getAlias()+"; 'fullName': "+author.getFullName()+"; 'birthday': "+author.getBirthday()+"; 'countryId': "+author.getCountry().getId());
+			if(authorOptional.isEmpty()) throw new ConcurrentAuthorException("Falha ao tentar criar autor com 'alias': '"+author.getAlias()+"'; 'fullName': '"+author.getFullName()+"'; 'birthday': '"+author.getBirthday()+"'; 'countryId': '"+author.getCountry().getId()+"'");
 			return authorOptional.get();
 		}
 	}
@@ -62,11 +62,13 @@ public class AuthorService {
 	@Transactional(readOnly=true)
 	public ResponseAuthorDTO getAuthorById(Long id) {
 		return responseAuthorDTOCreator.toResponseAuthorDTO(repo.findById(id).orElseThrow(() -> 
-			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': "+id)));
+			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"'")));
 	}
 
+	@Transactional(readOnly=true)
 	public ResponseAuthorDTO getAuthorByAlias(String alias) {
-		// TODO
-		return null;
+		Optional<Author> authorOptional = repo.findByAlias(alias);
+		if(authorOptional.isEmpty()) throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'alias': '"+alias+"'");
+		return responseAuthorDTOCreator.toResponseAuthorDTO(authorOptional.get());
 	}
 }

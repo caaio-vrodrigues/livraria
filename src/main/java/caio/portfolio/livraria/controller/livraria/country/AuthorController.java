@@ -50,7 +50,7 @@ public class AuthorController {
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponseAuthorDTO> editAuthorById(
 		@PathVariable Long id,
-		@RequestBody UpdateAuthorDTO dto
+		@Valid @RequestBody UpdateAuthorDTO dto
 	){
 		return ResponseEntity.ok(service.updateAuthor(id, dto));
 	}

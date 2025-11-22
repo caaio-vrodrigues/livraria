@@ -1,11 +1,9 @@
 package caio.portfolio.livraria.service.author;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +14,6 @@ import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
-import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
 import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
 import caio.portfolio.livraria.service.country.CountryService;
@@ -78,45 +75,20 @@ public class AuthorService {
 
 	@Transactional
 	public ResponseAuthorDTO updateAuthor(Long id, UpdateAuthorDTO dto) {
-		
 		Optional<Author> existingAuthor = repo.findById(id);
 		if(existingAuthor.isEmpty()) throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações");
-		
-		String updatedAlias = existingAuthor.get().getAlias();
-		boolean containsAliasAndIsDifferent = dto.getAlias() != null && 
-			!existingAuthor.get().getAlias().equals(dto.getAlias());
-		if(containsAliasAndIsDifferent) {
-			Optional<Author> authorUsingExpectedAlias = repo.findByAlias(dto.getAlias());
-			if(authorUsingExpectedAlias.isPresent()) throw new AuthorAlreadyExistsException("'alias': '"+dto.getAlias()+"' já está sendo utilizado pelo autor: '"+authorUsingExpectedAlias.get().getFullName()+"'");
-			updatedAlias = dto.getAlias();
-		}
-		
-		String updatedFullName = existingAuthor.get().getFullName();
-		boolean containsFullNameAndIsDifferent = dto.getFullName() != null && 
-			!existingAuthor.get().getFullName().equals(dto.getFullName());
-		if(containsFullNameAndIsDifferent) updatedFullName = dto.getFullName();
-		
-		LocalDate updatedBirthday = existingAuthor.get().getBirthday();
-		boolean containsBirthdayAndIsDifferent = dto.getBirthday() != null && 
-			!existingAuthor.get().getBirthday().equals(dto.getBirthday());
-		if(containsBirthdayAndIsDifferent) updatedBirthday = dto.getBirthday();
-		
-		Country updatedCountry = existingAuthor.get().getCountry();
-		boolean containsCountryIdAndIsDifferent = dto.getCountryId() != null && 
-			!existingAuthor.get().getCountry().getId().equals(dto.getCountryId());
-		if(containsCountryIdAndIsDifferent) 
-			updatedCountry = countryService.getCountryById(dto.getCountryId());
-		
 		Author updatedAuthor = Author.builder()
 			.id(existingAuthor.get().getId())
-			.alias(updatedAlias)
-			.fullName(updatedFullName)
-			.birthday(updatedBirthday)
-			.country(updatedCountry)
+			.alias(authorupdateValidator.validateAlias(
+				existingAuthor.get().getAlias(), dto.getAlias()))
+			.fullName(authorupdateValidator.validateFullName(
+				existingAuthor.get().getFullName(), dto.getFullName()))
+			.birthday(authorupdateValidator.validateBirthday(
+				existingAuthor.get().getBirthday(), dto.getBirthday()))
+			.country(authorupdateValidator.validateCountry(
+				existingAuthor.get().getCountry(), dto.getCountryId()))
 			.build();
-		
 		saveAndHandleConcurrentyAuthor(updatedAuthor);
-		
 		return responseAuthorDTOCreator.toResponseAuthorDTO(updatedAuthor);
 	}
 }

@@ -52,9 +52,7 @@ public class AuthorUpdateValidatorImpl implements AuthorUpdateValidator {
 	public Country validateCountry(Country existingCountry, Integer countryIdToUpdate) {
 		boolean containsCountryIdAndIsDifferent = countryIdToUpdate != null && 
 			!existingCountry.getId().equals(countryIdToUpdate);
-		if(containsCountryIdAndIsDifferent) {
-			return countryService.getCountryById(countryIdToUpdate);
-		}
+		if(containsCountryIdAndIsDifferent) return countryService.getCountryById(countryIdToUpdate);
 		return existingCountry;
 	}
 }

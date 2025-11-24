@@ -44,7 +44,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar país ao buscar com 'id' existente")
 	void getCountryById_returnsCountry() {
 		ResponseCountryDTO brazilRespDTO = service.getResponseCountryDTOById(1);
@@ -54,7 +54,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'id' inexistente")
 	void getCountryById_returnsException() {
 		assertThrows(
@@ -65,7 +65,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar país ao buscar com 'isoAlpha2Code' existente")
 	void getCountryByIsoAlpha2Code_returnsCountry() {
 		ResponseCountryDTO result = service.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
@@ -75,7 +75,7 @@ class CountryServiceIntegrationTest {
 	 
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'isoAlpha2Code' não existente")
 	void getCountryByIsoAlpha2Code_returnsException() {
 	    assertThrows(
@@ -86,7 +86,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar 'IllegalArgumentException' ao buscar com 'isoAlpha2Code' inválido")
 	void getCountryByIsoAlpha2Code_returnsIllegalArgExcep() {
 	    assertThrows(
@@ -97,7 +97,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional(readOnly=true)
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar lista de dto's de países quando existem países cadastrados")
 	void getAllCountries_returnsResponseCountryDTOList() {
 		List<ResponseCountryDTO> result = service.getAllCountries();
@@ -119,7 +119,7 @@ class CountryServiceIntegrationTest {
 	
 	@Test
 	@Transactional
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar país existente quando 'isoAlpha2Code' já está cadastrado")
 	void createOrFindCountry_returnsExistingCountry() {
 		CountryResultImplDTO result = service.createOrFindCountry(CREATE_BRAZIL_DTO);
@@ -144,7 +144,7 @@ class CountryServiceIntegrationTest {
 	 
 	@Test
 	@Transactional
-	@Sql("/sql/insert_country_list.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Não deve salvar quando país já existe")
 	void createOrFindCountry_doesNotSaveWhenCountryExists() {
 		long initialCount = repo.count();

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.controller.livraria.country;
+package caio.portfolio.livraria.controller.livraria.author;
 
 import java.util.List;
 

@@ -1,6 +1,5 @@
-package caio.portfolio.livraria.infrastructure.entity.author;
+package caio.portfolio.livraria.infrastructure.entity.publisher;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
@@ -18,37 +17,35 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Builder
 @Entity
-@Table(name="author")
-public class Author {
+@Table(name="publisher")
+public class Publisher {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="alias", nullable=false, unique=true)
-	private String alias;
-	
-	@Column(name="fullname", nullable=false)
-	private String fullName;
-	
-	@Column(name="birthday", nullable=false)
-	private LocalDate birthday;
+	@Column(name="name", nullable=false)
+	private String name;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="country_id", nullable=false)
+	@JoinColumn(name="countryId", nullable=false)
 	private Country country;
+	
+	@Column(name="full_address", nullable=false, unique=true)
+	private String fullAddress;
 	
 	@Override
     public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
-        return id != null && id.equals(author.id);
+        Publisher publisher = (Publisher) o;
+        return id != null && id.equals(publisher.id);
     }
 
     @Override

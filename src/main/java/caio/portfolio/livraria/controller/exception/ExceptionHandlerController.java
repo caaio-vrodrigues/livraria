@@ -20,6 +20,7 @@ import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
+import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -58,6 +59,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(ConcurrentPublisherException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ResponseEntity<Object> handleConcurrentPublisherException(
+		ConcurrentPublisherException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.CONFLICT,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Não foi possível criar uma nova editora por violação de concorrência"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
 	
 	@ExceptionHandler(PublisherAlreadyExistsException.class)

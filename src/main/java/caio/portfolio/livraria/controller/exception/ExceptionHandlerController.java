@@ -1,5 +1,7 @@
 package caio.portfolio.livraria.controller.exception;
 
+import org.springframework.http.converter.HttpMessageNotReadableException;
+
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,6 +57,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<Object> handleHttpMessageNotReadableException(
+	    HttpMessageNotReadableException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.BAD_REQUEST,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Corpo da requisição ilegível ou malformado. Verifique a sintaxe."
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(ConcurrentAuthorException.class)

@@ -34,6 +34,7 @@ class PublisherUpdateValidatorImplTest {
 	private static final String ITALY_ISO_CODE = "IT";
 	private static final String ROCCO_FULL_ADDRESS = "Rua do Passeio, 38, 11º andar, no Passeio Corporate";
 	private static final String ROCCO_NEW_FULL_ADDRESS = "Rua do Passeio, 888, 8º andar, no Passeio Corporate";
+	private static final String GLOBAL_BOOKS_FULL_ADDRESS = "123 Main Street, New York, USA";
 	private static final Integer BRAZIL_ID = 1;
 	private static final Integer ITALY_ID = 2;
 	private static final Integer INVALID_COUNTRY_ID = 300;
@@ -168,13 +169,13 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e valor já existente para lançar 'PublisherAlreadyExistsException'")
 	void validateFullAddress_throwsPublisherAlreadyExistsException() {
-		Mockito.when(repo.findByFullAddress(ROCCO_NEW_FULL_ADDRESS))
+		Mockito.when(repo.findByFullAddress(GLOBAL_BOOKS_FULL_ADDRESS))
 			.thenThrow(new PublisherAlreadyExistsException("'fullAddress' em uso"));
 		Assertions.assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> publisherUpdateValidatorImpl.validateFullAddress(
 					ROCCO_PUBLISHER.getFullAddress(), 
-					ROCCO_NEW_FULL_ADDRESS));
+					GLOBAL_BOOKS_FULL_ADDRESS));
 		Mockito.verify(repo).findByFullAddress(Mockito.anyString());
 	}
 }

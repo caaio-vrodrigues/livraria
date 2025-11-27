@@ -48,7 +48,7 @@ public class PublisherService {
 	}
 
 	public List<ResponsePublisherDTO> getAllPublishers() {
-		// TODO
-		return null;
+		return repo.findAll().stream()
+			.map(responsePublisherDTOCreator::toResponsePublisherDTO).toList();
 	}
 }

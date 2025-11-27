@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.publisher;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,5 +45,10 @@ public class PublisherService {
 			.build();
 		newPublisher = saveAndHandlePublisherConcurrency(newPublisher);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(newPublisher);
+	}
+
+	public List<ResponsePublisherDTO> getAllPublishers() {
+		// TODO
+		return null;
 	}
 }

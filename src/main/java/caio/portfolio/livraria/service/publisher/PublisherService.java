@@ -58,4 +58,10 @@ public class PublisherService {
 		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
 	}
+
+	public ResponsePublisherDTO getPublisherById(Long id) {
+		Optional<Publisher> publisherOptional = repo.findById(id);
+		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
+		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.CreatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePublisherDTO;
@@ -50,5 +51,11 @@ public class PublisherService {
 	public List<ResponsePublisherDTO> getAllPublishers() {
 		return repo.findAll().stream()
 			.map(responsePublisherDTOCreator::toResponsePublisherDTO).toList();
+	}
+	
+	public ResponsePublisherDTO getPublisherByFullAddress(String fullAddress) {
+		Optional<Publisher> publisherOptional = repo.findByFullAddress(fullAddress);
+		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress);
+		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
 	}
 }

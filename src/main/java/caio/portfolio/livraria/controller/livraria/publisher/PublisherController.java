@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.CreatePublisherDTO;
@@ -33,5 +34,10 @@ public class PublisherController {
 	@GetMapping
 	public ResponseEntity<List<ResponsePublisherDTO>> searchAllPublishers(){
 		return ResponseEntity.ok(service.getAllPublishers());
+	}
+	
+	@GetMapping("/full-address")
+	public ResponseEntity<ResponsePublisherDTO> searchPublisherByFullAddress(@RequestParam String fullAddress){
+		return ResponseEntity.ok(service.getPublisherByFullAddress(fullAddress));
 	}
 }

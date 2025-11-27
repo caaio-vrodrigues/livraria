@@ -22,6 +22,7 @@ import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryExcepti
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -59,6 +60,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(PublisherNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ResponseEntity<Object> handlePublisherNotFoundException(
+		PublisherNotFoundException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.NOT_FOUND,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Não foi possível encontrar uma editora para o argumento fornecido"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(ConcurrentPublisherException.class)

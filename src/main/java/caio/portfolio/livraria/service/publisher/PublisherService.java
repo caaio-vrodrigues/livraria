@@ -15,6 +15,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import caio.portfolio.livraria.service.publisher.model.ResponsePublisherDTOCreator;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class PublisherService {
 	private final PublisherRepository repo;
 	private final CountryService countryService;
 	private final ResponsePublisherDTOCreator responsePublisherDTOCreator;
+	private final PublisherUpdateValidator publisherUpdateValidator;
 	
 	private Publisher saveAndHandlePublisherConcurrency(Publisher publisher) {
 		try {
@@ -67,7 +69,18 @@ public class PublisherService {
 	}
 
 	public ResponsePublisherDTO updatePublisher(Long id, UpdatePublisherDTO dto) {
-		// TODO
-		return null;
+		Optional<Publisher> publisherOptional = repo.findById(id);
+		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
+		Publisher updatedPublisher = Publisher.builder()
+			.id(publisherOptional.get().getId())
+			.name(publisherUpdateValidator
+				.validateName(publisherOptional.get().getName(), dto.getName()))
+			.country(publisherUpdateValidator
+				.validateCountry(publisherOptional.get().getCountry(), dto.getCountryId()))
+			.fullAddress(publisherUpdateValidator
+				.validateFullAddress(publisherOptional.get().getFullAddress(), dto.getFullAddress()))
+			.build();
+		updatedPublisher = saveAndHandlePublisherConcurrency(updatedPublisher);
+		return responsePublisherDTOCreator.toResponsePublisherDTO(updatedPublisher);
 	}
 }

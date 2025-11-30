@@ -8,13 +8,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
-@EqualsAndHashCode(of="isbn")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -32,6 +30,6 @@ public abstract class Book {
 	@JoinColumn(name="publisher_id", nullable=false)
 	private Publisher publisher;
 	
-	@Column(name="isbn", nullable=false, unique=true)
+	@Column(name="isbn", nullable=false)
 	private String isbn;
 }

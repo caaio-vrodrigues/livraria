@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -43,13 +42,13 @@ public class Publisher {
 	@Override
     public boolean equals(Object o) {
         if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
+        if(!(o instanceof Publisher)) return false;
         Publisher publisher = (Publisher) o;
         return id != null && id.equals(publisher.id);
     }
 
-    @Override
+	@Override
     public int hashCode() {
-        return id != null ? Objects.hash(id) : 88;
+        return Objects.hash(id);
     }
 }

@@ -46,13 +46,13 @@ public class Author {
 	@Override
     public boolean equals(Object o) {
         if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
+        if(!(o instanceof Author)) return false;
         Author author = (Author) o;
         return id != null && id.equals(author.id);
     }
 
-    @Override
+	@Override
     public int hashCode() {
-        return id != null ? Objects.hash(id) : 88;
+        return Objects.hash(id);
     }
 }

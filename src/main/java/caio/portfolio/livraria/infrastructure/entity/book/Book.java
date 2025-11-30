@@ -2,7 +2,10 @@ package caio.portfolio.livraria.infrastructure.entity.book;
 
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
+import caio.portfolio.livraria.model.enums.Genre;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,6 +32,10 @@ public abstract class Book {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="publisher_id", nullable=false)
 	private Publisher publisher;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="genre", nullable=false)
+	private Genre genre;
 	
 	@Column(name="isbn", nullable=false)
 	private String isbn;

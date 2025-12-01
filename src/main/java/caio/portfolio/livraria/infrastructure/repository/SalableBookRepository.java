@@ -1,7 +1,13 @@
 package caio.portfolio.livraria.infrastructure.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
+import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 
-public interface SalableBookRepository extends JpaRepository<SalableBook, Long> {}
+public interface SalableBookRepository extends JpaRepository<SalableBook, Long> {
+	Optional<SalableBook> findByTitleAndAuthorAndPublisher(String title, Author author, Publisher publisher);
+}

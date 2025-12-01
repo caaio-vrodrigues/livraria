@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.controller.exception;
 
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.time.LocalDateTime;
@@ -270,6 +271,21 @@ public class ExceptionHandlerController {
 	        "Erro de validação nos campos da requisição",
 	        httpRequest.getRequestURI(),
 	        extractBindingResults(e)
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(HttpMessageConversionException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<Object> handleHttpMessageConversionException(
+		HttpMessageConversionException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.BAD_REQUEST,
+	        "Formato de requisição inválido ou dados incorretos. Verifique o JSON enviado",
+	        httpRequest.getRequestURI(),
+	        null
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}

@@ -6,9 +6,11 @@ import caio.portfolio.livraria.infrastructure.entity.book.dto.CreateBookDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
 @SuperBuilder
+@Jacksonized
 public class CreateSalableBookDTO extends CreateBookDTO {
 
 	@NotNull(message="O campo 'price' não pode ser nulo")

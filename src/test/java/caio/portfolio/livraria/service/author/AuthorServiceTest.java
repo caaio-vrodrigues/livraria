@@ -174,7 +174,7 @@ class AuthorServiceTest {
 		Mockito.when(repo.findAll()).thenReturn(AUTHOR_LIST);
 		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(Mockito.any(Author.class)))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO, RESPONSE_CAIO_VINICIUS_RODRIGUES_DTO);
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllAuthors();
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
 		Assertions.assertNotNull(responseAuthorDTOList);
 		Assertions.assertEquals(2, responseAuthorDTOList.size());
 		Assertions.assertEquals(RESPONSE_PAULO_COELHO_DTO, responseAuthorDTOList.get(0));
@@ -188,7 +188,7 @@ class AuthorServiceTest {
 	@DisplayName("Deve retornar uma lista vazia ao chamar método sem argumentos")
 	void getAllAuthors_returnsEmptyList() {
 		Mockito.when(repo.findAll()).thenReturn(List.of());
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllAuthors();
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
 		Assertions.assertNotNull(responseAuthorDTOList);
 		Assertions.assertEquals(0, responseAuthorDTOList.size());
 		Mockito.verify(repo).findAll();
@@ -202,7 +202,7 @@ class AuthorServiceTest {
 		Mockito.when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.of(PAULO_COELHO));
 		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO responseAuthorDTO = authorService.getAuthorById(PAULO_COELHO_ID);
+		ResponseAuthorDTO responseAuthorDTO = authorService.getResponseAuthorDTOById(PAULO_COELHO_ID);
 		Assertions.assertNotNull(responseAuthorDTO);
 		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTO.getAlias());
 		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, responseAuthorDTO.getFullName());
@@ -230,7 +230,7 @@ class AuthorServiceTest {
 		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.of(PAULO_COELHO));
 		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO author = authorService.getAuthorByAlias(PAULO_COLEHO_ALIAS);
+		ResponseAuthorDTO author = authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
 		Assertions.assertNotNull(author);
 		Assertions.assertEquals(PAULO_COLEHO_ALIAS, author.getAlias());
 		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, author.getFullName());
@@ -246,7 +246,7 @@ class AuthorServiceTest {
 		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.empty());
 		Assertions.assertThrows(
 			AuthorNotFoundException.class, 
-			() -> authorService.getAuthorByAlias(PAULO_COLEHO_ALIAS));
+			() -> authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS));
 		Mockito.verify(repo).findByAlias(Mockito.anyString());
 		Mockito.verify(responseAuthorDTOCreator, Mockito.never())
 			.toResponseAuthorDTO(Mockito.any(Author.class));

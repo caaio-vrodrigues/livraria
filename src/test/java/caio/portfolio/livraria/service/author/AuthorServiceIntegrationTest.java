@@ -74,7 +74,7 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar uma lista de 'ResponseAuthorDTO' ao chamar método sem argumentos")
 	void getAllAuthors_returnsResponseAuthorDTOList() {
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllAuthors();
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
 		Assertions.assertNotNull(responseAuthorDTOList);
 		Assertions.assertEquals(6, responseAuthorDTOList.size());
 		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTOList.get(0).getAlias());
@@ -83,7 +83,7 @@ class AuthorServiceIntegrationTest {
 	@Test
 	@DisplayName("Deve retornar uma lista vazia ao chamar método sem argumentos")
 	void getAllAuthors_returnsEmptyList() {
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllAuthors();
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
 		Assertions.assertNotNull(responseAuthorDTOList);
 		Assertions.assertEquals(0, responseAuthorDTOList.size());
 	}
@@ -93,7 +93,7 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'id'")
 	void getAuthorById_returnsResponseAuthorDTO() {
-		ResponseAuthorDTO responseAuthorDTO = authorService.getAuthorById(PAULO_COELHO_ID);
+		ResponseAuthorDTO responseAuthorDTO = authorService.getResponseAuthorDTOById(PAULO_COELHO_ID);
 		Assertions.assertNotNull(responseAuthorDTO);
 		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTO.getAlias());
 		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, responseAuthorDTO.getFullName());
@@ -114,7 +114,7 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'alias'")
 	void getAuthorByAlias_returnsResponseAuthorDTO() {
-		ResponseAuthorDTO author = authorService.getAuthorByAlias(PAULO_COLEHO_ALIAS);
+		ResponseAuthorDTO author = authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
 		Assertions.assertNotNull(author);
 		Assertions.assertEquals(PAULO_COLEHO_ALIAS, author.getAlias());
 		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, author.getFullName());
@@ -127,7 +127,7 @@ class AuthorServiceIntegrationTest {
 	void getAuthorByAlias_throwsAuthorNotFoundException() {
 		Assertions.assertThrows(
 			AuthorNotFoundException.class, 
-			() -> authorService.getAuthorByAlias(PAULO_COLEHO_ALIAS));
+			() -> authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS));
 	}
 	
 	@Test

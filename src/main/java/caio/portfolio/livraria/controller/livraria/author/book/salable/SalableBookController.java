@@ -1,0 +1,30 @@
+package caio.portfolio.livraria.controller.livraria.author.book.salable;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
+import caio.portfolio.livraria.service.book.salable.SalableBookService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/books/salable")
+public class SalableBookController {
+
+	private final SalableBookService service;
+	
+	@PostMapping
+	public ResponseEntity<ResponseSalableBookDTO> newSalableBook(
+		@Valid @RequestBody CreateSalableBookDTO dto
+	){
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(service.createSalableBook(dto));
+	}
+}

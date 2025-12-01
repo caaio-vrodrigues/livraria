@@ -31,7 +31,7 @@ public class SalableBook extends Book {
 	private BigDecimal price;
 	
 	@Column(name="units", nullable=false)
-	private BigDecimal units;
+	private Integer units;
 	
 	@Override
 	public boolean equals(Object o) {

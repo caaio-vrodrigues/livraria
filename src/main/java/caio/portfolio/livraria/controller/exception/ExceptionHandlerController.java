@@ -18,6 +18,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
+import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
@@ -60,6 +61,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(SalableBookAlreadyExistsException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ResponseEntity<Object> handleSalableBookAlreadyExistsException(
+		SalableBookAlreadyExistsException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.CONFLICT,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Violação de unicidade ao tentar criar novo livro"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
 	
 	@ExceptionHandler(PublisherNotFoundException.class)

@@ -107,7 +107,7 @@ class PublisherServiceIntegrationTest {
 	@Sql("/sql/publisher/insert_publisher_list.sql")
 	@DisplayName("Deve retornar lista de 'ResponsePublisherDTO' ao chamar método")
 	void getAllPublishers_returnsResponsePublisherDTOList() {
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllPublishers();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
 		assertEquals(2, responsePublisherDTOListResult.size());
 		assertEquals(ROCCO_NAME, responsePublisherDTOListResult.get(0).getName());
 		assertEquals(GLOBAL_BOOKS_NAME, responsePublisherDTOListResult.get(1).getName());
@@ -116,7 +116,7 @@ class PublisherServiceIntegrationTest {
 	@Test
 	@DisplayName("Deve retornar lista vazia ao chamar método")
 	void getAllPublishers_returnsEmptyList() {
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllPublishers();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
 		assertEquals(0, responsePublisherDTOListResult.size());
 	}
 	
@@ -126,7 +126,7 @@ class PublisherServiceIntegrationTest {
 	@DisplayName("Deve receber 'fullAddress' para buscar editora e retornar 'ResponsePublisherDTO'")
 	void getPublisherByFullAddress_returnsResponsePublisherDTO() {
 		ResponsePublisherDTO responsePublisherDTO = service
-			.getPublisherByFullAddress(ROCCO_FULL_ADDRESS);
+			.getResponsePublisherDTOByFullAddress(ROCCO_FULL_ADDRESS);
 		assertNotNull(responsePublisherDTO);
 		assertEquals(
 			ROCCO_PUBLISHER.getId(), 
@@ -147,7 +147,7 @@ class PublisherServiceIntegrationTest {
 	void getPublisherByFullAddress_throwsPublisherNotFoundException() {
 		assertThrows(
 			PublisherNotFoundException.class,
-			() -> service.getPublisherByFullAddress(ROCCO_FULL_ADDRESS));
+			() -> service.getResponsePublisherDTOByFullAddress(ROCCO_FULL_ADDRESS));
 	}
 	
 	@Test
@@ -156,7 +156,7 @@ class PublisherServiceIntegrationTest {
 	@DisplayName("Deve receber 'id' para buscar editora e retornar 'ResponsePublisherDTO'")
 	void getPublisherById_returnsResponsePublisherDTO() {
 		ResponsePublisherDTO responsePublisherDTO = service
-			.getPublisherById(ROCCO_ID);
+			.getResponsePublisherDTOById(ROCCO_ID);
 		assertNotNull(responsePublisherDTO);
 		assertEquals(
 			ROCCO_PUBLISHER.getId(), 
@@ -177,7 +177,7 @@ class PublisherServiceIntegrationTest {
 	void getPublisherById_throwsPublisherNotFoundException() {
 		assertThrows(
 			PublisherNotFoundException.class,
-			() -> service.getPublisherById(ROCCO_ID));
+			() -> service.getResponsePublisherDTOById(ROCCO_ID));
 	}
 	
 	@Test

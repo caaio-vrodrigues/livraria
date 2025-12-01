@@ -36,19 +36,19 @@ public class PublisherController {
 	
 	@GetMapping
 	public ResponseEntity<List<ResponsePublisherDTO>> searchAllPublishers(){
-		return ResponseEntity.ok(service.getAllPublishers());
+		return ResponseEntity.ok(service.getAllResponsePublisherDTOs());
 	}
 	
 	@GetMapping("/full-address")
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherByFullAddress(
 		@RequestParam String fullAddress
 	) {
-		return ResponseEntity.ok(service.getPublisherByFullAddress(fullAddress));
+		return ResponseEntity.ok(service.getResponsePublisherDTOByFullAddress(fullAddress));
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherById(@PathVariable Long id){
-		return ResponseEntity.ok(service.getPublisherById(id));
+		return ResponseEntity.ok(service.getResponsePublisherDTOById(id));
 	}
 	
 	@PutMapping("/{id}")

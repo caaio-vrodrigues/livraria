@@ -214,7 +214,7 @@ class PublisherServiceTest {
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO, RESPONSE_GLOBAL_BOOKS_DTO);
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllPublishers();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
 		assertEquals(2, responsePublisherDTOListResult.size());
 		assertTrue(responsePublisherDTOListResult
 			.contains(RESPONSE_ROCCO_DTO));
@@ -230,7 +230,7 @@ class PublisherServiceTest {
 	void getAllPublishers_returnsEmptyList() {
 		when(repo.findAll())
 			.thenReturn(List.of());
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllPublishers();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
 		assertEquals(0, responsePublisherDTOListResult.size());
 		verify(repo).findAll();
 		verify(responsePublisherDTOCreator, never())
@@ -246,7 +246,7 @@ class PublisherServiceTest {
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO);
 		ResponsePublisherDTO responsePublisherDTO = service
-			.getPublisherByFullAddress(ROCCO_FULL_ADDRESS);
+			.getResponsePublisherDTOByFullAddress(ROCCO_FULL_ADDRESS);
 		assertNotNull(responsePublisherDTO);
 		assertEquals(
 			ROCCO_PUBLISHER.getId(), 
@@ -273,7 +273,7 @@ class PublisherServiceTest {
 			.thenReturn(Optional.empty());
 		assertThrows(
 			PublisherNotFoundException.class,
-			() -> service.getPublisherByFullAddress(ROCCO_FULL_ADDRESS));
+			() -> service.getResponsePublisherDTOByFullAddress(ROCCO_FULL_ADDRESS));
 		verify(repo)
 			.findByFullAddress(anyString());
 		verify(responsePublisherDTOCreator, never())
@@ -289,7 +289,7 @@ class PublisherServiceTest {
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO);
 		ResponsePublisherDTO responsePublisherDTO = service
-			.getPublisherById(ROCCO_ID);
+			.getResponsePublisherDTOById(ROCCO_ID);
 		assertNotNull(responsePublisherDTO);
 		assertEquals(
 			ROCCO_PUBLISHER.getId(), 
@@ -316,7 +316,7 @@ class PublisherServiceTest {
 			.thenReturn(Optional.empty());
 		assertThrows(
 			PublisherNotFoundException.class,
-			() -> service.getPublisherById(ROCCO_ID));
+			() -> service.getResponsePublisherDTOById(ROCCO_ID));
 		verify(repo)
 			.findById(anyLong());
 		verify(responsePublisherDTOCreator, never())

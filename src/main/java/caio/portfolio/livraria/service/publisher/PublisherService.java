@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
@@ -39,6 +40,7 @@ public class PublisherService {
 		}
 	}
 
+	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
 		Optional<Publisher> existingPublisher = repo.findByFullAddress(dto.getFullAddress());
 		if(existingPublisher.isPresent()) throw new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe");
@@ -51,23 +53,27 @@ public class PublisherService {
 		return responsePublisherDTOCreator.toResponsePublisherDTO(newPublisher);
 	}
 
-	public List<ResponsePublisherDTO> getAllPublishers() {
+	@Transactional(readOnly=true)
+	public List<ResponsePublisherDTO> getAllResponsePublisherDTOs() {
 		return repo.findAll().stream()
 			.map(responsePublisherDTOCreator::toResponsePublisherDTO).toList();
 	}
 	
-	public ResponsePublisherDTO getPublisherByFullAddress(String fullAddress) {
+	@Transactional(readOnly=true)
+	public ResponsePublisherDTO getResponsePublisherDTOByFullAddress(String fullAddress) {
 		Optional<Publisher> publisherOptional = repo.findByFullAddress(fullAddress);
 		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
 	}
 
-	public ResponsePublisherDTO getPublisherById(Long id) {
+	@Transactional(readOnly=true)
+	public ResponsePublisherDTO getResponsePublisherDTOById(Long id) {
 		Optional<Publisher> publisherOptional = repo.findById(id);
 		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
 	}
 
+	@Transactional
 	public ResponsePublisherDTO updatePublisher(Long id, UpdatePublisherDTO dto) {
 		Optional<Publisher> publisherOptional = repo.findById(id);
 		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
@@ -82,5 +88,11 @@ public class PublisherService {
 			.build();
 		updatedPublisher = saveAndHandlePublisherConcurrency(updatedPublisher);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(updatedPublisher);
+	}
+	
+	@Transactional(readOnly=true)
+	public Publisher getPublisherById(Long id) {
+		return repo.findById(id).orElseThrow(() -> 
+			new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id));
 	}
 }

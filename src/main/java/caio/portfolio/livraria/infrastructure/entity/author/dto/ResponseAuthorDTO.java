@@ -2,20 +2,16 @@ package caio.portfolio.livraria.infrastructure.entity.author.dto;
 
 import java.time.LocalDate;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Builder
 public class ResponseAuthorDTO {
 	
-	private Long id;
-	private String alias;
-	private String fullName;
-	private LocalDate birthday;
-	private Integer countryId;
+	private final Long id;
+	private final String alias;
+	private final String fullName;
+	private final LocalDate birthday;
+	private final Integer countryId;
 }

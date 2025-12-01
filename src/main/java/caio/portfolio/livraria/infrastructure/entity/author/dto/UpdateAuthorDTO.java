@@ -8,27 +8,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import caio.portfolio.livraria.serialization.LocalDateDesserializer;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Builder
 public class UpdateAuthorDTO {
 
 	@JsonDeserialize(using=LocalDateDesserializer.class)
 	@JsonFormat(pattern="yyyy-MM-dd")
-	private LocalDate birthday;
+	private final LocalDate birthday;
 	
 	@Positive(message ="id deve ser um valor maior que 0")
-	private Integer countryId;
+	private final Integer countryId;
 	
 	@Pattern(regexp="^(?!\s*$).+", message="alias não pode ser vazio ou conter apenas espaços em branco, se presente")
-	private String alias;
+	private final String alias;
 	
 	@Pattern(regexp="^(?!\s*$).+", message="fullName não pode ser vazio ou conter apenas espaços em branco, se presente")
-	private String fullName;
+	private final String fullName;
 }

@@ -34,17 +34,17 @@ public class AuthorController {
 	
 	@GetMapping
 	public ResponseEntity<List<ResponseAuthorDTO>> findAllAuthors(){
-		return ResponseEntity.ok(service.getAllAuthors());
+		return ResponseEntity.ok(service.getAllResponseAuthorDTOs());
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponseAuthorDTO> findAuthorById(@PathVariable Long id){
-		return ResponseEntity.ok(service.getAuthorById(id));
+		return ResponseEntity.ok(service.getResponseAuthorDTOById(id));
 	}
 	
 	@GetMapping("/alias")
 	public ResponseEntity<ResponseAuthorDTO> findAuthorAlias(@RequestParam String alias){
-		return ResponseEntity.ok(service.getAuthorByAlias(alias));
+		return ResponseEntity.ok(service.getResponseAuthorDTOByAlias(alias));
 	}
 	
 	@PutMapping("/{id}")

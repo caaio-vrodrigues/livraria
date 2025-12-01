@@ -54,20 +54,20 @@ public class AuthorService {
 	}
 
 	@Transactional(readOnly=true)
-	public List<ResponseAuthorDTO> getAllAuthors() {
+	public List<ResponseAuthorDTO> getAllResponseAuthorDTOs() {
 		return repo.findAll().stream()
 			.map(responseAuthorDTOCreator::toResponseAuthorDTO)
 			.toList();
 	}
 
 	@Transactional(readOnly=true)
-	public ResponseAuthorDTO getAuthorById(Long id) {
+	public ResponseAuthorDTO getResponseAuthorDTOById(Long id) {
 		return responseAuthorDTOCreator.toResponseAuthorDTO(repo.findById(id).orElseThrow(() -> 
 			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"'")));
 	}
 
 	@Transactional(readOnly=true)
-	public ResponseAuthorDTO getAuthorByAlias(String alias) {
+	public ResponseAuthorDTO getResponseAuthorDTOByAlias(String alias) {
 		Optional<Author> authorOptional = repo.findByAlias(alias);
 		if(authorOptional.isEmpty()) throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'alias': '"+alias+"'");
 		return responseAuthorDTOCreator.toResponseAuthorDTO(authorOptional.get());
@@ -90,5 +90,11 @@ public class AuthorService {
 			.build();
 		saveAndHandleConcurrentyAuthor(updatedAuthor);
 		return responseAuthorDTOCreator.toResponseAuthorDTO(updatedAuthor);
+	}
+	
+	@Transactional(readOnly=true)
+	public Author getAuthorById(Long id) {
+		return repo.findById(id).orElseThrow(() ->
+			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações"));
 	}
 }

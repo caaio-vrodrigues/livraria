@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import caio.portfolio.livraria.serialization.TrimmedStringDeserializer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Builder
 public class CreateCountryDTO {
@@ -19,5 +15,5 @@ public class CreateCountryDTO {
 	@JsonDeserialize(using=TrimmedStringDeserializer.class)
 	@NotBlank(message="O campo 'isoAlpha2Code' não pode estar vazio")
 	@Size(min=2, max=2)
-	private String isoAlpha2Code;
+	private final String isoAlpha2Code;
 }

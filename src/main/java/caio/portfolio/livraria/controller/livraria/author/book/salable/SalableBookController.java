@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
@@ -56,5 +57,12 @@ public class SalableBookController {
 		@PathVariable Long publisherId
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByPublisherId(publisherId));
+	}
+	
+	@GetMapping("/title")
+	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOByTitle(
+		@RequestParam String title
+	){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title));
 	}
 }

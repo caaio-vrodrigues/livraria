@@ -100,4 +100,11 @@ public class SalableBookService {
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
+
+	@Transactional(readOnly=true)
+	public ResponseSalableBookDTO getResponseSalableBookDTOByTitle(String title) {
+		SalableBook book = repo.findByTitle(title).orElseThrow(() -> 
+			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'"));
+		return responseSalableBookDTOCreator.toResponseSalableBookDTO(book);
+	}
 }

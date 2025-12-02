@@ -17,4 +17,5 @@ public interface SalableBookRepository extends JpaRepository<SalableBook, Long> 
 	
 	Optional<List<SalableBook>> findByAuthor(Author author);
 	Optional<List<SalableBook>> findByPublisher(Publisher publisher);
+	Optional<SalableBook> findByTitle(String title);
 }

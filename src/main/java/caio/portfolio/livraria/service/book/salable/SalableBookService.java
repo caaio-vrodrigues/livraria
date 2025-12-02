@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.book.salable;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -63,5 +64,11 @@ public class SalableBookService {
 			.build();
 		newBook = saveAndHandleConcurrency(newBook);
 		return responseSalableBookDTOCreator.toResponseSalableBookDTO(newBook);
+	}
+
+	@Transactional(readOnly=true)
+	public List<ResponseSalableBookDTO> getAllResponseSalableBookDTOs() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

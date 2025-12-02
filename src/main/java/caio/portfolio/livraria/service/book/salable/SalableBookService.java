@@ -14,6 +14,7 @@ import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
@@ -118,6 +119,7 @@ public class SalableBookService {
 			.toList();
 	}
 
+	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByIsbn(String isbn) {
 		List<SalableBook> bookList = repo.findByIsbn(isbn).orElseThrow(() ->
 			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'isbn': '"+isbn+"'"));
@@ -125,4 +127,40 @@ public class SalableBookService {
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
+
+	@Transactional
+	public ResponseSalableBookDTO updateSalableBookByTitleAndAuthor(Long authorId, String title, UpdateSalableBookDTO dto) {
+		// TODO 
+		return null;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

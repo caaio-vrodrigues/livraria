@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.book.salable.SalableBookService;
 import jakarta.validation.Valid;
@@ -79,5 +81,14 @@ public class SalableBookController {
 		@PathVariable String isbn
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn));
+	}
+	
+	@PutMapping("/{authorId}")
+	public ResponseEntity<ResponseSalableBookDTO> editSalableBookByTitleAndAuthor(
+		@PathVariable Long authorId,
+		@RequestParam String title,
+		@RequestBody UpdateSalableBookDTO dto
+	){
+		return ResponseEntity.ok(service.updateSalableBookByTitleAndAuthor(authorId, title, dto));
 	}
 }

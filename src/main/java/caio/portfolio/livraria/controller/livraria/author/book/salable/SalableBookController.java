@@ -50,4 +50,11 @@ public class SalableBookController {
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByAuthorId(authorId));
 	}
+	
+	@GetMapping("/publisher/{publisherId}")
+	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByPublisherId(
+		@PathVariable Long publisherId
+	){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByPublisherId(publisherId));
+	}
 }

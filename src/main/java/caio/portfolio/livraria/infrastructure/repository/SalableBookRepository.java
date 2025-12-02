@@ -10,6 +10,11 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 
 public interface SalableBookRepository extends JpaRepository<SalableBook, Long> {
-	Optional<SalableBook> findByTitleAndAuthorAndPublisher(String title, Author author, Publisher publisher);
+	Optional<SalableBook> findByTitleAndAuthorAndPublisher(
+		String title, 
+		Author author, 
+		Publisher publisher);
+	
 	Optional<List<SalableBook>> findByAuthor(Author author);
+	Optional<List<SalableBook>> findByPublisher(Publisher publisher);
 }

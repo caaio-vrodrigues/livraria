@@ -78,6 +78,16 @@ public class SalableBookService {
 	@Transactional(readOnly=true)
 	public ResponseSalableBookDTO getResponseSalableBookDTOById(Long id) {
 		return responseSalableBookDTOCreator.toResponseSalableBookDTO(repo.findById(id)
-			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontra livro com 'id': '"+id+"'")));
+			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro com 'id': '"+id+"'")));
+	}
+
+	@Transactional(readOnly=true)
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByAuthorId(Long authorId) {
+		Author author = authorService.getAuthorById(authorId);
+		List<SalableBook> bookList = repo.findByAuthor(author)
+			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro para o autor: '"+author+"'"));
+		return bookList.stream()
+			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
+			.toList();
 	}
 }

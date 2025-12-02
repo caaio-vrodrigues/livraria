@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,16 @@ public class SalableBookController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOById(Long id){
+	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOById(
+		@PathVariable Long id
+	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOById(id));
+	}
+	
+	@GetMapping("/author/{authorId}")
+	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByAuthorId(
+		@PathVariable Long authorId
+	){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByAuthorId(authorId));
 	}
 }

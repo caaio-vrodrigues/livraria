@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import caio.portfolio.livraria.exception.custom.book.salable.ConcurrentSalableBookException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
@@ -39,8 +40,8 @@ public class SalableBookService {
 					book.getTitle(), 
 					book.getAuthor(), 
 					book.getPublisher());
-			if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: "+salableBookOptional.get().getTitle()+" já existe");
-			throw new ConcurrentSalableBookException("Não foi possível criar livro: "+book.getTitle()+" por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário");
+			if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
+			throw new ConcurrentSalableBookException("Não foi possível criar livro: '"+book.getTitle()+"' por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário");
 		}
 	}
 
@@ -52,7 +53,7 @@ public class SalableBookService {
 			dto.getTitle(), 
 			author, 
 			publisher);
-		if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: "+salableBookOptional.get().getTitle()+" já existe");
+		if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
 		SalableBook newBook = SalableBook.builder()
 			.title(dto.getTitle())
 			.genre(dto.getGenre())
@@ -72,5 +73,11 @@ public class SalableBookService {
 			.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
+	}
+
+	@Transactional(readOnly=true)
+	public ResponseSalableBookDTO getResponseSalableBookDTOById(Long id) {
+		return responseSalableBookDTOCreator.toResponseSalableBookDTO(repo.findById(id)
+			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontra livro com 'id': '"+id+"'")));
 	}
 }

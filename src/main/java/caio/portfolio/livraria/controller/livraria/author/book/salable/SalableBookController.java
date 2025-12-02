@@ -35,4 +35,9 @@ public class SalableBookController {
 	public ResponseEntity<List<ResponseSalableBookDTO>> findAllResponseSalableBookDTOs(){
 		return ResponseEntity.ok(service.getAllResponseSalableBookDTOs());
 	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOById(Long id){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOById(id));
+	}
 }

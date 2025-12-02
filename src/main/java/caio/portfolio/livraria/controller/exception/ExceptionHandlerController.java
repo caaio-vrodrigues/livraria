@@ -21,6 +21,7 @@ import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
 import caio.portfolio.livraria.exception.custom.book.salable.ConcurrentSalableBookException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
@@ -63,6 +64,21 @@ public class ExceptionHandlerController {
 		body.put(PATH, path);
 		body.put(DETAILS, details);
 		return body;
+	}
+	
+	@ExceptionHandler(SalableBookNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ResponseEntity<Object> handleSalableBookNotFoundException(
+		SalableBookNotFoundException e,
+	    HttpServletRequest httpRequest
+	){
+	    Map<String, Object> body = createErrorBody(
+	        HttpStatus.NOT_FOUND,
+	        e.getMessage(),
+	        httpRequest.getRequestURI(),
+	        "Não foi possível encontrar um livro para o argumento fornecido"
+	    );
+	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(ConcurrentSalableBookException.class)

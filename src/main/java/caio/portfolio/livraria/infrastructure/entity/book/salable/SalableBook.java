@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Entity
-@Table(name="salable_book")
+@Table(
+	name="salable_book",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {
+			"title",
+			"author_id",
+		},
+		name="UK_salable_book_title_author")
+	}
+)
 public class SalableBook extends Book {
 	
 	@Id

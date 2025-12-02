@@ -68,7 +68,9 @@ public class SalableBookService {
 
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getAllResponseSalableBookDTOs() {
-		// TODO Auto-generated method stub
-		return null;
+		return repo.findAll()
+			.stream()
+			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
+			.toList();
 	}
 }

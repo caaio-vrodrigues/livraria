@@ -16,6 +16,7 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSala
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
+import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
 import caio.portfolio.livraria.service.publisher.PublisherService;
@@ -106,5 +107,22 @@ public class SalableBookService {
 		SalableBook book = repo.findByTitle(title).orElseThrow(() -> 
 			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'"));
 		return responseSalableBookDTOCreator.toResponseSalableBookDTO(book);
+	}
+
+	@Transactional(readOnly=true)
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByGenre(Genre genre) {
+		List<SalableBook> bookList = repo.findByGenre(genre).orElseThrow(() -> 
+			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'genre': '"+genre.name()+"'"));
+		return bookList.stream()
+			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
+			.toList();
+	}
+
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByIsbn(String isbn) {
+		List<SalableBook> bookList = repo.findByIsbn(isbn).orElseThrow(() ->
+			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'isbn': '"+isbn+"'"));
+		return bookList.stream()
+			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
+			.toList();
 	}
 }

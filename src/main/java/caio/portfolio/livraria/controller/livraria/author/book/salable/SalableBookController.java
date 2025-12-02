@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
+import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.book.salable.SalableBookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,5 +65,19 @@ public class SalableBookController {
 		@RequestParam String title
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title));
+	}
+	
+	@GetMapping("/genre")
+	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByGenre(
+		@RequestParam Genre genre
+	){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByGenre(genre));
+	}
+	
+	@GetMapping("/isbn/{isbn}")
+	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByIsbn(
+		@PathVariable String isbn
+	){
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn));
 	}
 }

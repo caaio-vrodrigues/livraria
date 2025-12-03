@@ -63,7 +63,7 @@ public class SalableBookController {
 	}
 	
 	@GetMapping("/title")
-	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOByTitle(
+	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByTitle(
 		@RequestParam String title
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title));

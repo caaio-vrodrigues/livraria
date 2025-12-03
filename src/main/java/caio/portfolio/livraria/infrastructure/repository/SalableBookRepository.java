@@ -11,14 +11,10 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.model.enums.Genre;
 
 public interface SalableBookRepository extends JpaRepository<SalableBook, Long> {
-	Optional<SalableBook> findByTitleAndAuthorAndPublisher(
-		String title, 
-		Author author, 
-		Publisher publisher);
-	
+	Optional<SalableBook> findByTitleAndAuthor(String title, Author author);
 	Optional<List<SalableBook>> findByAuthor(Author author);
 	Optional<List<SalableBook>> findByPublisher(Publisher publisher);
-	Optional<SalableBook> findByTitle(String title);
+	Optional<List<SalableBook>> findByTitle(String title);
 	Optional<List<SalableBook>> findByGenre(Genre genre);
 	Optional<List<SalableBook>> findByIsbn(String isbn);
 }

@@ -38,10 +38,7 @@ public class SalableBookService {
 		}
 		catch(DataIntegrityViolationException e) {
 			Optional<SalableBook> salableBookOptional = repo
-				.findByTitleAndAuthorAndPublisher(
-					book.getTitle(), 
-					book.getAuthor(), 
-					book.getPublisher());
+				.findByTitleAndAuthor(book.getTitle(), book.getAuthor());
 			if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
 			throw new ConcurrentSalableBookException("Não foi possível criar livro: '"+book.getTitle()+"' por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário");
 		}
@@ -51,10 +48,8 @@ public class SalableBookService {
 	public ResponseSalableBookDTO createSalableBook(CreateSalableBookDTO dto) {
 		Author author = authorService.getAuthorById(dto.getAuthorId());
 		Publisher publisher = publisherService.getPublisherById(dto.getPublisherId());
-		Optional<SalableBook> salableBookOptional = repo.findByTitleAndAuthorAndPublisher(
-			dto.getTitle(), 
-			author, 
-			publisher);
+		Optional<SalableBook> salableBookOptional = repo
+			.findByTitleAndAuthor(dto.getTitle(), author);
 		if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
 		SalableBook newBook = SalableBook.builder()
 			.title(dto.getTitle())
@@ -104,10 +99,12 @@ public class SalableBookService {
 	}
 
 	@Transactional(readOnly=true)
-	public ResponseSalableBookDTO getResponseSalableBookDTOByTitle(String title) {
-		SalableBook book = repo.findByTitle(title).orElseThrow(() -> 
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByTitle(String title) {
+		List<SalableBook> bookList = repo.findByTitle(title).orElseThrow(() -> 
 			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'"));
-		return responseSalableBookDTOCreator.toResponseSalableBookDTO(book);
+		return bookList.stream()
+			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
+			.toList();
 	}
 
 	@Transactional(readOnly=true)

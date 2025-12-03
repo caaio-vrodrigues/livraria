@@ -9,11 +9,11 @@ import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 
 public interface SalableBookUpdateValidator {
 	TitleAndAuthorUpdateDTO validateTitleAndAuthor(
-		String title, String newTitle, Author author, Long nweAuthorId);
+		String currentTitle, String newTitle, Author currentAuthor, Long newAuthorId);
 	
-	Publisher validatePublisher(Publisher publisher, Long newPublisherID);
-	Genre validateGenre(Genre genre, Genre newGenre);
-	String validateIsbn(String isbn, String newIsbn);
-	BigDecimal validatePrice(BigDecimal price, BigDecimal newPrice);
-	Integer validateUnits(Integer unitas, Integer newUnits);
+	Publisher validatePublisher(Publisher currentPublisher, Long newPublisherId);
+	Genre validateGenre(Genre currentGenre, Genre newGenre);
+	String validateIsbn(String currentIsbn, String newIsbn);
+	BigDecimal validatePrice(BigDecimal currentPrice, BigDecimal newPrice);
+	Integer validateUnits(Integer currentUnits, Integer newUnits);
 }

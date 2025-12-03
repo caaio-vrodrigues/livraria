@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.controller.livraria.author.book.salable;
+package caio.portfolio.livraria.controller.book.salable;
 
 import java.util.List;
 

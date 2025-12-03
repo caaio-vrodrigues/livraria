@@ -16,14 +16,13 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 	
 	@Override
 	public TitleAndAuthorUpdateDTO validateTitleAndAuthor(
-		String title, String newTitle, Author author, Long authorId
+		String title, String newTitle, Author author, Long newAuthorId
 	){
 		boolean containsTitleAndIsDifferent = newTitle != null && !title.equals(newTitle);
-		boolean containsAuthorAndIsDifferent = authorId != null && !author.getId().equals(authorId);
-		
+		boolean containsAuthorAndIsDifferent = newAuthorId != null && !author.getId().equals(newAuthorId);
 		if(containsAuthorAndIsDifferent || containsTitleAndIsDifferent) {
 			title = containsTitleAndIsDifferent ? newTitle : title;
-			if(containsAuthorAndIsDifferent) author = authorService.getAuthorById(authorId);
+			if(containsAuthorAndIsDifferent) author = authorService.getAuthorById(newAuthorId);
 		}
 		return TitleAndAuthorUpdateDTO.builder()
 			.title(newTitle)

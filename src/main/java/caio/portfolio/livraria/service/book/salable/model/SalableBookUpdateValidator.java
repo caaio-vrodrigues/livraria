@@ -4,5 +4,5 @@ import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 
 public interface SalableBookUpdateValidator {
-	TitleAndAuthorUpdateDTO validateTitleAndAuthor(String title, String newTitle, Author author, Long authorId);
+	TitleAndAuthorUpdateDTO validateTitleAndAuthor(String title, String newTitle, Author author, Long nweAuthorId);
 }

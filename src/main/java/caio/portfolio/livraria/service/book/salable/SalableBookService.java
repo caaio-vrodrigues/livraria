@@ -46,6 +46,18 @@ public class SalableBookService {
 			throw new ConcurrentSalableBookException("Não foi possível criar livro: '"+book.getTitle()+"' por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário");
 		}
 	}
+	
+	private void validateUniqueness(TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId) {
+		boolean isDifferent = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
+			!titleAndAuthorUpdateDTO.getAuthor().getId().equals(authorId);
+		if(isDifferent) {
+			Optional<SalableBook> existingBookOptional = repo
+				.findByTitleAndAuthor(
+					titleAndAuthorUpdateDTO.getTitle(), 
+					titleAndAuthorUpdateDTO.getAuthor());
+			if(existingBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
+		}
+	}
 
 	@Transactional
 	public ResponseSalableBookDTO createSalableBook(CreateSalableBookDTO dto) {
@@ -142,16 +154,8 @@ public class SalableBookService {
 				dto.getTitle(), 
 				bookToUpdate.getAuthor(), 
 				dto.getAuthorId());
-		if(!titleAndAuthorUpdateDTO.getTitle()
-			.equals(bookToUpdate.getTitle()) ||
-				!titleAndAuthorUpdateDTO.getAuthor().getId()
-					.equals(bookToUpdate.getAuthor().getId())) {
-			Optional<SalableBook> existingBookOptional = repo
-				.findByTitleAndAuthor(
-					titleAndAuthorUpdateDTO.getTitle(), 
-					titleAndAuthorUpdateDTO.getAuthor());
-			if(existingBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
-		}
+		validateUniqueness(
+			titleAndAuthorUpdateDTO, bookToUpdate.getTitle(), bookToUpdate.getAuthor().getId());
 		SalableBook updatedSalableBook = SalableBook.builder()
 			.id(bookToUpdate.getId())
 			.title(titleAndAuthorUpdateDTO.getTitle())

@@ -19,7 +19,9 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
+import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
+import caio.portfolio.livraria.service.book.salable.model.SalableBookUpdateValidator;
 import caio.portfolio.livraria.service.publisher.PublisherService;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +31,7 @@ public class SalableBookService {
 
 	private final SalableBookRepository repo;
 	private final ResponseSalableBookDTOCreator responseSalableBookDTOCreator;
+	private final SalableBookUpdateValidator salableBookUpdateValidator;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
 	
@@ -126,38 +129,45 @@ public class SalableBookService {
 	}
 
 	@Transactional
-	public ResponseSalableBookDTO updateSalableBookByTitleAndAuthor(Long authorId, String title, UpdateSalableBookDTO dto) {
-		// TODO 
-		return null;
+	public ResponseSalableBookDTO updateSalableBookByTitleAndAuthor(
+		Long authorId, String title, UpdateSalableBookDTO dto
+	){
+		Author currentAuthor = authorService.getAuthorById(authorId);
+		SalableBook bookToUpdate = repo
+			.findByTitleAndAuthor(title, currentAuthor)
+				.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'; 'authorId': '"+authorId+"'"));
+		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO = salableBookUpdateValidator
+			.validateTitleAndAuthor(
+				bookToUpdate.getTitle(), 
+				dto.getTitle(), 
+				bookToUpdate.getAuthor(), 
+				dto.getAuthorId());
+		if(!titleAndAuthorUpdateDTO.getTitle()
+			.equals(bookToUpdate.getTitle()) ||
+				!titleAndAuthorUpdateDTO.getAuthor().getId()
+					.equals(bookToUpdate.getAuthor().getId())) {
+			Optional<SalableBook> existingBookOptional = repo
+				.findByTitleAndAuthor(
+					titleAndAuthorUpdateDTO.getTitle(), 
+					titleAndAuthorUpdateDTO.getAuthor());
+			if(existingBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
+		}
+		SalableBook updatedSalableBook = SalableBook.builder()
+			.id(bookToUpdate.getId())
+			.title(titleAndAuthorUpdateDTO.getTitle())
+			.author(titleAndAuthorUpdateDTO.getAuthor())
+			.genre(salableBookUpdateValidator
+				.validateGenre(bookToUpdate.getGenre(), dto.getGenre()))
+			.publisher(salableBookUpdateValidator
+				.validatePublisher(bookToUpdate.getPublisher(), dto.getPublisherId()))
+			.isbn(salableBookUpdateValidator
+				.validateIsbn(bookToUpdate.getIsbn(), dto.getIsbn()))
+			.price(salableBookUpdateValidator
+				.validatePrice(bookToUpdate.getPrice(), dto.getPrice()))
+			.units(salableBookUpdateValidator
+				.validateUnits(bookToUpdate.getUnits(), dto.getUnits()))
+			.build();
+		return responseSalableBookDTOCreator
+			.toResponseSalableBookDTO(saveAndHandleConcurrency(updatedSalableBook));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -22,7 +22,6 @@ public class CreateOrFindCountryResolverImpl implements CreateOrFindCountryResol
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
 	private final SaverAndConcurrencyHandle saverAndConcurrencyHandleImpl;
-	
 
 	@Override
 	public CountryResultImplDTO returnResultWithExistentCountry(String isoAlpha2Code) {

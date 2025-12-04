@@ -15,6 +15,7 @@ import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountry
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
 import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
 import caio.portfolio.livraria.service.country.model.CountryValidator;
+import caio.portfolio.livraria.service.country.model.CreateOrFindCountryResolver;
 import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
 import lombok.RequiredArgsConstructor;
 
@@ -25,71 +26,30 @@ public class CountryService {
 	private final CountryRepository repo;
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
+	private final CreateOrFindCountryResolver createOrFindCountryResolver;
 	
 	private Country resolveFindCountryByIsoAlpha2Code(
 		String validIsoAlpha2Code, 
 		String originalCode
-	) {
+	){
 	    return repo.findByIsoAlpha2Code(validIsoAlpha2Code).orElseThrow(() -> 
 	    	new CountryNotFoundException("País não encontrado para o 'isoAlpha2Code': "+originalCode));
 	}
 	
 	private Country resolveFindCountryById(Integer id) {
-	    return repo.findById(id).orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'id': "+id));
-	}
-	
-	private Country saveAndDealingConcurrency(Country country) {
-		try {
-			return repo.saveAndFlush(country);
-		}
-		catch(DataIntegrityViolationException e) {
-			Optional<Country> concurrentlyCreatedCountry = repo
-				.findByIsoAlpha2Code(country.getIsoAlpha2Code());
-			if(concurrentlyCreatedCountry.isEmpty()) throw new ConcurrentCountryException("Falha ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
-			return concurrentlyCreatedCountry.get();
-		}
-	}
-	
-	private CountryResultImplDTO returnResultWithExistentCountry(String isoAlpha2Code) {
-		Optional<Country> countryOptional = repo.findByIsoAlpha2Code(isoAlpha2Code);
-		boolean countryAlreadyExists = countryOptional.isPresent();
-		if(countryAlreadyExists) {
-			ResponseCountryDTO respCountryDTO = responseCountryDTOCreator
-				.toResponseCountryDTO(countryOptional.get());
-			return CountryResultImplDTO.builder()
-				.country(respCountryDTO)
-				.created(false)
-				.build();
-		}
-		return null;
-	}
-	
-	private CountryResultImplDTO returnResultWithNewCountry(String isoAlpha2Code) {
-		String validCountryName = countryValidator
-			.getNameByValidatedAndNormalizedIsoAlpha2Code(isoAlpha2Code);
-		Country newCountry = Country.builder()
-			.isoAlpha2Code(isoAlpha2Code)
-			.name(validCountryName)
-			.build();
-		newCountry = saveAndDealingConcurrency(newCountry);
-		ResponseCountryDTO respCountryDTO = responseCountryDTOCreator
-			.toResponseCountryDTO(newCountry);
-		return CountryResultImplDTO.builder()
-			.country(respCountryDTO)
-			.created(true)
-			.build();
+	    return repo.findById(id).orElseThrow(() -> 
+	    	new CountryNotFoundException("País não encontrado para o 'id': "+id));
 	}
 	
 	@Transactional
 	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
 		String validIsoAlpha2Code = countryValidator
 			.processIsoAlpha2Code(createCountryDTO.getIsoAlpha2Code());
-		CountryResultImplDTO resullWithExistentCountry = 
-			returnResultWithExistentCountry(validIsoAlpha2Code);
+		CountryResultImplDTO resullWithExistentCountry = createOrFindCountryResolver
+			.returnResultWithExistentCountry(validIsoAlpha2Code);
 		if(resullWithExistentCountry != null) return resullWithExistentCountry;
-		CountryResultImplDTO resullWithCreatedCountry = 
-			returnResultWithNewCountry(validIsoAlpha2Code);
-		return resullWithCreatedCountry;
+		return createOrFindCountryResolver
+			.returnResultWithNewCountry(validIsoAlpha2Code);
 	}
 	
 	@Transactional(readOnly=true)
@@ -116,8 +76,7 @@ public class CountryService {
 	
 	@Transactional(readOnly=true)
 	public Country getCountryById(Integer id) {
-		Optional<Country> countryOptional = repo.findById(id);
-		if(countryOptional.isEmpty()) throw new CountryNotFoundException("País não encontrado para o 'id': "+id);
-		return countryOptional.get();
+		return repo.findById(id).orElseThrow(() -> 
+			new CountryNotFoundException("País não encontrado para o 'id': "+id));
 	}
 }

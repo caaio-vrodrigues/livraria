@@ -75,18 +75,18 @@ public class AuthorService {
 
 	@Transactional
 	public ResponseAuthorDTO updateAuthor(Long id, UpdateAuthorDTO dto) {
-		Optional<Author> existingAuthor = repo.findById(id);
-		if(existingAuthor.isEmpty()) throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações");
+		Author existingAuthor = repo.findById(id).orElseThrow(() -> 
+			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações"));
 		Author updatedAuthor = Author.builder()
-			.id(existingAuthor.get().getId())
+			.id(existingAuthor.getId())
 			.alias(authorupdateValidator.validateAlias(
-				existingAuthor.get().getAlias(), dto.getAlias()))
+				existingAuthor.getAlias(), dto.getAlias()))
 			.fullName(authorupdateValidator.validateFullName(
-				existingAuthor.get().getFullName(), dto.getFullName()))
+				existingAuthor.getFullName(), dto.getFullName()))
 			.birthday(authorupdateValidator.validateBirthday(
-				existingAuthor.get().getBirthday(), dto.getBirthday()))
+				existingAuthor.getBirthday(), dto.getBirthday()))
 			.country(authorupdateValidator.validateCountry(
-				existingAuthor.get().getCountry(), dto.getCountryId()))
+				existingAuthor.getCountry(), dto.getCountryId()))
 			.build();
 		saveAndHandleConcurrentyAuthor(updatedAuthor);
 		return responseAuthorDTOCreator.toResponseAuthorDTO(updatedAuthor);

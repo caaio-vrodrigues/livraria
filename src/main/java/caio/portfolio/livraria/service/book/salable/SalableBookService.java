@@ -47,10 +47,12 @@ public class SalableBookService {
 		}
 	}
 	
-	private void validateUniqueness(TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId) {
-		boolean isDifferent = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
+	private void validateUniqueness(
+		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId
+	){
+		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
 			!titleAndAuthorUpdateDTO.getAuthor().getId().equals(authorId);
-		if(isDifferent) {
+		if(isDifferentTitleOrAuthor) {
 			Optional<SalableBook> existingBookOptional = repo
 				.findByTitleAndAuthor(
 					titleAndAuthorUpdateDTO.getTitle(), 

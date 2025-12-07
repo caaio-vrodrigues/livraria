@@ -3,11 +3,9 @@ package caio.portfolio.livraria.service.publisher;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
@@ -16,6 +14,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.PublisherSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import caio.portfolio.livraria.service.publisher.model.ResponsePublisherDTOCreator;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +27,7 @@ public class PublisherService {
 	private final CountryService countryService;
 	private final ResponsePublisherDTOCreator responsePublisherDTOCreator;
 	private final PublisherUpdateValidator publisherUpdateValidator;
-	
-	private Publisher saveAndHandlePublisherConcurrency(Publisher publisher) {
-		try {
-			return repo.saveAndFlush(publisher);
-		}
-		catch(DataIntegrityViolationException e) {
-			Optional<Publisher> publisherOptional = repo.findByFullAddress(publisher.getFullAddress());
-			if(publisherOptional.isPresent()) return publisherOptional.get();
-			throw new ConcurrentPublisherException("Falha ao tentar criar nova editora com 'name': "+publisher.getName()+"; 'fullAddress': "+publisher.getFullAddress()+"; 'countryId': "+publisher.getCountry());
-		}
-	}
+	private final PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
 
 	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
@@ -49,7 +38,7 @@ public class PublisherService {
 			.fullAddress(dto.getFullAddress())
 			.country(countryService.getCountryById(dto.getCountryId()))
 			.build();
-		newPublisher = saveAndHandlePublisherConcurrency(newPublisher);
+		newPublisher = publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(newPublisher);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(newPublisher);
 	}
 
@@ -86,7 +75,7 @@ public class PublisherService {
 			.fullAddress(publisherUpdateValidator
 				.validateFullAddress(publisherOptional.get().getFullAddress(), dto.getFullAddress()))
 			.build();
-		updatedPublisher = saveAndHandlePublisherConcurrency(updatedPublisher);
+		updatedPublisher = publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(updatedPublisher);
 		return responsePublisherDTOCreator.toResponsePublisherDTO(updatedPublisher);
 	}
 	

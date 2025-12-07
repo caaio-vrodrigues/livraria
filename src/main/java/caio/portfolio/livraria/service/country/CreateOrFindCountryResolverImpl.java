@@ -11,7 +11,7 @@ import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
 import caio.portfolio.livraria.service.country.model.CountryValidator;
 import caio.portfolio.livraria.service.country.model.CreateOrFindCountryResolver;
 import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
-import caio.portfolio.livraria.service.country.model.SaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.country.model.CountrySaverAndConcurrencyHandle;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -21,7 +21,7 @@ public class CreateOrFindCountryResolverImpl implements CreateOrFindCountryResol
 	private final CountryRepository repo;
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
-	private final SaverAndConcurrencyHandle saverAndConcurrencyHandleImpl;
+	private final CountrySaverAndConcurrencyHandle saverAndConcurrencyHandleImpl;
 
 	@Override
 	public CountryResultImplDTO returnResultWithExistentCountry(String isoAlpha2Code) {

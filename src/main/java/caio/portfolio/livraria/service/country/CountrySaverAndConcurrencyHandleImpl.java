@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
-import caio.portfolio.livraria.service.country.model.SaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.country.model.CountrySaverAndConcurrencyHandle;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class SaverAndConcurrencyHandleImpl implements SaverAndConcurrencyHandle {
+public class CountrySaverAndConcurrencyHandleImpl implements CountrySaverAndConcurrencyHandle {
 	
 	private final CountryRepository repo;
 

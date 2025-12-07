@@ -3,11 +3,9 @@ package caio.portfolio.livraria.service.book.salable;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.book.salable.ConcurrentSalableBookException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
@@ -21,6 +19,8 @@ import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
+import caio.portfolio.livraria.service.book.salable.model.SalableBookSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.book.salable.model.SalableBookUniquenessValidator;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookUpdateValidator;
 import caio.portfolio.livraria.service.publisher.PublisherService;
 import lombok.RequiredArgsConstructor;
@@ -32,34 +32,10 @@ public class SalableBookService {
 	private final SalableBookRepository repo;
 	private final ResponseSalableBookDTOCreator responseSalableBookDTOCreator;
 	private final SalableBookUpdateValidator salableBookUpdateValidator;
+	private final SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
+	private final SalableBookUniquenessValidator salableBookUniquenessValidator;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
-	
-	private SalableBook saveAndHandleConcurrency(SalableBook book) {
-		try {
-			return repo.saveAndFlush(book);
-		}
-		catch(DataIntegrityViolationException e) {
-			Optional<SalableBook> salableBookOptional = repo
-				.findByTitleAndAuthor(book.getTitle(), book.getAuthor());
-			if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
-			throw new ConcurrentSalableBookException("Não foi possível criar livro: '"+book.getTitle()+"' por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário");
-		}
-	}
-	
-	private void validateUniqueness(
-		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId
-	){
-		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
-			!titleAndAuthorUpdateDTO.getAuthor().getId().equals(authorId);
-		if(isDifferentTitleOrAuthor) {
-			Optional<SalableBook> existingBookOptional = repo
-				.findByTitleAndAuthor(
-					titleAndAuthorUpdateDTO.getTitle(), 
-					titleAndAuthorUpdateDTO.getAuthor());
-			if(existingBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
-		}
-	}
 
 	@Transactional
 	public ResponseSalableBookDTO createSalableBook(CreateSalableBookDTO dto) {
@@ -77,8 +53,9 @@ public class SalableBookService {
 			.price(dto.getPrice())
 			.units(dto.getUnits())
 			.build();
-		newBook = saveAndHandleConcurrency(newBook);
-		return responseSalableBookDTOCreator.toResponseSalableBookDTO(newBook);
+		return responseSalableBookDTOCreator
+			.toResponseSalableBookDTO(salableBookSaverAndConcurrencyHandleImpl
+				.saveAndHandleConcurrency(newBook));
 	}
 
 	@Transactional(readOnly=true)
@@ -156,7 +133,7 @@ public class SalableBookService {
 				dto.getTitle(), 
 				bookToUpdate.getAuthor(), 
 				dto.getAuthorId());
-		validateUniqueness(
+		salableBookUniquenessValidator.validateUniqueness(
 			titleAndAuthorUpdateDTO, bookToUpdate.getTitle(), bookToUpdate.getAuthor().getId());
 		SalableBook updatedSalableBook = SalableBook.builder()
 			.id(bookToUpdate.getId())
@@ -174,6 +151,7 @@ public class SalableBookService {
 				.validateUnits(bookToUpdate.getUnits(), dto.getUnits()))
 			.build();
 		return responseSalableBookDTOCreator
-			.toResponseSalableBookDTO(saveAndHandleConcurrency(updatedSalableBook));
+			.toResponseSalableBookDTO(salableBookSaverAndConcurrencyHandleImpl
+				.saveAndHandleConcurrency(updatedSalableBook));
 	}
 }

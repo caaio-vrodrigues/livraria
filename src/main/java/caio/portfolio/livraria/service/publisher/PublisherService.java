@@ -1,7 +1,6 @@
 package caio.portfolio.livraria.service.publisher;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,22 +23,23 @@ import lombok.RequiredArgsConstructor;
 public class PublisherService {
 
 	private final PublisherRepository repo;
-	private final CountryService countryService;
 	private final ResponsePublisherDTOCreator responsePublisherDTOCreator;
 	private final PublisherUpdateValidator publisherUpdateValidator;
 	private final PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
+	private final CountryService countryService;
 
 	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
-		Optional<Publisher> existingPublisher = repo.findByFullAddress(dto.getFullAddress());
-		if(existingPublisher.isPresent()) throw new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe");
+		repo.findByFullAddress(dto.getFullAddress()).orElseThrow(() -> 
+			new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe"));
 		Publisher newPublisher = Publisher.builder()
 			.name(dto.getName())
 			.fullAddress(dto.getFullAddress())
 			.country(countryService.getCountryById(dto.getCountryId()))
 			.build();
-		newPublisher = publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(newPublisher);
-		return responsePublisherDTOCreator.toResponsePublisherDTO(newPublisher);
+		return responsePublisherDTOCreator
+			.toResponsePublisherDTO(publisherSaverAndConcurrencyHandle
+				.saveAndHandlePublisherConcurrency(newPublisher));
 	}
 
 	@Transactional(readOnly=true)
@@ -50,33 +50,37 @@ public class PublisherService {
 	
 	@Transactional(readOnly=true)
 	public ResponsePublisherDTO getResponsePublisherDTOByFullAddress(String fullAddress) {
-		Optional<Publisher> publisherOptional = repo.findByFullAddress(fullAddress);
-		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress);
-		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
+		return responsePublisherDTOCreator
+			.toResponsePublisherDTO(repo.findByFullAddress(fullAddress).orElseThrow(() ->
+				new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress)));
 	}
 
 	@Transactional(readOnly=true)
 	public ResponsePublisherDTO getResponsePublisherDTOById(Long id) {
-		Optional<Publisher> publisherOptional = repo.findById(id);
-		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
-		return responsePublisherDTOCreator.toResponsePublisherDTO(publisherOptional.get());
+		return responsePublisherDTOCreator
+			.toResponsePublisherDTO(repo.findById(id).orElseThrow(() -> 
+				new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id)));
 	}
 
 	@Transactional
 	public ResponsePublisherDTO updatePublisher(Long id, UpdatePublisherDTO dto) {
-		Optional<Publisher> publisherOptional = repo.findById(id);
-		if(publisherOptional.isEmpty()) throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
+		Publisher currentPublisher = repo.findById(id).orElseThrow(() ->
+			new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id));
 		Publisher updatedPublisher = Publisher.builder()
-			.id(publisherOptional.get().getId())
-			.name(publisherUpdateValidator
-				.validateName(publisherOptional.get().getName(), dto.getName()))
-			.country(publisherUpdateValidator
-				.validateCountry(publisherOptional.get().getCountry(), dto.getCountryId()))
-			.fullAddress(publisherUpdateValidator
-				.validateFullAddress(publisherOptional.get().getFullAddress(), dto.getFullAddress()))
+			.id(currentPublisher.getId())
+			.name(publisherUpdateValidator.validateName(
+				currentPublisher.getName(), 
+				dto.getName()))
+			.country(publisherUpdateValidator.validateCountry(
+				currentPublisher.getCountry(), 
+				dto.getCountryId()))
+			.fullAddress(publisherUpdateValidator.validateFullAddress(
+				currentPublisher.getFullAddress(), 
+				dto.getFullAddress()))
 			.build();
-		updatedPublisher = publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(updatedPublisher);
-		return responsePublisherDTOCreator.toResponsePublisherDTO(updatedPublisher);
+		return responsePublisherDTOCreator
+			.toResponsePublisherDTO(publisherSaverAndConcurrencyHandle
+				.saveAndHandlePublisherConcurrency(updatedPublisher));
 	}
 	
 	@Transactional(readOnly=true)

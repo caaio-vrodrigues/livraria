@@ -21,24 +21,30 @@ public class PublisherUpdateValidatorImpl implements PublisherUpdateValidator {
 	
 	@Override
 	public String validateName(String currentName, String newName) {
-		boolean containsFullNameAndIsDifferent = newName != null && !currentName.equals(newName);
+		boolean containsFullNameAndIsDifferent = newName != null && 
+			!currentName.equals(newName);
 		if(containsFullNameAndIsDifferent) return newName;
 		return currentName;
 	}
 
 	@Override
 	public Country validateCountry(Country currentCountry, Integer newCountryId) {
-		boolean containsCountryIdAndIsDifferent = newCountryId != null && !currentCountry.getId().equals(newCountryId);
-		if(containsCountryIdAndIsDifferent) return countryService.getCountryById(newCountryId);
+		boolean containsCountryIdAndIsDifferent = newCountryId != null && 
+			!currentCountry.getId().equals(newCountryId);
+		if(containsCountryIdAndIsDifferent) 
+			return countryService.getCountryById(newCountryId);
 		return currentCountry;
 	}
 
 	@Override
 	public String validateFullAddress(String currentAddress, String newAddress) {
-		boolean containsFullAddressAndIsDifferent = newAddress != null && !currentAddress.equals(newAddress);
+		boolean containsFullAddressAndIsDifferent = newAddress != null && 
+			!currentAddress.equals(newAddress);
 		if(containsFullAddressAndIsDifferent) {
-			Optional<Publisher> publisherOptionalByFullAddress = repo.findByFullAddress(newAddress); 
-			if(publisherOptionalByFullAddress.isPresent()) throw new PublisherAlreadyExistsException("Falha na atualização, 'fullAddress': "+newAddress+" já está em uso pela editora: "+publisherOptionalByFullAddress.get().getName());
+			Optional<Publisher> publisherOptionalByFullAddress = repo
+				.findByFullAddress(newAddress);
+			if(publisherOptionalByFullAddress.isPresent()) 
+				throw new PublisherAlreadyExistsException("Falha na atualização, 'fullAddress': "+newAddress+" já está em uso pela editora: "+publisherOptionalByFullAddress.get().getName());
 			return newAddress;
 		}
 		return currentAddress;

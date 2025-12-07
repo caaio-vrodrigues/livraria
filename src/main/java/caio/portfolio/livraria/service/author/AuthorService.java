@@ -1,6 +1,7 @@
 package caio.portfolio.livraria.service.author;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,9 @@ public class AuthorService {
 	
 	@Transactional
 	public ResponseAuthorDTO createAuthor(CreateAuthorDTO dto) {
-		repo.findByAlias(dto.getAlias()).orElseThrow(() ->
-			new AuthorAlreadyExistsException("'alias': '"+dto.getAlias()+"' já está sendo utilizado pelo autor: '"+dto.getFullName()+"'"));
+		Optional<Author> authorOptional = repo.findByAlias(dto.getAlias());
+		if(authorOptional.isPresent()) 
+			throw new AuthorAlreadyExistsException("'alias': '"+dto.getAlias()+"' já está sendo utilizado pelo autor: '"+dto.getFullName()+"'");
 		Author newAuthor = Author.builder()
 			.alias(dto.getAlias())
 			.fullName(dto.getFullName())

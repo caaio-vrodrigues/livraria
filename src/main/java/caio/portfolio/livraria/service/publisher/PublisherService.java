@@ -1,6 +1,7 @@
 package caio.portfolio.livraria.service.publisher;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +31,9 @@ public class PublisherService {
 
 	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
-		repo.findByFullAddress(dto.getFullAddress()).orElseThrow(() -> 
-			new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe"));
+		Optional<Publisher> existingPublisherOptional = repo.findByFullAddress(dto.getFullAddress());
+		if(existingPublisherOptional.isPresent()) 
+			throw new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe");
 		Publisher newPublisher = Publisher.builder()
 			.name(dto.getName())
 			.fullAddress(dto.getFullAddress())

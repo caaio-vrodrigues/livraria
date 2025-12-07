@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import caio.portfolio.livraria.infrastructure.entity.book.Book;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.model.UnitDecreaser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 		name="UK_salable_book_title_author")
 	}
 )
-public class SalableBook extends Book {
+public class SalableBook extends Book implements UnitDecreaser {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -54,5 +55,12 @@ public class SalableBook extends Book {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
+	}
+
+	@Override
+	public void decreaseUnits(int unitsToDecrease) {
+		if(units < unitsToDecrease) 
+			throw new RuntimeException("Quantidade de livros insuficiente para realizar a venda. Estoque atual: "+units);
+		units -= unitsToDecrease;
 	}
 }

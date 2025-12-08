@@ -77,8 +77,9 @@ public class SalableBookService {
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByAuthorId(Long authorId) {
 		Author author = authorService.getAuthorById(authorId);
-		List<SalableBook> bookList = repo.findByAuthor(author)
-			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro para o autor: '"+author.getFullName()+"'"));
+		List<SalableBook> bookList = repo.findByAuthor(author);
+		if(bookList.isEmpty()) 
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o autor: '"+author.getFullName()+"'");
 		return bookList.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
@@ -87,8 +88,9 @@ public class SalableBookService {
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByPublisherId(Long publisherId) {
 		Publisher publisher = publisherService.getPublisherById(publisherId);
-		List<SalableBook> bookList = repo.findByPublisher(publisher)
-			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro para a editora: '"+publisher.getName()+"'"));
+		List<SalableBook> bookList = repo.findByPublisher(publisher);
+		if(bookList.isEmpty()) 
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para a editora: '"+publisher.getName()+"'");
 		return bookList.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
@@ -96,8 +98,9 @@ public class SalableBookService {
 
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByTitle(String title) {
-		List<SalableBook> bookList = repo.findByTitle(title).orElseThrow(() -> 
-			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'"));
+		List<SalableBook> bookList = repo.findByTitle(title);
+		if(bookList.isEmpty())
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'");
 		return bookList.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
@@ -105,8 +108,9 @@ public class SalableBookService {
 
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByGenre(Genre genre) {
-		List<SalableBook> bookList = repo.findByGenre(genre).orElseThrow(() -> 
-			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'genre': '"+genre.name()+"'"));
+		List<SalableBook> bookList = repo.findByGenre(genre);
+		if(bookList.isEmpty())
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'genre': '"+genre.name()+"'");
 		return bookList.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
@@ -114,8 +118,9 @@ public class SalableBookService {
 
 	@Transactional(readOnly=true)
 	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByIsbn(String isbn) {
-		List<SalableBook> bookList = repo.findByIsbn(isbn).orElseThrow(() ->
-			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'isbn': '"+isbn+"'"));
+		List<SalableBook> bookList = repo.findByIsbn(isbn);
+		if(bookList.isEmpty())
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'isbn': '"+isbn+"'");
 		return bookList.stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();

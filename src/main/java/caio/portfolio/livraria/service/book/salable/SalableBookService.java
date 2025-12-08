@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.book.salable;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ public class SalableBookService {
 	private final SalableBookUpdateValidator salableBookUpdateValidator;
 	private final SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
 	private final SalableBookUniquenessValidator salableBookUniquenessValidator;
+	private final BookSellerImpl bookSellerImpl;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
 
@@ -153,5 +155,10 @@ public class SalableBookService {
 		return responseSalableBookDTOCreator
 			.toResponseSalableBookDTO(salableBookSaverAndConcurrencyHandleImpl
 				.saveAndHandleConcurrency(updatedSalableBook));
+	}
+	
+	@Transactional 
+	public BigDecimal sellBook(Long bookId, int units){
+		return bookSellerImpl.sellBook(bookId, units);
 	}
 }

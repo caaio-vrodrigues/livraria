@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.controller.book.salable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -90,5 +91,13 @@ public class SalableBookController {
 		@RequestBody UpdateSalableBookDTO dto
 	){
 		return ResponseEntity.ok(service.updateSalableBookByTitleAndAuthor(authorId, title, dto));
+	}
+	
+	@PutMapping("/sell/{bookId}/{units}")
+	public ResponseEntity<BigDecimal> sellBook(
+		@PathVariable Long bookId, 
+		@PathVariable int units
+	){
+		return ResponseEntity.ok(service.sellBook(bookId, units));
 	}
 }

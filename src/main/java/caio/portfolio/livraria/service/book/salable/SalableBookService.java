@@ -2,12 +2,10 @@ package caio.portfolio.livraria.service.book.salable;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
@@ -19,6 +17,7 @@ import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
+import caio.portfolio.livraria.service.book.salable.model.BookSeller;
 import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookUniquenessValidator;
@@ -35,17 +34,18 @@ public class SalableBookService {
 	private final SalableBookUpdateValidator salableBookUpdateValidator;
 	private final SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
 	private final SalableBookUniquenessValidator salableBookUniquenessValidator;
-	private final BookSellerImpl bookSellerImpl;
+	private final BookSeller bookSeller;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
 
 	@Transactional
 	public ResponseSalableBookDTO createSalableBook(CreateSalableBookDTO dto) {
-		Author author = authorService.getAuthorById(dto.getAuthorId());
-		Publisher publisher = publisherService.getPublisherById(dto.getPublisherId());
-		Optional<SalableBook> salableBookOptional = repo
-			.findByTitleAndAuthor(dto.getTitle(), author);
-		if(salableBookOptional.isPresent()) throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
+		Author author = authorService
+			.getAuthorById(dto.getAuthorId());
+		salableBookUniquenessValidator
+			.validateUniquenessOnCreate(author, dto.getTitle());
+		Publisher publisher = publisherService
+			.getPublisherById(dto.getPublisherId());
 		SalableBook newBook = SalableBook.builder()
 			.title(dto.getTitle())
 			.genre(dto.getGenre())
@@ -135,7 +135,7 @@ public class SalableBookService {
 				dto.getTitle(), 
 				bookToUpdate.getAuthor(), 
 				dto.getAuthorId());
-		salableBookUniquenessValidator.validateUniqueness(
+		salableBookUniquenessValidator.validateUniquenessOnUpdate(
 			titleAndAuthorUpdateDTO, bookToUpdate.getTitle(), bookToUpdate.getAuthor().getId());
 		SalableBook updatedSalableBook = SalableBook.builder()
 			.id(bookToUpdate.getId())
@@ -159,6 +159,6 @@ public class SalableBookService {
 	
 	@Transactional 
 	public BigDecimal sellBook(Long bookId, int units){
-		return bookSellerImpl.sellBook(bookId, units);
+		return bookSeller.sellBook(bookId, units);
 	}
 }

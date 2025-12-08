@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
+import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
@@ -18,7 +19,7 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 	private final SalableBookRepository repo;
 	
 	@Override
-	public void validateUniqueness(
+	public void validateUniquenessOnUpdate(
 		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId
 	){
 		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
@@ -31,5 +32,13 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 			if(existingBookOptional.isPresent()) 
 				throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
 		}
+	}
+
+	@Override
+	public void validateUniquenessOnCreate(Author author, String title) {
+		Optional<SalableBook> salableBookOptional = repo
+			.findByTitleAndAuthor(title, author);
+		if(salableBookOptional.isPresent()) 
+			throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
 	}
 }

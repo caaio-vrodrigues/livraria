@@ -1,8 +1,11 @@
 package caio.portfolio.livraria.service.book.salable.model;
 
+import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 
 public interface SalableBookUniquenessValidator {
-	void validateUniqueness(
+	void validateUniquenessOnUpdate(
 		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId);
+	
+	void validateUniquenessOnCreate(Author author, String title);
 }

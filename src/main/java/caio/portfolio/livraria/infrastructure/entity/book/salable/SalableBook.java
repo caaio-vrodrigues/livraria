@@ -38,10 +38,16 @@ public class SalableBook extends Book implements UnitDecreaser {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name="price", nullable=false)
+	@Column(
+		name="price", 
+		nullable=false, 
+		columnDefinition="DECIMAL(8,2) CHECK (price >= 0)")
 	private BigDecimal price;
 	
-	@Column(name="units", nullable=false)
+	@Column(
+		name="units", 
+		nullable=false, 
+		columnDefinition="INT CHECK (units >= 0)")
 	private Integer units;
 	
 	@Override

@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.AssertionFailure;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -320,5 +321,20 @@ public class ExceptionHandlerController {
             null
         );
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+	
+	@ExceptionHandler(AssertionFailure.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Object> handleAssertionFailure(
+        AssertionFailure e,
+        HttpServletRequest httpRequest
+    ){
+        Map<String, Object> body = createErrorBody(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Ocorreu um erro interno inesperado durante a persistência de dados. Por favor, contate o suporte.",
+            httpRequest.getRequestURI(),
+            null
+        );
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

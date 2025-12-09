@@ -24,11 +24,14 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 	public TitleAndAuthorUpdateDTO validateTitleAndAuthor(
 		String title, String newTitle, Author author, Long newAuthorId
 	){
-		boolean containsTitleAndIsDifferent = newTitle != null && !title.equals(newTitle);
-		boolean containsAuthorAndIsDifferent = newAuthorId != null && !author.getId().equals(newAuthorId);
+		boolean containsTitleAndIsDifferent = newTitle != null && 
+			!title.equals(newTitle);
+		boolean containsAuthorAndIsDifferent = newAuthorId != null && 
+			!author.getId().equals(newAuthorId);
 		if(containsAuthorAndIsDifferent || containsTitleAndIsDifferent) {
 			title = containsTitleAndIsDifferent ? newTitle : title;
-			if(containsAuthorAndIsDifferent) author = authorService.getAuthorById(newAuthorId);
+			if(containsAuthorAndIsDifferent) 
+				author = authorService.getAuthorById(newAuthorId);
 		}
 		return TitleAndAuthorUpdateDTO.builder()
 			.title(title)
@@ -37,7 +40,9 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 	}
 
 	@Override
-	public Publisher validatePublisher(Publisher currentPublisher, Long newPublisherId) {
+	public Publisher validatePublisher(
+		Publisher currentPublisher, Long newPublisherId
+	){
 		boolean containsPublisherAndIsDifferent = newPublisherId != null && 
 			!currentPublisher.getId().equals(newPublisherId);
 		if(containsPublisherAndIsDifferent) 
@@ -48,28 +53,34 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 	@Override
 	public Genre validateGenre(Genre currentGenre, Genre newGenre) {
 		boolean containsGenreAndIsDifferent = newGenre != null && 
-			!currentGenre.getGenreType().equals(newGenre.getGenreType());
+			!currentGenre.getGenreType()
+				.equals(newGenre.getGenreType());
 		if(containsGenreAndIsDifferent) return newGenre;
 		return currentGenre;
 	}
 
 	@Override
 	public String validateIsbn(String currentIsbn, String newIsbn) {
-		boolean containsIsbnAndIsDifferent = newIsbn != null && !currentIsbn.equals(newIsbn);
+		boolean containsIsbnAndIsDifferent = newIsbn != null && 
+			!currentIsbn.equals(newIsbn);
 		if(containsIsbnAndIsDifferent) return newIsbn;
 		return currentIsbn;
 	}
 
 	@Override
-	public BigDecimal validatePrice(BigDecimal currentPrice, BigDecimal newPrice) {
-		boolean containsPriceAndIsDifferent = newPrice != null && !currentPrice.equals(newPrice);
+	public BigDecimal validatePrice(
+		BigDecimal currentPrice, BigDecimal newPrice
+	){
+		boolean containsPriceAndIsDifferent = newPrice != null && 
+			!currentPrice.equals(newPrice);
 		if(containsPriceAndIsDifferent) return newPrice;
 		return currentPrice;
 	}
 
 	@Override
 	public Integer validateUnits(Integer currentUnits, Integer newUnits) {
-		boolean containsNewUnitsAndIsDifferent = newUnits != null && !currentUnits.equals(newUnits);
+		boolean containsNewUnitsAndIsDifferent = newUnits != null && 
+			!currentUnits.equals(newUnits);
 		if(containsNewUnitsAndIsDifferent) return newUnits;
 		return currentUnits;
 	}

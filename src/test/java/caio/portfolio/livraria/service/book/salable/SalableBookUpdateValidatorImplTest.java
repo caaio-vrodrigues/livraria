@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.book.salable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,6 +35,8 @@ class SalableBookUpdateValidatorImplTest {
 	@Mock AuthorService authorService;
 	@Mock PublisherService publisherService;
 	
+	private static final int CURRENT_UNITS = 100;
+	private static final int NEW_UNITS = 80;
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long CAIO_ID = 2L;
 	private static final Long NON_EXISTENT_ID = 100L;
@@ -61,6 +64,8 @@ class SalableBookUpdateValidatorImplTest {
 	private static final Integer USA_ID = 2;
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
 	private static final LocalDate CAIO_BIRTHDAY = LocalDate.of(1992, 03, 20);
+	private static final BigDecimal CURRENT_PRICE = BigDecimal.valueOf(100);
+	private static final BigDecimal NEW_PRICE = BigDecimal.valueOf(50);
 	
 	private static final Country BRAZIL = Country.builder()
 		.id(BRAZIL_ID)
@@ -110,10 +115,18 @@ class SalableBookUpdateValidatorImplTest {
 		when(authorService.getAuthorById(CAIO_ID))
 			.thenReturn(CAIO_VINICIUS_RODRIGUES);
 		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO = salableBookUpdateValidatorImpl
-			.validateTitleAndAuthor(CURRENT_TITLE, NEW_TITLE, PAULO_COELHO, CAIO_ID);
+			.validateTitleAndAuthor(
+				CURRENT_TITLE, 
+				NEW_TITLE, 
+				PAULO_COELHO, 
+				CAIO_ID);
 		assertNotNull(titleAndAuthorUpdateDTO);
-		assertEquals(NEW_TITLE, titleAndAuthorUpdateDTO.getTitle());
-		assertEquals(CAIO_ID, titleAndAuthorUpdateDTO.getAuthor().getId());
+		assertEquals(
+			NEW_TITLE, 
+			titleAndAuthorUpdateDTO.getTitle());
+		assertEquals(
+			CAIO_ID, 
+			titleAndAuthorUpdateDTO.getAuthor().getId());
 	}
 	
 	@Test
@@ -132,7 +145,28 @@ class SalableBookUpdateValidatorImplTest {
 		assertEquals(
 			PAULO_COELHO.getId(), 
 			titleAndAuthorUpdateDTO.getAuthor().getId());
-		verify(authorService, never()).getAuthorById(anyLong());
+		verify(authorService, never())
+			.getAuthorById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve retornar 'TitleAndAuthorUpdateDTO' contendo valores sem alteração ao receber argumentos nulos")
+	void validateTitleAndAuthor_nullArgument_returnsCurrentTitleAndAuthorUpdateDTO() {
+		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO = salableBookUpdateValidatorImpl
+			.validateTitleAndAuthor(
+				CURRENT_TITLE, 
+				null, 
+				PAULO_COELHO, 
+				null);
+		assertNotNull(titleAndAuthorUpdateDTO);
+		assertEquals(
+			CURRENT_TITLE, 
+			titleAndAuthorUpdateDTO.getTitle());
+		assertEquals(
+			PAULO_COELHO.getId(), 
+			titleAndAuthorUpdateDTO.getAuthor().getId());
+		verify(authorService, never())
+			.getAuthorById(anyLong());
 	}
 	
 	@Test
@@ -143,7 +177,11 @@ class SalableBookUpdateValidatorImplTest {
 		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> salableBookUpdateValidatorImpl
-				.validateTitleAndAuthor(CURRENT_TITLE, NEW_TITLE, PAULO_COELHO, NON_EXISTENT_ID));
+					.validateTitleAndAuthor(
+						CURRENT_TITLE, 
+						NEW_TITLE, 
+						PAULO_COELHO, 
+						NON_EXISTENT_ID));
 	}
 	
 	@Test
@@ -152,21 +190,52 @@ class SalableBookUpdateValidatorImplTest {
 		when(publisherService.getPublisherById(GLOBAL_BOOKS_ID))
 			.thenReturn(GLOBAL_BOOKS_PUBLISHER);
 		Publisher publisher = salableBookUpdateValidatorImpl
-			.validatePublisher(ROCCO_PUBLISHER, GLOBAL_BOOKS_ID);
+			.validatePublisher(
+				ROCCO_PUBLISHER, 
+				GLOBAL_BOOKS_ID);
 		assertNotNull(publisher);
-		assertEquals(GLOBAL_BOOKS_ID, publisher.getId());
-		assertEquals(GLOBAL_BOOKS_NAME, publisher.getName());
+		assertEquals(
+			GLOBAL_BOOKS_ID, 
+			publisher.getId());
+		assertEquals(
+			GLOBAL_BOOKS_NAME, 
+			publisher.getName());
 	}
 	
 	@Test
 	@DisplayName("Deve validar a mesma editora e retorna-la")
 	void validatePublisher_returnsCurrentPublisher() {
 		Publisher publisher = salableBookUpdateValidatorImpl
-			.validatePublisher(ROCCO_PUBLISHER, ROCCO_ID);
+			.validatePublisher(
+				ROCCO_PUBLISHER, 
+				ROCCO_ID);
 		assertNotNull(publisher);
-		assertEquals(ROCCO_ID, publisher.getId());
-		assertEquals(ROCCO_NAME, publisher.getName());
-		verify(publisherService, never()).getPublisherById(anyLong());
+		assertEquals(
+			ROCCO_ID, 
+			publisher.getId());
+		assertEquals(
+			ROCCO_NAME, 
+			publisher.getName());
+		verify(publisherService, never())
+			.getPublisherById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve retornar editora já existente ao receber argumento nulo")
+	void validatePublisher_nullArgument_returnsCurrentPublisher() {
+		Publisher publisher = salableBookUpdateValidatorImpl
+			.validatePublisher(
+				ROCCO_PUBLISHER, 
+				null);
+		assertNotNull(publisher);
+		assertEquals(
+			ROCCO_ID, 
+			publisher.getId());
+		assertEquals(
+			ROCCO_NAME, 
+			publisher.getName());
+		verify(publisherService, never())
+			.getPublisherById(anyLong());
 	}
 	
 	@Test
@@ -176,42 +245,150 @@ class SalableBookUpdateValidatorImplTest {
 			.thenThrow(PublisherNotFoundException.class);
 		assertThrows(
 			PublisherNotFoundException.class, 
-			() -> salableBookUpdateValidatorImpl.validatePublisher(ROCCO_PUBLISHER, NON_EXISTENT_ID));
+			() -> salableBookUpdateValidatorImpl
+					.validatePublisher(
+						ROCCO_PUBLISHER, 
+						NON_EXISTENT_ID));
 	}
 	
 	@Test
 	@DisplayName("Deve validar novo gênero e retorna-lo")
 	void validateGenre_returnsNewGenre() {
 		Genre fiction = salableBookUpdateValidatorImpl
-			.validateGenre(FICTION, ROMANCE);
+			.validateGenre(
+				FICTION, 
+				ROMANCE);
 		assertNotNull(fiction);
-		assertEquals(ROMANCE.getGenreType(), fiction.getGenreType());
+		assertEquals(
+			ROMANCE.getGenreType(), 
+			fiction.getGenreType());
 	}
 	
 	@Test
 	@DisplayName("Deve validar o mesmo gênero e retorna-lo")
 	void validateGenre_returnsCurrentGenre() {
 		Genre fiction = salableBookUpdateValidatorImpl
-			.validateGenre(FICTION, FICTION);
+			.validateGenre(
+				FICTION, 
+				FICTION);
 		assertNotNull(fiction);
-		assertEquals(FICTION.getGenreType(), fiction.getGenreType());
+		assertEquals(
+			FICTION.getGenreType(), 
+			fiction.getGenreType());
+	}
+	
+	@Test
+	@DisplayName("Deve retornar mesmo gênero ao receber argumento nulo")
+	void validateGenre_nullArgument_returnsCurrentGenre() {
+		Genre fiction = salableBookUpdateValidatorImpl
+			.validateGenre(
+				FICTION, 
+				null);
+		assertNotNull(fiction);
+		assertEquals(
+			FICTION.getGenreType(), 
+			fiction.getGenreType());
 	}
 	
 	@Test
 	@DisplayName("Deve validar novo isbn e retorna-lo")
 	void validateIsbn_returnsNewIsbn() {
 		String isbn = salableBookUpdateValidatorImpl
-			.validateIsbn(CURRENT_ISBN, NEW_ISBN);
+			.validateIsbn(
+				CURRENT_ISBN, 
+				NEW_ISBN);
 		assertNotNull(isbn);
-		assertEquals(NEW_ISBN, isbn);
+		assertEquals(
+			NEW_ISBN, 
+			isbn);
 	}
 	
 	@Test
 	@DisplayName("Deve validar mesmo isbn e retorna-lo")
 	void validateIsbn_returnsCurrentIsbn() {
 		String isbn = salableBookUpdateValidatorImpl
-			.validateIsbn(CURRENT_ISBN, CURRENT_ISBN);
+			.validateIsbn(
+				CURRENT_ISBN, 
+				CURRENT_ISBN);
 		assertNotNull(isbn);
-		assertEquals(CURRENT_ISBN, isbn);
+		assertEquals(
+			CURRENT_ISBN, 
+			isbn);
+	}
+	
+	@Test
+	@DisplayName("Deve retornar mesmo isbn ao receber argumento nulo")
+	void validateIsbn_nullArgument_returnsCurrentIsbn() {
+		String isbn = salableBookUpdateValidatorImpl
+			.validateIsbn(
+				CURRENT_ISBN, 
+				null);
+		assertNotNull(isbn);
+		assertEquals(
+			CURRENT_ISBN, 
+			isbn);
+	}
+	
+	@Test
+	@DisplayName("Deve validar novo preço e retorna-lo")
+	void validatePrice_returnsNewPrice() {
+		BigDecimal price = salableBookUpdateValidatorImpl
+			.validatePrice(
+				CURRENT_PRICE, 
+				NEW_PRICE);
+		assertNotNull(price);
+		assertEquals(
+			NEW_PRICE, 
+			price);
+	}
+	
+	@Test
+	@DisplayName("Deve validar mesmo preço e retorna-lo")
+	void validatePrice_returnsCurrentPrice() {
+		BigDecimal price = salableBookUpdateValidatorImpl
+			.validatePrice(
+				CURRENT_PRICE, 
+				CURRENT_PRICE);
+		assertNotNull(price);
+		assertEquals(
+			CURRENT_PRICE, 
+			price);
+	}
+	
+	@Test
+	@DisplayName("Deve retornar mesmo preço ao receber argumento nulo")
+	void validatePrice_nullArgument_returnsCurrentPrice() {
+		BigDecimal price = salableBookUpdateValidatorImpl
+			.validatePrice(
+				CURRENT_PRICE, 
+				null);
+		assertNotNull(price);
+		assertEquals(
+			CURRENT_PRICE, 
+			price);
+	}
+	
+	@Test
+	@DisplayName("Deve validar novas unidades e retorna-las")
+	void validateUnits_returnsNewUnits() {
+		int units = salableBookUpdateValidatorImpl
+			.validateUnits(
+				CURRENT_UNITS, 
+				NEW_UNITS);
+		assertEquals(
+			NEW_UNITS, 
+			units);
+	}
+	
+	@Test
+	@DisplayName("Deve validar mesmas unidades e retorna-las")
+	void validateUnits_returnsCurrentUnits() {
+		int units = salableBookUpdateValidatorImpl
+			.validateUnits(
+				CURRENT_UNITS, 
+				CURRENT_UNITS);
+		assertEquals(
+			CURRENT_UNITS, 
+			units);
 	}
 }

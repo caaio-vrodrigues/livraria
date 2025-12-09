@@ -3,7 +3,9 @@ package caio.portfolio.livraria.service.author;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +54,18 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/country/insert_brazil.sql")
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'ResponseAuthorDTO' após processo de criação e salvamento")
 	void createAuthor_returnsResponseAuthorDTO() {
-		ResponseAuthorDTO pauloCoelhoResponse = authorService.createAuthor(CREATE_PAULO_COELHO_DTO);
-		Assertions.assertNotNull(pauloCoelhoResponse);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, pauloCoelhoResponse.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, pauloCoelhoResponse.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_ID, pauloCoelhoResponse.getId());
+		ResponseAuthorDTO pauloCoelhoResponse = authorService
+			.createAuthor(CREATE_PAULO_COELHO_DTO);
+		assertNotNull(pauloCoelhoResponse);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			pauloCoelhoResponse.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			pauloCoelhoResponse.getFullName());
+		assertEquals(
+			PAULO_COELHO_ID, 
+			pauloCoelhoResponse.getId());
 	}
 	
 	@Test
@@ -64,7 +73,7 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'AuthorAlreadyExistsException' após verificar autor já existente")
 	void createAuthor_throwsAuthorAlreadyExistsException() {
-		Assertions.assertThrows(
+		assertThrows(
 			AuthorAlreadyExistsException.class, 
 			() -> authorService.createAuthor(CREATE_PAULO_COELHO_DTO));
 	}
@@ -74,18 +83,22 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar uma lista de 'ResponseAuthorDTO' ao chamar método sem argumentos")
 	void getAllAuthors_returnsResponseAuthorDTOList() {
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
-		Assertions.assertNotNull(responseAuthorDTOList);
-		Assertions.assertEquals(6, responseAuthorDTOList.size());
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTOList.get(0).getAlias());
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService
+			.getAllResponseAuthorDTOs();
+		assertNotNull(responseAuthorDTOList);
+		assertEquals(6, responseAuthorDTOList.size());
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			responseAuthorDTOList.get(0).getAlias());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar uma lista vazia ao chamar método sem argumentos")
 	void getAllAuthors_returnsEmptyList() {
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
-		Assertions.assertNotNull(responseAuthorDTOList);
-		Assertions.assertEquals(0, responseAuthorDTOList.size());
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService
+			.getAllResponseAuthorDTOs();
+		assertNotNull(responseAuthorDTOList);
+		assertEquals(0, responseAuthorDTOList.size());
 	}
 	
 	@Test
@@ -93,18 +106,27 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'id'")
 	void getAuthorById_returnsResponseAuthorDTO() {
-		ResponseAuthorDTO responseAuthorDTO = authorService.getResponseAuthorDTOById(PAULO_COELHO_ID);
-		Assertions.assertNotNull(responseAuthorDTO);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTO.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, responseAuthorDTO.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_BIRTHDAY, responseAuthorDTO.getBirthday());
-		Assertions.assertEquals(BRAZIL_ID, responseAuthorDTO.getCountryId());
+		ResponseAuthorDTO responseAuthorDTO = authorService
+			.getResponseAuthorDTOById(PAULO_COELHO_ID);
+		assertNotNull(responseAuthorDTO);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			responseAuthorDTO.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			responseAuthorDTO.getFullName());
+		assertEquals(
+			PAULO_COELHO_BIRTHDAY, 
+			responseAuthorDTO.getBirthday());
+		assertEquals(
+			BRAZIL_ID, 
+			responseAuthorDTO.getCountryId());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'id'")
 	void getAuthorById_throwsAuthorNotFoundException() {
-		Assertions.assertThrows(
+		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getAuthorById(PAULO_COELHO_ID));
 	}
@@ -114,18 +136,27 @@ class AuthorServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'alias'")
 	void getAuthorByAlias_returnsResponseAuthorDTO() {
-		ResponseAuthorDTO author = authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
-		Assertions.assertNotNull(author);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, author.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, author.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_BIRTHDAY, author.getBirthday());
-		Assertions.assertEquals(BRAZIL_ID, author.getCountryId());
+		ResponseAuthorDTO author = authorService
+			.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
+		assertNotNull(author);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			author.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			author.getFullName());
+		assertEquals(
+			PAULO_COELHO_BIRTHDAY, 
+			author.getBirthday());
+		assertEquals(
+			BRAZIL_ID, 
+			author.getCountryId());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'alias'")
 	void getAuthorByAlias_throwsAuthorNotFoundException() {
-		Assertions.assertThrows(
+		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS));
 	}
@@ -136,20 +167,34 @@ class AuthorServiceIntegrationTest {
 	@DisplayName("Deve atualizar autor por 'id' e retornar 'ResponseAuthorDTO'")
 	void updateAuthor_returnsResponseAuthorDTO() {
 		ResponseAuthorDTO responseAuthorDTO = authorService
-			.updateAuthor(PAULO_COELHO_ID, UPDATE_PAULO_COELHO);
-		Assertions.assertNotNull(responseAuthorDTO);
-		Assertions.assertEquals(PAULO_COELHO_ID, responseAuthorDTO.getId());
-		Assertions.assertEquals(PAULO_COELHO_UPDATED_ALIAS, responseAuthorDTO.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_UPDATED_FULL_NAME, responseAuthorDTO.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_BIRTHDAY, responseAuthorDTO.getBirthday());
-		Assertions.assertEquals(BRAZIL_ID, responseAuthorDTO.getCountryId());
+			.updateAuthor(
+				PAULO_COELHO_ID, 
+				UPDATE_PAULO_COELHO);
+		assertNotNull(responseAuthorDTO);
+		assertEquals(
+			PAULO_COELHO_ID, 
+			responseAuthorDTO.getId());
+		assertEquals(
+			PAULO_COELHO_UPDATED_ALIAS, 
+			responseAuthorDTO.getAlias());
+		assertEquals(
+			PAULO_COELHO_UPDATED_FULL_NAME, 
+			responseAuthorDTO.getFullName());
+		assertEquals(
+			PAULO_COELHO_BIRTHDAY, 
+			responseAuthorDTO.getBirthday());
+		assertEquals(
+			BRAZIL_ID, 
+			responseAuthorDTO.getCountryId());
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'AuthorNotFoundException' ao enviar 'id' não existente")
 	void updateAuthor_throwsAuthorNotFoundException() {
-		Assertions.assertThrows(
+		assertThrows(
 			AuthorNotFoundException.class , 
-			() -> authorService.updateAuthor(PAULO_COELHO_ID, UPDATE_PAULO_COELHO));
+			() -> authorService.updateAuthor(
+				PAULO_COELHO_ID, 
+				UPDATE_PAULO_COELHO));
 	}
 }

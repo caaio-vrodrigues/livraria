@@ -46,7 +46,8 @@ class AuthorUpdateValidatorImplIntegrationTest {
     @Sql("/sql/author/insert_author_list.sql")
     @DisplayName("Deve validar 'alias' diferente do atual e retorna-lo se não houver conflito")
     void validateAlias_returnsNewAlias(){
-        String updatedAlias = authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
+        String updatedAlias = authorUpdateValidatorImpl
+        	.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
         assertNotNull(updatedAlias);
         assertEquals(NEW_ALIAS, updatedAlias);
     }
@@ -58,7 +59,9 @@ class AuthorUpdateValidatorImplIntegrationTest {
     void validateAlias_throwsAuthorAlreadyExistsException() {
         AuthorAlreadyExistsException thrown = assertThrows(
             AuthorAlreadyExistsException.class,
-            () -> authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, EXISTING_ALIAS));
+            () -> authorUpdateValidatorImpl.validateAlias(
+            	AUTHOR_ALIAS, 
+            	EXISTING_ALIAS));
         assertTrue(thrown.getMessage().contains(EXISTING_ALIAS));
     }
     
@@ -66,9 +69,12 @@ class AuthorUpdateValidatorImplIntegrationTest {
     @Sql("/sql/country/insert_country_list.sql")
     @DisplayName("Deve receber 'countryId' diferente do 'id' contido no país do autor e retornar país diferente")
     void validateCountry_returnsNewCountry() {
-        Country updatedCountry = authorUpdateValidatorImpl.validateCountry(BRAZIL, ITALY_ID);
+        Country updatedCountry = authorUpdateValidatorImpl
+        	.validateCountry(BRAZIL, ITALY_ID);
         assertNotNull(updatedCountry);
-        assertEquals(ITALY_ID, updatedCountry.getId());
+        assertEquals(
+        	ITALY_ID, 
+        	updatedCountry.getId());
     }
     
     @Test
@@ -76,7 +82,10 @@ class AuthorUpdateValidatorImplIntegrationTest {
     void validateCountry_throwsCountryNotFoundException() {
         CountryNotFoundException thrown = assertThrows(
             CountryNotFoundException.class,
-            () -> authorUpdateValidatorImpl.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
-        assertTrue(thrown.getMessage().contains(" "+NON_EXISTENT_COUNTRY_ID));
+            () -> authorUpdateValidatorImpl.validateCountry(
+            	BRAZIL, 
+            	NON_EXISTENT_COUNTRY_ID));
+        assertTrue(thrown.getMessage()
+        	.contains(" "+NON_EXISTENT_COUNTRY_ID));
     }
 }

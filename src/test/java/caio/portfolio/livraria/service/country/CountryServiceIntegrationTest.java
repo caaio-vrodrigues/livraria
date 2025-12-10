@@ -38,7 +38,8 @@ class CountryServiceIntegrationTest {
 	private static final String NON_EXISTENT_COUNTRY_CODE = "ir";
 	private static final String INVALID_COUNTRY_CODE = "ur";
 	
-	private static final CreateCountryDTO CREATE_BRAZIL_DTO = CreateCountryDTO.builder()
+	private static final CreateCountryDTO CREATE_BRAZIL_DTO = CreateCountryDTO
+		.builder()
 	    .isoAlpha2Code(RAW_BRAZIL_CODE)
 	    .build();
 	
@@ -49,7 +50,9 @@ class CountryServiceIntegrationTest {
 	void getCountryById_returnsCountry() {
 		ResponseCountryDTO brazilRespDTO = service.getResponseCountryDTOById(1);
 		assertNotNull(brazilRespDTO);
-		assertEquals(BRAZIL_VALID_CODE, brazilRespDTO.getIsoAlpha2Code());
+		assertEquals(
+			BRAZIL_VALID_CODE, 
+			brazilRespDTO.getIsoAlpha2Code());
 	}
 	
 	@Test
@@ -68,9 +71,14 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar país ao buscar com 'isoAlpha2Code' existente")
 	void getCountryByIsoAlpha2Code_returnsCountry() {
-		ResponseCountryDTO result = service.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
-		assertEquals(BRAZIL_VALID_CODE, result.getIsoAlpha2Code());
-		assertEquals(BRAZIL_NAME, result.getName());
+		ResponseCountryDTO result = service
+			.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
+		assertEquals(
+			BRAZIL_VALID_CODE, 
+			result.getIsoAlpha2Code());
+		assertEquals(
+			BRAZIL_NAME, 
+			result.getName());
 	}
 	 
 	@Test
@@ -103,8 +111,12 @@ class CountryServiceIntegrationTest {
 		List<ResponseCountryDTO> result = service.getAllCountries();
 		assertNotNull(result);
 		assertEquals(10, result.size());
-		assertEquals(BRAZIL_VALID_CODE, result.get(0).getIsoAlpha2Code());
-		assertEquals(UNITED_STATES_VALID_CODE, result.get(1).getIsoAlpha2Code());
+		assertEquals(
+			BRAZIL_VALID_CODE, 
+			result.get(0).getIsoAlpha2Code());
+		assertEquals(
+			UNITED_STATES_VALID_CODE, 
+			result.get(1).getIsoAlpha2Code());
 	}
 	 
 	@Test
@@ -122,10 +134,15 @@ class CountryServiceIntegrationTest {
 	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve retornar país existente quando 'isoAlpha2Code' já está cadastrado")
 	void createOrFindCountry_returnsExistingCountry() {
-		CountryResultImplDTO result = service.createOrFindCountry(CREATE_BRAZIL_DTO);
+		CountryResultImplDTO result = service
+			.createOrFindCountry(CREATE_BRAZIL_DTO);
 	    assertNotNull(result);
-	    assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
-	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
+	    assertEquals(
+	    	BRAZIL_VALID_CODE, 
+	    	result.getCountry().getIsoAlpha2Code());
+	    assertEquals(
+	    	BRAZIL_NAME, 
+	    	result.getCountry().getName());
 	    assertFalse(result.isCreated());
 	}
 	 
@@ -134,10 +151,15 @@ class CountryServiceIntegrationTest {
 	@DisplayName("Deve criar novo país quando 'isoAlpha2Code' não existe")
 	void createOrFindCountry_createsNewCountry() {
 		long initialCount = repo.count();
-		CountryResultImplDTO result = service.createOrFindCountry(CREATE_BRAZIL_DTO);
+		CountryResultImplDTO result = service
+			.createOrFindCountry(CREATE_BRAZIL_DTO);
 	    assertNotNull(result);
-	    assertEquals(BRAZIL_VALID_CODE, result.getCountry().getIsoAlpha2Code());
-	    assertEquals(BRAZIL_NAME, result.getCountry().getName());
+	    assertEquals(
+	    	BRAZIL_VALID_CODE, 
+	    	result.getCountry().getIsoAlpha2Code());
+	    assertEquals(
+	    	BRAZIL_NAME, 
+	    	result.getCountry().getName());
 	    assertTrue(result.isCreated());
 	    assertEquals(initialCount + 1, repo.count());
 	}

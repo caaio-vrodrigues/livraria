@@ -33,6 +33,7 @@ class AuthorUpdateValidatorImplTest {
 	
 	private static final Long EXISTING_AUTHOR_ID = 2L;
 	private static final String NEW_ALIAS = "CVR";
+	private static final String INVALID_ALIAS = " ";
 	private static final String EXISTING_AUTHOR_FULL_NAME = "Alessandro Del Piero";
 	private static final String AUTHOR_ALIAS = "Caio VR";
 	private static final String AUTHOR_FULLNAME = "Caio Vinicius Rodrigues";
@@ -59,7 +60,8 @@ class AuthorUpdateValidatorImplTest {
 		.isoAlpha2Code(ITALY_CODE)
 		.build(); 
 	
-	private static final Author EXISTING_AUTHOR_WITH_NEW_ALIAS = Author.builder()
+	private static final Author EXISTING_AUTHOR_WITH_NEW_ALIAS = Author
+		.builder()
         .id(EXISTING_AUTHOR_ID)
         .alias(NEW_ALIAS)
         .fullName(EXISTING_AUTHOR_FULL_NAME)
@@ -69,17 +71,22 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve validar 'alias' diferente do atual e retorna-lo")
 	void validateAlias_returnsNewAlias(){
-		when(repo.findByAlias(NEW_ALIAS)).thenReturn(Optional.empty());
-		String updatedAlias = authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
+		when(repo.findByAlias(NEW_ALIAS))
+			.thenReturn(Optional.empty());
+		String updatedAlias = authorUpdateValidatorImpl
+			.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
 		assertNotNull(updatedAlias);
-		assertEquals(NEW_ALIAS, updatedAlias);
+		assertEquals(
+			NEW_ALIAS, 
+			updatedAlias);
 		verify(repo).findByAlias(NEW_ALIAS);
 	}
 	
 	@Test
 	@DisplayName("Deve validar 'alias' igual ao atual e retorna-lo")
 	void validateAlias_returnsExistingAlias(){
-		String updatedAlias = authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, AUTHOR_ALIAS);
+		String updatedAlias = authorUpdateValidatorImpl
+			.validateAlias(AUTHOR_ALIAS, AUTHOR_ALIAS);
 		assertNotNull(updatedAlias);
 		assertEquals(AUTHOR_ALIAS, updatedAlias);
 		verifyNoInteractions(repo);
@@ -88,30 +95,38 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'null' e retornar o 'alias' existente")
 	void validateAlias_nullArgument_returnsExistingAlias(){
-		String updatedAlias = authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, null);
+		String updatedAlias = authorUpdateValidatorImpl
+			.validateAlias(AUTHOR_ALIAS, null);
 		assertNotNull(updatedAlias);
-		assertEquals(AUTHOR_ALIAS, updatedAlias);
+		assertEquals(
+			AUTHOR_ALIAS, 
+			updatedAlias);
 		verifyNoInteractions(repo); 
 	}
 	
 	@Test
 	@DisplayName("Deve receber argumento vazio e retornar 'RuntimeException'")
 	void validateAlias_returnsRuntimeException(){
-		when(repo.findByAlias(" ")).thenThrow(RuntimeException.class);
+		when(repo.findByAlias(" "))
+			.thenThrow(RuntimeException.class);
 		assertThrows(
 			RuntimeException.class, 
-			() -> authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, " "));
-		verify(repo).findByAlias(" ");
+			() -> authorUpdateValidatorImpl
+				.validateAlias(AUTHOR_ALIAS, INVALID_ALIAS));
+		verify(repo).findByAlias(INVALID_ALIAS);
 	}
 	
 	@Test
     @DisplayName("Deve lançar 'AuthorAlreadyExistsException' se o novo 'alias' já estiver em uso")
     void validateAlias_throwsAuthorAlreadyExistsException() {
-		when(repo.findByAlias(NEW_ALIAS)).thenReturn(Optional.of(EXISTING_AUTHOR_WITH_NEW_ALIAS));
+		when(repo.findByAlias(NEW_ALIAS))
+			.thenReturn(Optional.of(EXISTING_AUTHOR_WITH_NEW_ALIAS));
 		AuthorAlreadyExistsException thrown = assertThrows(
             AuthorAlreadyExistsException.class,
-            () -> authorUpdateValidatorImpl.validateAlias(AUTHOR_ALIAS, NEW_ALIAS));
-		assertTrue(thrown.getMessage().contains(EXISTING_AUTHOR_WITH_NEW_ALIAS.getFullName()));
+            () -> authorUpdateValidatorImpl
+            	.validateAlias(AUTHOR_ALIAS, NEW_ALIAS));
+		assertTrue(thrown.getMessage()
+			.contains(EXISTING_AUTHOR_WITH_NEW_ALIAS.getFullName()));
 		verify(repo).findByAlias(NEW_ALIAS);
 	}
 	
@@ -163,7 +178,8 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'null' e retornar 'birthday' existente")
 	void validateBirthday_nullArgument_returnsExistingBirthday() {
-		LocalDate updatedBirthday = authorUpdateValidatorImpl.validateBirthday(AUTHOR_BIRTHDAY, null);
+		LocalDate updatedBirthday = authorUpdateValidatorImpl
+			.validateBirthday(AUTHOR_BIRTHDAY, null);
 		assertNotNull(updatedBirthday);
 		assertEquals(AUTHOR_BIRTHDAY, updatedBirthday);
 	}
@@ -171,7 +187,8 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'countryId' igual ao 'id' contido no país do autor e retornar mesmo país do autor")
 	void validateCountry_returnsExistingCountry() {
-		Country updatedCountry = authorUpdateValidatorImpl.validateCountry(BRAZIL, BRAZIL_ID);
+		Country updatedCountry = authorUpdateValidatorImpl
+			.validateCountry(BRAZIL, BRAZIL_ID);
 		assertNotNull(updatedCountry);
 		assertEquals(BRAZIL_ID, updatedCountry.getId());
 		verifyNoInteractions(countryService);
@@ -181,7 +198,8 @@ class AuthorUpdateValidatorImplTest {
 	@DisplayName("Deve receber 'countryId' diferente do 'id' contido no país do autor e retornar país diferente do país do autor")
 	void validateCountry_returnsNewCountry() {
 		when(countryService.getCountryById(ITALY_ID)).thenReturn(ITALY);
-		Country updatedCountry = authorUpdateValidatorImpl.validateCountry(BRAZIL, ITALY_ID);
+		Country updatedCountry = authorUpdateValidatorImpl
+			.validateCountry(BRAZIL, ITALY_ID);
 		assertNotNull(updatedCountry);
 		assertEquals(ITALY_ID, updatedCountry.getId());
 		verify(countryService).getCountryById(ITALY_ID);
@@ -190,7 +208,8 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'null' e retornar mesmo país do autor")
 	void validateCountry_nullArgument_returnsExistingCountry() {
-		Country updatedCountry = authorUpdateValidatorImpl.validateCountry(BRAZIL, null);
+		Country updatedCountry = authorUpdateValidatorImpl
+			.validateCountry(BRAZIL, null);
 		assertNotNull(updatedCountry);
 		assertEquals(BRAZIL_ID, updatedCountry.getId());
 		verifyNoInteractions(countryService);
@@ -203,7 +222,8 @@ class AuthorUpdateValidatorImplTest {
 			.thenThrow(new CountryNotFoundException("País com 'id': "+NON_EXISTENT_COUNTRY_ID+" não encontrado"));
 		CountryNotFoundException thrown = assertThrows(
             CountryNotFoundException.class,
-            () -> authorUpdateValidatorImpl.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
+            () -> authorUpdateValidatorImpl
+            	.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
 		assertTrue(thrown.getMessage().contains(" "+NON_EXISTENT_COUNTRY_ID));
 		verify(countryService).getCountryById(NON_EXISTENT_COUNTRY_ID);
 	}

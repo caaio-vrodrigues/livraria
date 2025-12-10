@@ -4,15 +4,23 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.anyInt;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
@@ -23,6 +31,7 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDT
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
+import caio.portfolio.livraria.service.author.model.AuthorSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
 import caio.portfolio.livraria.service.country.CountryService;
 
@@ -34,6 +43,7 @@ class AuthorServiceTest {
 	@Mock private CountryService countryService;
 	@Mock private AuthorRepository repo;
 	@Mock private ResponseAuthorDTOCreator responseAuthorDTOCreator;
+	@Mock private AuthorSaverAndConcurrencyHandle saverAndConcurrencyHandle;
 	
 	
 	private static final Long PAULO_COELHO_ID = 1L;
@@ -90,14 +100,16 @@ class AuthorServiceTest {
 		.countryId(CAIO_VINICIUS_RODRIGUES.getCountry().getId())
 		.build();
 	
-	private static final CreateAuthorDTO CREATE_PAULO_COELHO_DTO = CreateAuthorDTO.builder()
+	private static final CreateAuthorDTO CREATE_PAULO_COELHO_DTO = CreateAuthorDTO
+		.builder()
 		.alias(PAULO_COLEHO_ALIAS)
 		.fullName(PAULO_COELHO_FULL_NAME)
 		.birthday(PAULO_COELHO_BIRTHDAY)
 		.countryId(BRAZIL_ID)
 		.build();
 	
-	private static final UpdateAuthorDTO UPDATE_PAULO_COELHO = UpdateAuthorDTO.builder()
+	private static final UpdateAuthorDTO UPDATE_PAULO_COELHO = UpdateAuthorDTO
+		.builder()
 		.alias(PAULO_COELHO_UPDATED_ALIAS)
 		.fullName(PAULO_COELHO_UPDATED_FULL_NAME)
 		.birthday(PAULO_COELHO_BIRTHDAY)
@@ -111,7 +123,8 @@ class AuthorServiceTest {
 		.country(PAULO_COELHO.getCountry())
 		.build();
 	
-	private static final ResponseAuthorDTO UPDATE_PAULO_COELHO_DTO = ResponseAuthorDTO.builder()
+	private static final ResponseAuthorDTO UPDATE_PAULO_COELHO_DTO = ResponseAuthorDTO
+		.builder()
 		.id(UPDATED_PAULO_COELHO.getId())
 		.alias(UPDATED_PAULO_COELHO.getAlias())
 		.fullName(UPDATED_PAULO_COELHO.getFullName())
@@ -119,33 +132,48 @@ class AuthorServiceTest {
 		.countryId(UPDATED_PAULO_COELHO.getCountry().getId())
 		.build();
 	
-	private static final List<Author> AUTHOR_LIST = List.of(PAULO_COELHO, CAIO_VINICIUS_RODRIGUES);
+	private static final List<Author> AUTHOR_LIST = List.of(
+		PAULO_COELHO, 
+		CAIO_VINICIUS_RODRIGUES);
 
 	@Test
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'ResponseAuthorDTO' após processo de criação e salvamento")
 	void createAuthor_returnsResponseAuthorDTO() {
-		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.empty());
-		Mockito.when(countryService.getCountryById(BRAZIL_ID)).thenReturn(BRAZIL);
-		Mockito.when(repo.saveAndFlush(Mockito.any(Author.class))).thenReturn(PAULO_COELHO);
-		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+			.thenReturn(Optional.empty());
+		when(countryService.getCountryById(BRAZIL_ID))
+			.thenReturn(BRAZIL);
+		when(saverAndConcurrencyHandle
+			.saveAndHandleConcurrentyAuthor(any(Author.class)))
+				.thenReturn(PAULO_COELHO);
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO pauloCoelhoResponse = authorService.createAuthor(CREATE_PAULO_COELHO_DTO);
-		Assertions.assertNotNull(pauloCoelhoResponse);
-		Assertions.assertEquals(RESPONSE_PAULO_COELHO_DTO, pauloCoelhoResponse);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, pauloCoelhoResponse.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, pauloCoelhoResponse.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_ID, pauloCoelhoResponse.getId());
-		Mockito.verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
-		Mockito.verify(countryService).getCountryById(BRAZIL_ID);
-		Mockito.verify(repo).saveAndFlush(Mockito.any(Author.class));
-		Mockito.verify(responseAuthorDTOCreator).toResponseAuthorDTO(PAULO_COELHO);
+		ResponseAuthorDTO pauloCoelhoResponse = authorService
+			.createAuthor(CREATE_PAULO_COELHO_DTO);
+		assertNotNull(pauloCoelhoResponse);
+		assertEquals(
+			RESPONSE_PAULO_COELHO_DTO, 
+			pauloCoelhoResponse);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			pauloCoelhoResponse.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			pauloCoelhoResponse.getFullName());
+		assertEquals(
+			PAULO_COELHO_ID, 
+			pauloCoelhoResponse.getId());
+		verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
+		verify(countryService).getCountryById(BRAZIL_ID);
+		verify(responseAuthorDTOCreator).toResponseAuthorDTO(PAULO_COELHO);
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'AuthorAlreadyExistsException' após verificar autor já existente")
 	void createAuthor_throwsAuthorAlreadyExistsException() {
-		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.of(PAULO_COELHO));
-		Assertions.assertThrows(
+		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+			.thenReturn(Optional.of(PAULO_COELHO));
+		assertThrows(
 			AuthorAlreadyExistsException.class, 
 			() -> authorService.createAuthor(CREATE_PAULO_COELHO_DTO));
 	}
@@ -153,160 +181,217 @@ class AuthorServiceTest {
 	@Test
     @DisplayName("Deve lançar 'ConcurrentAuthorException' ao tentar salvar autor")
     void createAuthor_throwsConcurrentAuthorException() {
-		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.empty());
-		Mockito.when(countryService.getCountryById(BRAZIL_ID)).thenReturn(BRAZIL);
-		Mockito.when(repo.saveAndFlush(Mockito.any(Author.class)))
-        	.thenThrow(new DataIntegrityViolationException("Erro de persistência"));
-		Assertions.assertThrows(
+		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+			.thenReturn(Optional.empty());
+		when(countryService.getCountryById(BRAZIL_ID))
+			.thenReturn(BRAZIL);
+		when(saverAndConcurrencyHandle
+			.saveAndHandleConcurrentyAuthor(any(Author.class)))
+				.thenThrow(new ConcurrentAuthorException("Erro de persistência"));
+		assertThrows(
 			ConcurrentAuthorException.class,
             () -> authorService.createAuthor(CREATE_PAULO_COELHO_DTO)
         );
-		Mockito.verify(repo, Mockito.times(2)).findByAlias(PAULO_COLEHO_ALIAS);
-	    Mockito.verify(countryService).getCountryById(BRAZIL_ID);
-	    Mockito.verify(repo).saveAndFlush(Mockito.any(Author.class));
-	    Mockito.verify(responseAuthorDTOCreator, Mockito.never())
-	    	.toResponseAuthorDTO(Mockito.any(Author.class));
+		verify(repo, times(1)).findByAlias(PAULO_COLEHO_ALIAS);
+	    verify(countryService).getCountryById(BRAZIL_ID);
+	    verify(saverAndConcurrencyHandle)
+	    	.saveAndHandleConcurrentyAuthor(any(Author.class));
+	    verify(responseAuthorDTOCreator, never())
+	    	.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar uma lista de 'ResponseAuthorDTO' ao chamar método sem argumentos")
 	void getAllAuthors_returnsResponseAuthorDTOList() {
-		Mockito.when(repo.findAll()).thenReturn(AUTHOR_LIST);
-		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(Mockito.any(Author.class)))
-			.thenReturn(RESPONSE_PAULO_COELHO_DTO, RESPONSE_CAIO_VINICIUS_RODRIGUES_DTO);
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
-		Assertions.assertNotNull(responseAuthorDTOList);
-		Assertions.assertEquals(2, responseAuthorDTOList.size());
-		Assertions.assertEquals(RESPONSE_PAULO_COELHO_DTO, responseAuthorDTOList.get(0));
-		Assertions.assertEquals(RESPONSE_CAIO_VINICIUS_RODRIGUES_DTO, responseAuthorDTOList.get(1));
-		Mockito.verify(repo).findAll();
-		Mockito.verify(responseAuthorDTOCreator, Mockito.times(2))
-			.toResponseAuthorDTO(Mockito.any(Author.class));
+		when(repo.findAll()).thenReturn(AUTHOR_LIST);
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(any(Author.class)))
+			.thenReturn(
+				RESPONSE_PAULO_COELHO_DTO, 
+				RESPONSE_CAIO_VINICIUS_RODRIGUES_DTO);
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService
+			.getAllResponseAuthorDTOs();
+		assertNotNull(responseAuthorDTOList);
+		assertEquals(2, responseAuthorDTOList.size());
+		assertEquals(
+			RESPONSE_PAULO_COELHO_DTO, 
+			responseAuthorDTOList.get(0));
+		assertEquals(
+			RESPONSE_CAIO_VINICIUS_RODRIGUES_DTO, 
+			responseAuthorDTOList.get(1));
+		verify(repo).findAll();
+		verify(responseAuthorDTOCreator, times(2))
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar uma lista vazia ao chamar método sem argumentos")
 	void getAllAuthors_returnsEmptyList() {
-		Mockito.when(repo.findAll()).thenReturn(List.of());
-		List<ResponseAuthorDTO> responseAuthorDTOList = authorService.getAllResponseAuthorDTOs();
-		Assertions.assertNotNull(responseAuthorDTOList);
-		Assertions.assertEquals(0, responseAuthorDTOList.size());
-		Mockito.verify(repo).findAll();
-		Mockito.verify(responseAuthorDTOCreator, Mockito.never())
-			.toResponseAuthorDTO(Mockito.any(Author.class));
+		when(repo.findAll()).thenReturn(List.of());
+		List<ResponseAuthorDTO> responseAuthorDTOList = authorService
+			.getAllResponseAuthorDTOs();
+		assertNotNull(responseAuthorDTOList);
+		assertEquals(0, responseAuthorDTOList.size());
+		verify(repo).findAll();
+		verify(responseAuthorDTOCreator, never())
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'id'")
 	void getAuthorById_returnsResponseAuthorDTO() {
-		Mockito.when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.of(PAULO_COELHO));
-		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(repo.findById(PAULO_COELHO_ID))
+			.thenReturn(Optional.of(PAULO_COELHO));
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO responseAuthorDTO = authorService.getResponseAuthorDTOById(PAULO_COELHO_ID);
-		Assertions.assertNotNull(responseAuthorDTO);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, responseAuthorDTO.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, responseAuthorDTO.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_BIRTHDAY, responseAuthorDTO.getBirthday());
-		Assertions.assertEquals(BRAZIL_ID, responseAuthorDTO.getCountryId());
-		Mockito.verify(repo).findById(PAULO_COELHO_ID);
-		Mockito.verify(responseAuthorDTOCreator).toResponseAuthorDTO(PAULO_COELHO);
+		ResponseAuthorDTO responseAuthorDTO = authorService
+			.getResponseAuthorDTOById(PAULO_COELHO_ID);
+		assertNotNull(responseAuthorDTO);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			responseAuthorDTO.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			responseAuthorDTO.getFullName());
+		assertEquals(
+			PAULO_COELHO_BIRTHDAY, 
+			responseAuthorDTO.getBirthday());
+		assertEquals(
+			BRAZIL_ID, 
+			responseAuthorDTO.getCountryId());
+		verify(repo).findById(PAULO_COELHO_ID);
+		verify(responseAuthorDTOCreator)
+			.toResponseAuthorDTO(PAULO_COELHO);
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'id'")
 	void getAuthorById_throwsAuthorNotFoundException() {
-		Mockito.when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.empty());
-		Assertions.assertThrows(
+		when(repo.findById(PAULO_COELHO_ID))
+			.thenReturn(Optional.empty());
+		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getAuthorById(PAULO_COELHO_ID));
-		Mockito.verify(repo).findById(PAULO_COELHO_ID);
-		Mockito.verify(responseAuthorDTOCreator, Mockito.never())
-			.toResponseAuthorDTO(Mockito.any(Author.class));
+		verify(repo).findById(PAULO_COELHO_ID);
+		verify(responseAuthorDTOCreator, never())
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'alias'")
 	void getAuthorByAlias_returnsResponseAuthorDTO() {
-		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.of(PAULO_COELHO));
-		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+			.thenReturn(Optional.of(PAULO_COELHO));
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO author = authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
-		Assertions.assertNotNull(author);
-		Assertions.assertEquals(PAULO_COLEHO_ALIAS, author.getAlias());
-		Assertions.assertEquals(PAULO_COELHO_FULL_NAME, author.getFullName());
-		Assertions.assertEquals(PAULO_COELHO_BIRTHDAY, author.getBirthday());
-		Assertions.assertEquals(BRAZIL_ID, author.getCountryId());
-		Mockito.verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
-		Mockito.verify(responseAuthorDTOCreator).toResponseAuthorDTO(PAULO_COELHO);
+		ResponseAuthorDTO author = authorService
+			.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
+		assertNotNull(author);
+		assertEquals(
+			PAULO_COLEHO_ALIAS, 
+			author.getAlias());
+		assertEquals(
+			PAULO_COELHO_FULL_NAME, 
+			author.getFullName());
+		assertEquals(
+			PAULO_COELHO_BIRTHDAY, 
+			author.getBirthday());
+		assertEquals(
+			BRAZIL_ID, 
+			author.getCountryId());
+		verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
+		verify(responseAuthorDTOCreator)
+			.toResponseAuthorDTO(PAULO_COELHO);
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'alias'")
 	void getAuthorByAlias_throwsAuthorNotFoundException() {
-		Mockito.when(repo.findByAlias(PAULO_COLEHO_ALIAS)).thenReturn(Optional.empty());
-		Assertions.assertThrows(
+		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+			.thenReturn(Optional.empty());
+		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS));
-		Mockito.verify(repo).findByAlias(Mockito.anyString());
-		Mockito.verify(responseAuthorDTOCreator, Mockito.never())
-			.toResponseAuthorDTO(Mockito.any(Author.class));
+		verify(repo).findByAlias(anyString());
+		verify(responseAuthorDTOCreator, never())
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve atualizar autor por 'id' e retornar 'ResponseAuthorDTO'")
 	void updateAuthor_returnsResponseAuthorDTO() {
-		Mockito.when(repo.findById(PAULO_COELHO_ID))
+		when(repo.findById(PAULO_COELHO_ID))
 			.thenReturn(Optional.of(PAULO_COELHO));
-		Mockito.when(authorupdateValidator
-			.validateAlias(PAULO_COLEHO_ALIAS, PAULO_COELHO_UPDATED_ALIAS))
+		when(authorupdateValidator.validateAlias(
+			PAULO_COLEHO_ALIAS, 
+			PAULO_COELHO_UPDATED_ALIAS))
 				.thenReturn(PAULO_COELHO_UPDATED_ALIAS);
-		Mockito.when(authorupdateValidator
-			.validateFullName(PAULO_COELHO_FULL_NAME, PAULO_COELHO_UPDATED_FULL_NAME))
+		when(authorupdateValidator.validateFullName(
+			PAULO_COELHO_FULL_NAME, 
+			PAULO_COELHO_UPDATED_FULL_NAME))
 				.thenReturn(PAULO_COELHO_UPDATED_FULL_NAME);
-		Mockito.when(authorupdateValidator
-			.validateBirthday(PAULO_COELHO_BIRTHDAY, PAULO_COELHO_BIRTHDAY))
+		when(authorupdateValidator.validateBirthday(
+			PAULO_COELHO_BIRTHDAY, 
+			PAULO_COELHO_BIRTHDAY))
 				.thenReturn(PAULO_COELHO_BIRTHDAY);
-		Mockito.when(authorupdateValidator
-			.validateCountry(BRAZIL, null))
-				.thenReturn(BRAZIL);
-		Mockito.when(repo.saveAndFlush(UPDATED_PAULO_COELHO))
-			.thenReturn(UPDATED_PAULO_COELHO);
-		Mockito.when(responseAuthorDTOCreator.toResponseAuthorDTO(UPDATED_PAULO_COELHO))
+		when(authorupdateValidator.validateCountry(BRAZIL, null))
+			.thenReturn(BRAZIL);
+		when(saverAndConcurrencyHandle
+				.saveAndHandleConcurrentyAuthor(any(Author.class)))
+					.thenReturn(PAULO_COELHO);
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(UPDATED_PAULO_COELHO))
 			.thenReturn(UPDATE_PAULO_COELHO_DTO);
-		ResponseAuthorDTO responseAuthorDTO = authorService.updateAuthor(PAULO_COELHO_ID, UPDATE_PAULO_COELHO);
-		Assertions.assertNotNull(responseAuthorDTO);
-		Assertions.assertEquals(UPDATED_PAULO_COELHO.getId(), responseAuthorDTO.getId());
-		Assertions.assertEquals(UPDATED_PAULO_COELHO.getAlias(), responseAuthorDTO.getAlias());
-		Assertions.assertEquals(UPDATED_PAULO_COELHO.getFullName(), responseAuthorDTO.getFullName());
-		Assertions.assertEquals(UPDATED_PAULO_COELHO.getBirthday(), responseAuthorDTO.getBirthday());
-		Assertions.assertEquals(UPDATED_PAULO_COELHO.getCountry().getId(), responseAuthorDTO.getCountryId());
-		Mockito.verify(repo).findById(PAULO_COELHO_ID);
-		Mockito.verify(authorupdateValidator).validateAlias(Mockito.anyString(), Mockito.anyString());
-		Mockito.verify(authorupdateValidator).validateFullName(Mockito.anyString(), Mockito.anyString());
-		Mockito.verify(authorupdateValidator).validateBirthday(Mockito.any(LocalDate.class), Mockito.any(LocalDate.class));
-		Mockito.verify(repo).saveAndFlush(Mockito.any(Author.class));
-		Mockito.verify(responseAuthorDTOCreator).toResponseAuthorDTO(Mockito.any(Author.class));
+		ResponseAuthorDTO responseAuthorDTO = authorService
+			.updateAuthor(
+				PAULO_COELHO_ID, 
+				UPDATE_PAULO_COELHO);
+		assertNotNull(responseAuthorDTO);
+		assertEquals(
+			UPDATED_PAULO_COELHO.getId(), 
+			responseAuthorDTO.getId());
+		assertEquals(
+			UPDATED_PAULO_COELHO.getAlias(), 
+			responseAuthorDTO.getAlias());
+		assertEquals(
+			UPDATED_PAULO_COELHO.getFullName(), 
+			responseAuthorDTO.getFullName());
+		assertEquals(
+			UPDATED_PAULO_COELHO.getBirthday(), 
+			responseAuthorDTO.getBirthday());
+		assertEquals(
+			UPDATED_PAULO_COELHO.getCountry().getId(), 
+			responseAuthorDTO.getCountryId());
+		verify(repo).findById(PAULO_COELHO_ID);
+		verify(authorupdateValidator)
+			.validateAlias(anyString(), anyString());
+		verify(authorupdateValidator)
+			.validateFullName(anyString(), anyString());
+		verify(authorupdateValidator)
+			.validateBirthday(any(LocalDate.class), any(LocalDate.class));
+		verify(responseAuthorDTOCreator)
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'AuthorNotFoundException' ao enviar 'id' não existente")
 	void updateAuthor_throwsAuthorNotFoundException() {
-		Mockito.when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.empty());
-		Assertions.assertThrows(
+		when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.empty());
+		assertThrows(
 			AuthorNotFoundException.class , 
-			() -> authorService.updateAuthor(PAULO_COELHO_ID, UPDATE_PAULO_COELHO));
-		Mockito.verify(repo).findById(Mockito.anyLong());
-		Mockito.verify(authorupdateValidator, Mockito.never())
-			.validateAlias(Mockito.anyString(), Mockito.anyString());
-		Mockito.verify(authorupdateValidator, Mockito.never())
-			.validateFullName(Mockito.anyString(), Mockito.anyString());
-		Mockito.verify(authorupdateValidator, Mockito.never())
-			.validateBirthday(Mockito.any(LocalDate.class), Mockito.any(LocalDate.class));
-		Mockito.verify(authorupdateValidator, Mockito.never())
-			.validateCountry(Mockito.any(Country.class), Mockito.anyInt());
-		Mockito.verify(repo, Mockito.never()).saveAndFlush(Mockito.any(Author.class));
-		Mockito.verify(repo, Mockito.never()).findByAlias(Mockito.anyString());
-		Mockito.verify(responseAuthorDTOCreator, Mockito.never())
-			.toResponseAuthorDTO(Mockito.any(Author.class));
+			() -> authorService.updateAuthor(
+				PAULO_COELHO_ID, 
+				UPDATE_PAULO_COELHO));
+		verify(repo).findById(anyLong());
+		verify(authorupdateValidator, never())
+			.validateAlias(anyString(), anyString());
+		verify(authorupdateValidator, never())
+			.validateFullName(anyString(), anyString());
+		verify(authorupdateValidator, never())
+			.validateBirthday(any(LocalDate.class), any(LocalDate.class));
+		verify(authorupdateValidator, never())
+			.validateCountry(any(Country.class), anyInt());
+		verify(repo, never()).saveAndFlush(any(Author.class));
+		verify(repo, never()).findByAlias(anyString());
+		verify(responseAuthorDTOCreator, never())
+			.toResponseAuthorDTO(any(Author.class));
 	}
 }

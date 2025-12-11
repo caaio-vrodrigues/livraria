@@ -62,9 +62,15 @@ class PublisherUpdateValidatorImplIntegrationTest {
 		Country validatedCountry = publisherUpdateValidatorImpl
 			.validateCountry(ROCCO_PUBLISHER.getCountry(), ITALY_ID);
 		Assertions.assertNotNull(validatedCountry);
-		Assertions.assertEquals(ITALY.getName(), validatedCountry.getName());
-		Assertions.assertEquals(ITALY.getIsoAlpha2Code(), validatedCountry.getIsoAlpha2Code());
-		Assertions.assertEquals(ITALY.getId(), validatedCountry.getId());
+		Assertions.assertEquals(
+			ITALY.getName(), 
+			validatedCountry.getName());
+		Assertions.assertEquals(
+			ITALY.getIsoAlpha2Code(), 
+			validatedCountry.getIsoAlpha2Code());
+		Assertions.assertEquals(
+			ITALY.getId(), 
+			validatedCountry.getId());
 	}
 	
 	@Test
@@ -73,7 +79,8 @@ class PublisherUpdateValidatorImplIntegrationTest {
 	void validateCountry_throwsCountryNotFoundException() {
 		Assertions.assertThrows(
 			CountryNotFoundException.class, 
-			() -> publisherUpdateValidatorImpl.validateCountry(
+			() -> publisherUpdateValidatorImpl
+				.validateCountry(
 					ROCCO_PUBLISHER.getCountry(), 
 					INVALID_COUNTRY_ID));
 	}
@@ -84,7 +91,9 @@ class PublisherUpdateValidatorImplIntegrationTest {
 	@DisplayName("Deve receber 'fullAddress' atual e valor diferente para retornar novo 'fullAddress'")
 	void validateFullAddress_returnsNewFullAddress() {
 		String updatedFullAddress = publisherUpdateValidatorImpl
-			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), ROCCO_NEW_FULL_ADDRESS);
+			.validateFullAddress(
+				ROCCO_PUBLISHER.getFullAddress(), 
+				ROCCO_NEW_FULL_ADDRESS);
 		Assertions.assertNotNull(updatedFullAddress);
 		Assertions.assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
 	}

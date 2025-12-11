@@ -107,16 +107,22 @@ class PublisherServiceIntegrationTest {
 	@Sql("/sql/publisher/insert_publisher_list.sql")
 	@DisplayName("Deve retornar lista de 'ResponsePublisherDTO' ao chamar método")
 	void getAllPublishers_returnsResponsePublisherDTOList() {
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service
+			.getAllResponsePublisherDTOs();
 		assertEquals(2, responsePublisherDTOListResult.size());
-		assertEquals(ROCCO_NAME, responsePublisherDTOListResult.get(0).getName());
-		assertEquals(GLOBAL_BOOKS_NAME, responsePublisherDTOListResult.get(1).getName());
+		assertEquals(
+			ROCCO_NAME, 
+			responsePublisherDTOListResult.get(0).getName());
+		assertEquals(
+			GLOBAL_BOOKS_NAME, 
+			responsePublisherDTOListResult.get(1).getName());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar lista vazia ao chamar método")
 	void getAllPublishers_returnsEmptyList() {
-		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
+		List<ResponsePublisherDTO> responsePublisherDTOListResult = service
+			.getAllResponsePublisherDTOs();
 		assertEquals(0, responsePublisherDTOListResult.size());
 	}
 	

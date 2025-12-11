@@ -1,6 +1,8 @@
 package caio.portfolio.livraria.service.publisher;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,14 +63,14 @@ class PublisherUpdateValidatorImplIntegrationTest {
 	void validateCountry_returnsNewCountry() {
 		Country validatedCountry = publisherUpdateValidatorImpl
 			.validateCountry(ROCCO_PUBLISHER.getCountry(), ITALY_ID);
-		Assertions.assertNotNull(validatedCountry);
-		Assertions.assertEquals(
+		assertNotNull(validatedCountry);
+		assertEquals(
 			ITALY.getName(), 
 			validatedCountry.getName());
-		Assertions.assertEquals(
+		assertEquals(
 			ITALY.getIsoAlpha2Code(), 
 			validatedCountry.getIsoAlpha2Code());
-		Assertions.assertEquals(
+		assertEquals(
 			ITALY.getId(), 
 			validatedCountry.getId());
 	}
@@ -77,7 +79,7 @@ class PublisherUpdateValidatorImplIntegrationTest {
 	@Sql("/sql/country/insert_brazil.sql")
 	@DisplayName("Deve receber 'Country' atual e 'countryId' não existente para lançar 'CountryNotFoundException'")
 	void validateCountry_throwsCountryNotFoundException() {
-		Assertions.assertThrows(
+		assertThrows(
 			CountryNotFoundException.class, 
 			() -> publisherUpdateValidatorImpl
 				.validateCountry(
@@ -94,8 +96,8 @@ class PublisherUpdateValidatorImplIntegrationTest {
 			.validateFullAddress(
 				ROCCO_PUBLISHER.getFullAddress(), 
 				ROCCO_NEW_FULL_ADDRESS);
-		Assertions.assertNotNull(updatedFullAddress);
-		Assertions.assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
+		assertNotNull(updatedFullAddress);
+		assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
 	}
 	
 	@Test
@@ -103,7 +105,7 @@ class PublisherUpdateValidatorImplIntegrationTest {
 	@Sql("/sql/publisher/insert_publisher_list.sql")
 	@DisplayName("Deve receber 'fullAddress' atual e valor já existente para lançar 'PublisherAlreadyExistsException'")
 	void validateFullAddress_throwsPublisherAlreadyExistsException() {
-		Assertions.assertThrows(
+		assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> publisherUpdateValidatorImpl.validateFullAddress(
 					ROCCO_PUBLISHER.getFullAddress(), 

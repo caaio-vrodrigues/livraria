@@ -2,7 +2,9 @@ package caio.portfolio.livraria.service.publisher;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,52 +64,81 @@ class PublisherUpdateValidatorImplTest {
 	@DisplayName("Deve receber 'name' atual e novo valor como argumentos para retornar novo valor após validação")
 	void validateName_returnsNewValidatedName() {
 		String validatedName = publisherUpdateValidatorImpl
-			.validateName(ROCCO_PUBLISHER.getName(), ROCCO_NEW_NAME);
-		Assertions.assertNotNull(validatedName);
-		Assertions.assertEquals(ROCCO_NEW_NAME, validatedName);
+			.validateName(
+				ROCCO_PUBLISHER.getName(), 
+				ROCCO_NEW_NAME);
+		assertNotNull(validatedName);
+		assertEquals(ROCCO_NEW_NAME, validatedName);
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'name' atual e mesmo valor como argumentos para retornar valor atual após validação")
 	void validateName_returnsCurrentValidatedName() {
 		String validatedName = publisherUpdateValidatorImpl
-			.validateName(ROCCO_PUBLISHER.getName(), ROCCO_NAME);
-		Assertions.assertNotNull(validatedName);
-		Assertions.assertEquals(ROCCO_PUBLISHER.getName(), validatedName);
+			.validateName(
+				ROCCO_PUBLISHER.getName(), 
+				ROCCO_NAME);
+		assertNotNull(validatedName);
+		assertEquals(
+			ROCCO_PUBLISHER.getName(), 
+			validatedName);
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'name' atual e 'null' como argumentos para retornar valor atual após validação")
 	void validateName_nullArgument_returnsCurrentValidatedName() {
 		String validatedName = publisherUpdateValidatorImpl
-			.validateName(ROCCO_PUBLISHER.getName(), null);
-		Assertions.assertNotNull(validatedName);
-		Assertions.assertEquals(ROCCO_PUBLISHER.getName(), validatedName);
+			.validateName(
+				ROCCO_PUBLISHER.getName(), 
+				null);
+		assertNotNull(validatedName);
+		assertEquals(
+			ROCCO_PUBLISHER.getName(), 
+			validatedName);
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'id' de um país diferente para retornar novo 'Country'")
 	void validateCountry_returnsNewCountry() {
-		Mockito.when(countryService.getCountryById(ITALY_ID)).thenReturn(ITALY);
+		Mockito.when(countryService.getCountryById(ITALY_ID))
+			.thenReturn(ITALY);
 		Country validatedCountry = publisherUpdateValidatorImpl
-			.validateCountry(ROCCO_PUBLISHER.getCountry(), ITALY_ID);
-		Assertions.assertNotNull(validatedCountry);
-		Assertions.assertEquals(ITALY.getName(), validatedCountry.getName());
-		Assertions.assertEquals(ITALY.getIsoAlpha2Code(), validatedCountry.getIsoAlpha2Code());
-		Assertions.assertEquals(ITALY.getId(), validatedCountry.getId());
-		Mockito.verify(countryService).getCountryById(Mockito.anyInt());
+			.validateCountry(
+				ROCCO_PUBLISHER.getCountry(), 
+				ITALY_ID);
+		assertNotNull(validatedCountry);
+		assertEquals(
+			ITALY.getName(), 
+			validatedCountry.getName());
+		assertEquals(
+			ITALY.getIsoAlpha2Code(), 
+			validatedCountry.getIsoAlpha2Code());
+		assertEquals(
+			ITALY.getId(), 
+			validatedCountry.getId());
+		Mockito.verify(countryService)
+			.getCountryById(Mockito.anyInt());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'id' do mesmo país para retornar 'Country' atual")
 	void validateCountry_returnsCurrentCountry() {
 		Country validatedCountry = publisherUpdateValidatorImpl
-			.validateCountry(ROCCO_PUBLISHER.getCountry(), BRAZIL_ID);
-		Assertions.assertNotNull(validatedCountry);
-		Assertions.assertEquals(BRAZIL.getName(), validatedCountry.getName());
-		Assertions.assertEquals(BRAZIL.getIsoAlpha2Code(), validatedCountry.getIsoAlpha2Code());
-		Assertions.assertEquals(BRAZIL.getId(), validatedCountry.getId());
-		Mockito.verify(countryService, Mockito.never()).getCountryById(Mockito.anyInt());
+			.validateCountry(
+				ROCCO_PUBLISHER.getCountry(), 
+				BRAZIL_ID);
+		assertNotNull(validatedCountry);
+		assertEquals(
+			BRAZIL.getName(), 
+			validatedCountry.getName());
+		assertEquals(
+			BRAZIL.getIsoAlpha2Code(), 
+			validatedCountry.getIsoAlpha2Code());
+		assertEquals(
+			BRAZIL.getId(), 
+			validatedCountry.getId());
+		Mockito.verify(countryService, Mockito.never())
+			.getCountryById(Mockito.anyInt());
 	}
 	
 	@Test
@@ -115,11 +146,18 @@ class PublisherUpdateValidatorImplTest {
 	void validateCountry_nullArgument_returnsCurrentCountry() {
 		Country validatedCountry = publisherUpdateValidatorImpl
 			.validateCountry(ROCCO_PUBLISHER.getCountry(), null);
-		Assertions.assertNotNull(validatedCountry);
-		Assertions.assertEquals(BRAZIL.getName(), validatedCountry.getName());
-		Assertions.assertEquals(BRAZIL.getIsoAlpha2Code(), validatedCountry.getIsoAlpha2Code());
-		Assertions.assertEquals(BRAZIL.getId(), validatedCountry.getId());
-		Mockito.verify(countryService, Mockito.never()).getCountryById(Mockito.anyInt());
+		assertNotNull(validatedCountry);
+		assertEquals(
+			BRAZIL.getName(), 
+			validatedCountry.getName());
+		assertEquals(
+			BRAZIL.getIsoAlpha2Code(), 
+			validatedCountry.getIsoAlpha2Code());
+		assertEquals(
+			BRAZIL.getId(), 
+			validatedCountry.getId());
+		Mockito.verify(countryService, Mockito.never())
+			.getCountryById(Mockito.anyInt());
 	}
 	
 	@Test
@@ -127,12 +165,13 @@ class PublisherUpdateValidatorImplTest {
 	void validateCountry_throwsCountryNotFoundException() {
 		Mockito.when(countryService.getCountryById(INVALID_COUNTRY_ID))
 			.thenThrow(new CountryNotFoundException("Não foi possível encontrar um país para o 'id' fornecido"));
-		Assertions.assertThrows(
+		assertThrows(
 			CountryNotFoundException.class, 
 			() -> publisherUpdateValidatorImpl.validateCountry(
 					ROCCO_PUBLISHER.getCountry(), 
 					INVALID_COUNTRY_ID));
-		Mockito.verify(countryService).getCountryById(Mockito.anyInt());
+		Mockito.verify(countryService)
+			.getCountryById(Mockito.anyInt());
 	}
 	
 	@Test
@@ -141,29 +180,40 @@ class PublisherUpdateValidatorImplTest {
 		Mockito.when(repo.findByFullAddress(ROCCO_NEW_FULL_ADDRESS)).thenReturn(Optional.empty());
 		String updatedFullAddress = publisherUpdateValidatorImpl
 			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), ROCCO_NEW_FULL_ADDRESS);
-		Assertions.assertNotNull(updatedFullAddress);
-		Assertions.assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
-		Mockito.verify(repo).findByFullAddress(Mockito.anyString());
+		assertNotNull(updatedFullAddress);
+		assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
+		Mockito.verify(repo)
+			.findByFullAddress(Mockito.anyString());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e mesmo valor como argumentos para retornar 'fullAddress' atual")
 	void validateFullAddress_returnsCurrentFullAddress() {
 		String updatedFullAddress = publisherUpdateValidatorImpl
-			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), ROCCO_FULL_ADDRESS);
-		Assertions.assertNotNull(updatedFullAddress);
-		Assertions.assertEquals(ROCCO_PUBLISHER.getFullAddress(), updatedFullAddress);
-		Mockito.verify(repo, Mockito.never()).findByFullAddress(Mockito.anyString());
+			.validateFullAddress(
+				ROCCO_PUBLISHER.getFullAddress(), 
+				ROCCO_FULL_ADDRESS);
+		assertNotNull(updatedFullAddress);
+		assertEquals(
+			ROCCO_PUBLISHER.getFullAddress(), 
+			updatedFullAddress);
+		Mockito.verify(repo, Mockito.never())
+			.findByFullAddress(Mockito.anyString());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e 'null' como argumentos para retornar 'fullAddress' atual")
 	void validateFullAddress_nullArgument_returnsCurrentFullAddress() {
 		String updatedFullAddress = publisherUpdateValidatorImpl
-			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), null);
-		Assertions.assertNotNull(updatedFullAddress);
-		Assertions.assertEquals(ROCCO_PUBLISHER.getFullAddress(), updatedFullAddress);
-		Mockito.verify(repo, Mockito.never()).findByFullAddress(Mockito.anyString());
+			.validateFullAddress(
+				ROCCO_PUBLISHER.getFullAddress(), 
+				null);
+		assertNotNull(updatedFullAddress);
+		assertEquals(
+			ROCCO_PUBLISHER.getFullAddress(), 
+			updatedFullAddress);
+		Mockito.verify(repo, Mockito.never())
+			.findByFullAddress(Mockito.anyString());
 	}
 	
 	@Test
@@ -171,11 +221,12 @@ class PublisherUpdateValidatorImplTest {
 	void validateFullAddress_throwsPublisherAlreadyExistsException() {
 		Mockito.when(repo.findByFullAddress(GLOBAL_BOOKS_FULL_ADDRESS))
 			.thenThrow(new PublisherAlreadyExistsException("'fullAddress' em uso"));
-		Assertions.assertThrows(
+		assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> publisherUpdateValidatorImpl.validateFullAddress(
 					ROCCO_PUBLISHER.getFullAddress(), 
 					GLOBAL_BOOKS_FULL_ADDRESS));
-		Mockito.verify(repo).findByFullAddress(Mockito.anyString());
+		Mockito.verify(repo)
+			.findByFullAddress(Mockito.anyString());
 	}
 }

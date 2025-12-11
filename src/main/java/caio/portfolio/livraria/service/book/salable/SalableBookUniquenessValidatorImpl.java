@@ -20,10 +20,14 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 	
 	@Override
 	public void validateUniquenessOnUpdate(
-		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, String title, Long authorId
+		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO, 
+		String title, 
+		Long authorId
 	){
-		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle().equals(title) || 
-			!titleAndAuthorUpdateDTO.getAuthor().getId().equals(authorId);
+		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle()
+				.equals(title) || 
+			!titleAndAuthorUpdateDTO.getAuthor().getId()
+				.equals(authorId);
 		if(isDifferentTitleOrAuthor) {
 			Optional<SalableBook> existingBookOptional = repo
 				.findByTitleAndAuthor(

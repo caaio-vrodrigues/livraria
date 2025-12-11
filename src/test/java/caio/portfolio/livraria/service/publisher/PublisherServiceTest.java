@@ -33,6 +33,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.PublisherSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import caio.portfolio.livraria.service.publisher.model.ResponsePublisherDTOCreator;
 
@@ -44,6 +45,7 @@ class PublisherServiceTest {
 	@Mock private PublisherRepository repo;
 	@Mock private ResponsePublisherDTOCreator responsePublisherDTOCreator;
 	@Mock private PublisherUpdateValidator publisherUpdateValidator;
+	@Mock private PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
 	
 	private static final Long ROCCO_ID = 1L;
 	private static final Long GLOBAL_BOOKS_ID = 2L;
@@ -92,13 +94,15 @@ class PublisherServiceTest {
 		.fullAddress(ROCCO_NEW_FULL_ADDRESS)
 		.build();
 	
-	private static final CreatePublisherDTO CREATE_ROCCO_DTO = CreatePublisherDTO.builder()
+	private static final CreatePublisherDTO CREATE_ROCCO_DTO = CreatePublisherDTO
+		.builder()
 		.name(ROCCO_NAME)
 		.fullAddress(ROCCO_FULL_ADDRESS)
 		.countryId(BRAZIL_ID)
 		.build();
 	
-	private static final ResponsePublisherDTO RESPONSE_ROCCO_DTO = ResponsePublisherDTO.builder()
+	private static final ResponsePublisherDTO RESPONSE_ROCCO_DTO = ResponsePublisherDTO
+		.builder()
 		.id(ROCCO_ID)
 		.name(ROCCO_NAME)
 		.fullAddress(ROCCO_FULL_ADDRESS)
@@ -128,8 +132,7 @@ class PublisherServiceTest {
 		.build();
 	
 	private static final List<Publisher> PUBLISHER_LIST = List.of(
-		ROCCO_PUBLISHER, 
-		GLOBAL_BOOKS_PUBLISHER);
+		ROCCO_PUBLISHER, GLOBAL_BOOKS_PUBLISHER);
 
 	@Test
 	@DisplayName("Deve receber um 'CreatePublisherDTO' e retornar um 'ResponsePublisherDTO' após criação")
@@ -138,11 +141,14 @@ class PublisherServiceTest {
 			.thenReturn(Optional.empty());
 		when(countryService.getCountryById(BRAZIL_ID))
 			.thenReturn(BRAZIL);
-		when(repo.saveAndFlush(any(Publisher.class)))
+		when(publisherSaverAndConcurrencyHandle
+				.saveAndHandlePublisherConcurrency(any(Publisher.class)))
 			.thenReturn(ROCCO_PUBLISHER);
-		when(responsePublisherDTOCreator.toResponsePublisherDTO(ROCCO_PUBLISHER))
+		when(responsePublisherDTOCreator
+				.toResponsePublisherDTO(ROCCO_PUBLISHER))
 			.thenReturn(RESPONSE_ROCCO_DTO);
-		ResponsePublisherDTO responsePublisherDTO = service.createPublisher(CREATE_ROCCO_DTO);
+		ResponsePublisherDTO responsePublisherDTO = service
+			.createPublisher(CREATE_ROCCO_DTO);
 		assertNotNull(responsePublisherDTO);
 		assertEquals(
 			RESPONSE_ROCCO_DTO.getId(), 
@@ -156,12 +162,8 @@ class PublisherServiceTest {
 		assertEquals(
 			RESPONSE_ROCCO_DTO.getCountryId(), 
 			responsePublisherDTO.getCountryId());
-		verify(repo)
-			.findByFullAddress(anyString());
 		verify(countryService)
 			.getCountryById(anyInt());
-		verify(repo)
-			.saveAndFlush(any(Publisher.class));
 		verify(responsePublisherDTOCreator)
 			.toResponsePublisherDTO(any(Publisher.class));
 	}
@@ -191,17 +193,14 @@ class PublisherServiceTest {
 			.thenReturn(Optional.empty());
 		when(countryService.getCountryById(BRAZIL_ID))
 			.thenReturn(BRAZIL);
-		when(repo.saveAndFlush(any(Publisher.class)))
+		when(publisherSaverAndConcurrencyHandle
+				.saveAndHandlePublisherConcurrency(any(Publisher.class)))
 			.thenThrow(ConcurrentPublisherException.class);
 		assertThrows(
 			ConcurrentPublisherException.class, 
 			() -> service.createPublisher(CREATE_ROCCO_DTO));
-		verify(repo)
-			.findByFullAddress(anyString());
 		verify(countryService)
 			.getCountryById(anyInt());
-		verify(repo)
-			.saveAndFlush(any(Publisher.class));
 		verify(responsePublisherDTOCreator, never())
 			.toResponsePublisherDTO(any(Publisher.class));
 	}
@@ -337,7 +336,7 @@ class PublisherServiceTest {
 		when(publisherUpdateValidator
 				.validateFullAddress(anyString(), anyString()))
 			.thenReturn(ROCCO_NEW_FULL_ADDRESS);
-		when(repo.saveAndFlush(any(Publisher.class)))
+		when(publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(any(Publisher.class)))
 			.thenReturn(UPDATED_ROCCO_PUBLISHER);
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
@@ -358,14 +357,12 @@ class PublisherServiceTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getCountry().getId(), 
 			responsePublisherDTO.getCountryId());
-		verify(repo).findById(anyLong());
 		verify(publisherUpdateValidator)
 			.validateName(anyString(), anyString());
 		verify(publisherUpdateValidator)
 			.validateCountry(BRAZIL, null);
 		verify(publisherUpdateValidator)
 			.validateFullAddress(anyString(), anyString());
-		verify(repo).saveAndFlush(any(Publisher.class));
 		verify(responsePublisherDTOCreator)
 			.toResponsePublisherDTO(any(Publisher.class));
 	}

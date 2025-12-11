@@ -28,6 +28,7 @@ class CountryValidatorImplTest {
 	private static final String VALID_FRANCE_CODE = "FR";
 	private static final String RAW_FRANCE_CODE = "fr ";
 	private static final String INVALID_COUNTRY_CODE = "UR";
+	private static final String INVALID_CODE = " ";
 	
 	private static final Set<String> CODES_LIST = new HashSet<>();
 	
@@ -43,8 +44,12 @@ class CountryValidatorImplTest {
 	@Test
 	@DisplayName("Deve retornar 'isoAlpha2Code' normalizado caso seja um valor válido")
     void processIsoAlpha2Code_returnsValidIsoAlpha2Code() {
-        assertEquals(VALID_BRAZIL_CODE, validator.processIsoAlpha2Code(RAW_BRAZIL_CODE));
-        assertEquals(VALID_FRANCE_CODE, validator.processIsoAlpha2Code(RAW_FRANCE_CODE));
+        assertEquals(
+        	VALID_BRAZIL_CODE, 
+        	validator.processIsoAlpha2Code(RAW_BRAZIL_CODE));
+        assertEquals(
+        	VALID_FRANCE_CODE, 
+        	validator.processIsoAlpha2Code(RAW_FRANCE_CODE));
     }
 	
 	@Test
@@ -60,7 +65,7 @@ class CountryValidatorImplTest {
     void processIsoAlpha2Code_throwsExceptionForBlank() {
 		assertThrows(
 			IllegalArgumentException.class, 
-			() -> validator.processIsoAlpha2Code("  "));
+			() -> validator.processIsoAlpha2Code(INVALID_CODE));
     }
 	
 	@Test
@@ -76,7 +81,9 @@ class CountryValidatorImplTest {
 	@Test
 	@DisplayName("Deve retornar nome de país ao receber 'isoAlpha2Code' para validação")
 	void resolveNameByIsoAlpha2Code_returnsCountryName() {
-		assertEquals(BRAZIL_NAME, validator.resolveNameByIsoAlpha2Code(VALID_BRAZIL_CODE));
+		assertEquals(
+			BRAZIL_NAME, 
+			validator.resolveNameByIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 	
 	@Test
@@ -90,6 +97,8 @@ class CountryValidatorImplTest {
 	@Test
 	@DisplayName("Deve retornar nome de país após receber 'isoAlpha2Code' já validado")
 	void getNameByValidatedAndNormalizedIsoAlpha2Code_returnsCountryName() {
-		assertEquals(BRAZIL_NAME, validator.getNameByValidatedAndNormalizedIsoAlpha2Code(VALID_BRAZIL_CODE));
+		assertEquals(
+			BRAZIL_NAME, 
+			validator.getNameByValidatedAndNormalizedIsoAlpha2Code(VALID_BRAZIL_CODE));
 	}
 }

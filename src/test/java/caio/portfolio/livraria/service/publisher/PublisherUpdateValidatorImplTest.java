@@ -2,6 +2,11 @@ package caio.portfolio.livraria.service.publisher;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
@@ -100,7 +104,7 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'id' de um país diferente para retornar novo 'Country'")
 	void validateCountry_returnsNewCountry() {
-		Mockito.when(countryService.getCountryById(ITALY_ID))
+		when(countryService.getCountryById(ITALY_ID))
 			.thenReturn(ITALY);
 		Country validatedCountry = publisherUpdateValidatorImpl
 			.validateCountry(
@@ -116,8 +120,8 @@ class PublisherUpdateValidatorImplTest {
 		assertEquals(
 			ITALY.getId(), 
 			validatedCountry.getId());
-		Mockito.verify(countryService)
-			.getCountryById(Mockito.anyInt());
+		verify(countryService)
+			.getCountryById(anyInt());
 	}
 	
 	@Test
@@ -137,8 +141,8 @@ class PublisherUpdateValidatorImplTest {
 		assertEquals(
 			BRAZIL.getId(), 
 			validatedCountry.getId());
-		Mockito.verify(countryService, Mockito.never())
-			.getCountryById(Mockito.anyInt());
+		verify(countryService, never())
+			.getCountryById(anyInt());
 	}
 	
 	@Test
@@ -156,34 +160,34 @@ class PublisherUpdateValidatorImplTest {
 		assertEquals(
 			BRAZIL.getId(), 
 			validatedCountry.getId());
-		Mockito.verify(countryService, Mockito.never())
-			.getCountryById(Mockito.anyInt());
+		verify(countryService, never())
+			.getCountryById(anyInt());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'countryId' não existente para lançar 'CountryNotFoundException'")
 	void validateCountry_throwsCountryNotFoundException() {
-		Mockito.when(countryService.getCountryById(INVALID_COUNTRY_ID))
+		when(countryService.getCountryById(INVALID_COUNTRY_ID))
 			.thenThrow(new CountryNotFoundException("Não foi possível encontrar um país para o 'id' fornecido"));
 		assertThrows(
 			CountryNotFoundException.class, 
 			() -> publisherUpdateValidatorImpl.validateCountry(
 					ROCCO_PUBLISHER.getCountry(), 
 					INVALID_COUNTRY_ID));
-		Mockito.verify(countryService)
-			.getCountryById(Mockito.anyInt());
+		verify(countryService)
+			.getCountryById(anyInt());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e valor diferente para retornar novo 'fullAddress'")
 	void validateFullAddress_returnsNewFullAddress() {
-		Mockito.when(repo.findByFullAddress(ROCCO_NEW_FULL_ADDRESS)).thenReturn(Optional.empty());
+		when(repo.findByFullAddress(ROCCO_NEW_FULL_ADDRESS)).thenReturn(Optional.empty());
 		String updatedFullAddress = publisherUpdateValidatorImpl
 			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), ROCCO_NEW_FULL_ADDRESS);
 		assertNotNull(updatedFullAddress);
 		assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
-		Mockito.verify(repo)
-			.findByFullAddress(Mockito.anyString());
+		verify(repo)
+			.findByFullAddress(anyString());
 	}
 	
 	@Test
@@ -197,8 +201,8 @@ class PublisherUpdateValidatorImplTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getFullAddress(), 
 			updatedFullAddress);
-		Mockito.verify(repo, Mockito.never())
-			.findByFullAddress(Mockito.anyString());
+		verify(repo, never())
+			.findByFullAddress(anyString());
 	}
 	
 	@Test
@@ -212,21 +216,21 @@ class PublisherUpdateValidatorImplTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getFullAddress(), 
 			updatedFullAddress);
-		Mockito.verify(repo, Mockito.never())
-			.findByFullAddress(Mockito.anyString());
+		verify(repo, never())
+			.findByFullAddress(anyString());
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e valor já existente para lançar 'PublisherAlreadyExistsException'")
 	void validateFullAddress_throwsPublisherAlreadyExistsException() {
-		Mockito.when(repo.findByFullAddress(GLOBAL_BOOKS_FULL_ADDRESS))
+		when(repo.findByFullAddress(GLOBAL_BOOKS_FULL_ADDRESS))
 			.thenThrow(new PublisherAlreadyExistsException("'fullAddress' em uso"));
 		assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> publisherUpdateValidatorImpl.validateFullAddress(
 					ROCCO_PUBLISHER.getFullAddress(), 
 					GLOBAL_BOOKS_FULL_ADDRESS));
-		Mockito.verify(repo)
-			.findByFullAddress(Mockito.anyString());
+		verify(repo)
+			.findByFullAddress(anyString());
 	}
 }

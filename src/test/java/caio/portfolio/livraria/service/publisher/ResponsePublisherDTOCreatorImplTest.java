@@ -1,6 +1,7 @@
 package caio.portfolio.livraria.service.publisher;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePublisherDTO;
-
 
 @ExtendWith(MockitoExtension.class)
 class ResponsePublisherDTOCreatorImplTest {
@@ -42,20 +42,20 @@ class ResponsePublisherDTOCreatorImplTest {
 	void toResponsePublisherDTO_returnsResponsePublisherDTO() {
 		ResponsePublisherDTO responsePublisherDTO = responsePublisherDTOCreatorImpl
 			.toResponsePublisherDTO(ROCCO_PUBLISHER);
-		Assertions.assertNotNull(responsePublisherDTO);
-		Assertions.assertEquals(
+		assertNotNull(responsePublisherDTO);
+		assertEquals(
 			ROCCO_PUBLISHER.getId(), 
 			responsePublisherDTO.getId()
 		);
-		Assertions.assertEquals(
+		assertEquals(
 			ROCCO_PUBLISHER.getName(), 
 			responsePublisherDTO.getName()
 		);
-		Assertions.assertEquals(
+		assertEquals(
 			ROCCO_PUBLISHER.getFullAddress(), 
 			responsePublisherDTO.getFullAddress()
 		);
-		Assertions.assertEquals(
+		assertEquals(
 			ROCCO_PUBLISHER.getCountry().getId(), 
 			responsePublisherDTO.getCountryId()
 		);

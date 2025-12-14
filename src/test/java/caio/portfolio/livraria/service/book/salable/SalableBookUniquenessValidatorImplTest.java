@@ -1,5 +1,6 @@
 package caio.portfolio.livraria.service.book.salable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -31,19 +32,21 @@ class SalableBookUniquenessValidatorImplTest {
 	@InjectMocks private SalableBookUniquenessValidatorImpl salableBookUniquenessValidatorImpl;
 	@Mock private SalableBookRepository repo;
 	
+	private static final int UNITS = 50;
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long ROCCO_ID = 1L;
 	private static final String BRAZIL_NAME = "Brazil";
 	private static final String BRAZIL_CODE = "BR";
 	private static final String PAULO_COLEHO_ALIAS = "O Mago";
 	private static final String PAULO_COELHO_FULL_NAME = "Paulo Coelho";
-	private static final String CURRENT_TITLE = "Current Title";
+	private static final String O_ALQUIMISTA_TITLE = "Current Title";
 	private static final String NEW_TITLE = "New Title";
 	private static final String ROCCO_NAME = "Rocco";
 	private static final String ROCCO_FULL_ADDRESS = "Rua do Passeio, 38, 11º andar, no Passeio Corporate";
 	private static final String O_ALQUIMISTA_ISBN = "abc123";
 	private static final Integer BRAZIL_ID = 1;
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
+	private static final BigDecimal O_ALQUIMISTA_PRICE = BigDecimal.valueOf(39.5);
 	
 	private static final Country BRAZIL = Country.builder()
 		.id(BRAZIL_ID)
@@ -62,7 +65,7 @@ class SalableBookUniquenessValidatorImplTest {
 	private static final TitleAndAuthorUpdateDTO TITLE_AND_AUTHOR_UPDATE_DTO = TitleAndAuthorUpdateDTO
 		.builder()
 		.author(PAULO_COELHO)
-		.title(CURRENT_TITLE)
+		.title(O_ALQUIMISTA_TITLE)
 		.build();
 	
 	private static final Publisher ROCCO_PUBLISHER = Publisher.builder()
@@ -74,18 +77,18 @@ class SalableBookUniquenessValidatorImplTest {
 	
 	private static final SalableBook O_ALQUIMISTA = SalableBook.builder()
 		.author(PAULO_COELHO)	
+		.title(O_ALQUIMISTA_TITLE)
 		.genre(Genre.FANTASY)
 		.isbn(O_ALQUIMISTA_ISBN)
 		.publisher(ROCCO_PUBLISHER)
+		.price(O_ALQUIMISTA_PRICE)
+		.units(UNITS)
 		.build();
 	
 	@Test
 	@DisplayName("Deve validar unicidade de livro com sucesso para atualização")
 	void validateUniquenessOnUpdate_successfulValidation() {
-		when(repo
-			.findByTitleAndAuthor(
-				anyString(),
-				any(Author.class)))
+		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.empty());
 		assertDoesNotThrow(
 			() -> salableBookUniquenessValidatorImpl
@@ -97,9 +100,7 @@ class SalableBookUniquenessValidatorImplTest {
 	@Test
 	@DisplayName("Deve lançar 'SalableBookAlreadyExistsException' ao tentar validação de unicidade para atualização")
 	void validateUniquenessOnUpdate_throwsSalableBookAlreadyExistsException() {
-		when(repo.findByTitleAndAuthor(
-				anyString(), 
-				any(Author.class)))
+		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.of(O_ALQUIMISTA));
 		assertThrows(
 			SalableBookAlreadyExistsException.class,
@@ -111,9 +112,7 @@ class SalableBookUniquenessValidatorImplTest {
 	@Test
 	@DisplayName("Deve validar unicidade de livro com sucesso para atualização ao receber argumento nulo")
 	void validateUniquenessOnUpdate_nullArgument_successfulValidation() {
-		when(repo.findByTitleAndAuthor(
-				anyString(),
-				any(Author.class)))
+		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.empty());
 		assertDoesNotThrow(
 			() -> salableBookUniquenessValidatorImpl
@@ -125,9 +124,7 @@ class SalableBookUniquenessValidatorImplTest {
 	@Test
 	@DisplayName("Deve validar unicidade de livro com sucesso para criação")
 	void validateUniquenessOnCreate_successfulValidation() {
-		when(repo.findByTitleAndAuthor(
-				anyString(),
-				any(Author.class)))
+		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.empty());
 		assertDoesNotThrow(
 			() -> salableBookUniquenessValidatorImpl
@@ -141,9 +138,7 @@ class SalableBookUniquenessValidatorImplTest {
 	@Test
 	@DisplayName("Deve lançar 'SalableBookAlreadyExistsException' ao tentar validar unicidade de livro")
 	void validateUniquenessOnCreate_throwsSalableBookAlreadyExistsException() {
-		when(repo.findByTitleAndAuthor(
-				anyString(),
-				any(Author.class)))
+		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.of(O_ALQUIMISTA));
 		assertThrows(
 			SalableBookAlreadyExistsException.class,

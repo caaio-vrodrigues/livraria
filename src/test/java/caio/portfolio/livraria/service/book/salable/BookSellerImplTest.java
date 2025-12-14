@@ -6,8 +6,11 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
@@ -86,5 +90,17 @@ class BookSellerImplTest {
 		assertEquals(
 			O_ALQUIMISTA.getPrice().multiply(BigDecimal.valueOf(2)), 
 			totalToPay);
+		verify(repo, times(1)).findById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'SalableBookNotFoundException' ao tenatr realizar venda de livro não existente")
+	void sellBook_throwsSalableBookNotFoundException() {
+		when(repo.findById(anyLong()))
+			.thenReturn(Optional.empty());
+		assertThrows(
+			SalableBookNotFoundException.class,
+			() -> bookSellerImpl.sellBook(O_ALQUIMISTA_ID, UNITS));
+		verify(repo, times(1)).findById(anyLong());
 	}
 }

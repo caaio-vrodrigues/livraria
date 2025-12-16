@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
@@ -165,5 +166,11 @@ public class SalableBookService {
 	@Transactional 
 	public BigDecimal sellBook(Long bookId, int units){
 		return bookSeller.sellBook(bookId, units);
+	}
+
+	@Transactional
+	public BigDecimal sellBooks(BookSellListDTO bookListDTO) {
+		// TODO 
+		return null;
 	}
 }

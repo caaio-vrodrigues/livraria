@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
@@ -93,11 +94,18 @@ public class SalableBookController {
 		return ResponseEntity.ok(service.updateSalableBookByTitleAndAuthor(authorId, title, dto));
 	}
 	
-	@PutMapping("/sell/{bookId}/{units}")
+	@PutMapping("/sell-book/{bookId}/{units}")
 	public ResponseEntity<BigDecimal> sellBook(
 		@PathVariable Long bookId, 
 		@PathVariable int units
 	){
 		return ResponseEntity.ok(service.sellBook(bookId, units));
+	}
+	
+	@PutMapping("/sell-books")
+	public ResponseEntity<BigDecimal> sellBooks(
+		@RequestBody BookSellListDTO bookListDTO
+	){
+		return ResponseEntity.ok(service.sellBooks(bookListDTO));
 	}
 }

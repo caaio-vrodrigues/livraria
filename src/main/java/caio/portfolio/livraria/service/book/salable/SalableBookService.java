@@ -170,7 +170,6 @@ public class SalableBookService {
 
 	@Transactional
 	public BigDecimal sellBooks(BookSellListDTO bookListDTO) {
-		// TODO 
-		return null;
+		return bookSeller.sellBooks(bookListDTO);
 	}
 }

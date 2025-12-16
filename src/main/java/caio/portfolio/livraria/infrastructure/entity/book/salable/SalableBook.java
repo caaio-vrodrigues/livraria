@@ -3,6 +3,7 @@ package caio.portfolio.livraria.infrastructure.entity.book.salable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableBookUnitsException;
 import caio.portfolio.livraria.infrastructure.entity.book.Book;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.model.UnitDecreaser;
 import jakarta.persistence.Column;
@@ -66,7 +67,7 @@ public class SalableBook extends Book implements UnitDecreaser {
 	@Override
 	public void decreaseUnits(int unitsToDecrease) {
 		if(units < unitsToDecrease) 
-			throw new RuntimeException("Quantidade de livros insuficiente para realizar a venda. Estoque atual: "+units);
+			throw new InsuficientSalableBookUnitsException("Quantidade de livros insuficiente para realizar a venda. Estoque atual: "+units);
 		units -= unitsToDecrease;
 	}
 }

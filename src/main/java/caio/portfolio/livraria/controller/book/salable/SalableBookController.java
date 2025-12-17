@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -104,8 +105,13 @@ public class SalableBookController {
 	
 	@PutMapping("/sell-books")
 	public ResponseEntity<BigDecimal> sellBooks(
-		@RequestBody BookSellListDTO bookListDTO
+		@Valid @RequestBody BookSellListDTO bookListDTO
 	){
 		return ResponseEntity.ok(service.sellBooks(bookListDTO));
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Boolean> deleteSalableBookById(@PathVariable Long id){
+		return ResponseEntity.ok(service.deleteSalableBookById(id));
 	}
 }

@@ -172,4 +172,10 @@ public class SalableBookService {
 	public BigDecimal sellBooks(BookSellListDTO bookListDTO) {
 		return bookSeller.sellBooks(bookListDTO);
 	}
+
+	@Transactional
+	public Boolean deleteSalableBookById(Long id) {
+		// TODO 
+		return null;
+	}
 }

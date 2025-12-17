@@ -25,10 +25,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
+import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableBookUnitsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
@@ -59,7 +62,8 @@ class SalableBookServiceTest {
 	@Mock private SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
 	
 	private static final int O_ALQUIMISTA_UNITS = 50;
-	private static final int NEW_UNITS = 50;
+	private static final int SELL_UNITS = 2;
+	private static final int NEW_UNITS = 30;
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long ROCCO_ID = 1L;
 	private static final Long O_ALQUIMISTA_ID = 1L;
@@ -200,6 +204,18 @@ class SalableBookServiceTest {
 		.publisherId(GLOBAL_BOOKS_PUBLISHER.getId())
 		.price(NEW_PRICE)
 		.units(NEW_UNITS)
+		.build();
+	
+	private static final BookSellDTO BOOK_SELL_DTO = BookSellDTO.builder()
+		.bookId(O_ALQUIMISTA_ID)	
+		.units(SELL_UNITS)
+		.build();
+	
+	private static final List<BookSellDTO> BOOK_SELL_DTO_LIST = List.of(BOOK_SELL_DTO);
+	
+	private static final BookSellListDTO BOOK_SELL_LIST_DTO = BookSellListDTO
+		.builder()
+		.sellList(BOOK_SELL_DTO_LIST)
 		.build();
 	
 	private static final List<SalableBook> BOOK_LIST = List.of(O_ALQUIMISTA);
@@ -578,5 +594,38 @@ class SalableBookServiceTest {
 		BigDecimal totalToPay = salableBookService
 			.sellBook(O_ALQUIMISTA.getId(), 2);
 		assertNotNull(totalToPay);
+		assertEquals(
+			O_ALQUIMISTA_PRICE.multiply(BigDecimal.valueOf(2)), 
+			totalToPay);
+	}
+	
+	@Test
+	@DisplayName("Deve propagar corretamente 'InsuficientSalableBookUnitsException' ao tentar venda de livro com unidades insuficientes")
+	void sellBook_throwsInsuficientSalableBookUnitsException() {
+		when(bookSeller.sellBook(anyLong(), anyInt()))
+			.thenThrow(InsuficientSalableBookUnitsException.class);
+		assertThrows(
+			InsuficientSalableBookUnitsException.class,
+			() -> salableBookService.sellBook(O_ALQUIMISTA.getId(), 2));
+	}
+	
+	@Test
+	@DisplayName("Deve realizar venda de múltiplos livros e retornar total à pagar")
+	void sellBooks_returnsBigdecimal() {
+		when(bookSeller.sellBooks(any(BookSellListDTO.class)))
+			.thenReturn(TOTAL_TO_PAY);
+		BigDecimal totalToPay = salableBookService.sellBooks(BOOK_SELL_LIST_DTO);
+		assertNotNull(totalToPay);
+		assertEquals(TOTAL_TO_PAY, totalToPay);
+	}
+	
+	@Test
+	@DisplayName("Deve propagar corretamente 'InsuficientSalableBookUnitsException' ao tentar venda de múltiplos livros com unidades insuficientes")
+	void sellBooks_throwsInsuficientSalableBookUnitsException() {
+		when(bookSeller.sellBooks(any(BookSellListDTO.class)))
+			.thenThrow(InsuficientSalableBookUnitsException.class);
+		assertThrows(
+			InsuficientSalableBookUnitsException.class,
+			() -> salableBookService.sellBooks(BOOK_SELL_LIST_DTO));
 	}
 }

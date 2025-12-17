@@ -19,10 +19,13 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
+import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableBookUnitsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.CreateSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.ResponseSalableBookDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSalableBookDTO;
@@ -38,7 +41,8 @@ class SalableBookServiceIntegrationTest {
 	@Autowired private SalableBookService salableBookService;
 	
 	private static final int O_ALQUIMISTA_UNITS = 50;
-	private static final int NEW_UNITS = 50;
+	private static final int NEW_UNITS = 30;
+	private static final int SELL_UNITS = 2;
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long ROCCO_ID = 1L;
 	private static final Long O_ALQUIMISTA_ID = 1L;
@@ -64,7 +68,7 @@ class SalableBookServiceIntegrationTest {
 	private static final Integer USA_ID = 2;
 	private static final LocalDate CAIO_BIRTHDAY = LocalDate.of(1992, 03, 20);
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
-	private static final BigDecimal O_ALQUIMISTA_PRICE = BigDecimal.valueOf(39.5);
+	private static final BigDecimal O_ALQUIMISTA_PRICE = BigDecimal.valueOf(35.5);
 	private static final BigDecimal NEW_PRICE = BigDecimal.valueOf(32.8);
 	
 	private static final Country BRAZIL = Country.builder()
@@ -140,6 +144,18 @@ class SalableBookServiceIntegrationTest {
 		.publisherId(GLOBAL_BOOKS_PUBLISHER.getId())
 		.price(NEW_PRICE)
 		.units(NEW_UNITS)
+		.build();
+	
+	private static final BookSellDTO BOOK_SELL_DTO = BookSellDTO.builder()
+		.bookId(O_ALQUIMISTA_ID)	
+		.units(SELL_UNITS)
+		.build();
+	
+	private static final List<BookSellDTO> BOOK_SELL_DTO_LIST = List.of(BOOK_SELL_DTO);
+	
+	private static final BookSellListDTO BOOK_SELL_LIST_DTO = BookSellListDTO
+		.builder()
+		.sellList(BOOK_SELL_DTO_LIST)
 		.build();
 	
 	@Test
@@ -385,5 +401,45 @@ class SalableBookServiceIntegrationTest {
 		BigDecimal totalToPay = salableBookService
 			.sellBook(O_ALQUIMISTA.getId(), 2);
 		assertNotNull(totalToPay);
+	}
+	
+	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/publisher/insert_publisher_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
+	@Sql("/sql/book/salable/insert_salable_book_list_zero_units.sql")
+	@DisplayName("Deve propagar corretamente 'InsuficientSalableBookUnitsException' ao tentar venda de livro com unidades insuficientes")
+	void sellBook_throwsInsuficientSalableBookUnitsException() {
+		assertThrows(
+			InsuficientSalableBookUnitsException.class,
+			() -> salableBookService.sellBook(O_ALQUIMISTA.getId(), 2));
+	}
+	
+	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/publisher/insert_publisher_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
+	@Sql("/sql/book/salable/insert_salable_book_list.sql")
+	@DisplayName("Deve realizar venda de múltiplos livros e retornar total à pagar")
+	void sellBooks_returnsBigdecimal() {
+		BigDecimal totalToPay = salableBookService
+			.sellBooks(BOOK_SELL_LIST_DTO);
+		assertNotNull(totalToPay);
+		assertEquals(
+			O_ALQUIMISTA_PRICE.multiply(
+				BigDecimal.valueOf(SELL_UNITS)).floatValue(), 
+			totalToPay.floatValue());
+	}
+	
+	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/publisher/insert_publisher_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
+	@Sql("/sql/book/salable/insert_salable_book_list_zero_units.sql")
+	@DisplayName("Deve propagar corretamente 'InsuficientSalableBookUnitsException' ao tentar venda de múltiplos livros com unidades insuficientes")
+	void sellBooks_throwsInsuficientSalableBookUnitsException() {
+		assertThrows(
+			InsuficientSalableBookUnitsException.class,
+			() -> salableBookService.sellBooks(BOOK_SELL_LIST_DTO));
 	}
 }

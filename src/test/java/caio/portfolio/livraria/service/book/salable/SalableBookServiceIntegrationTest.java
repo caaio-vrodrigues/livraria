@@ -401,6 +401,9 @@ class SalableBookServiceIntegrationTest {
 		BigDecimal totalToPay = salableBookService
 			.sellBook(O_ALQUIMISTA.getId(), 2);
 		assertNotNull(totalToPay);
+		assertEquals(
+			O_ALQUIMISTA_PRICE.multiply(BigDecimal.valueOf(SELL_UNITS)).floatValue(),
+			totalToPay.floatValue());
 	}
 	
 	@Test

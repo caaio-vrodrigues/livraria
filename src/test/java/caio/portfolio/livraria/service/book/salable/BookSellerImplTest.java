@@ -2,6 +2,7 @@ package caio.portfolio.livraria.service.book.salable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -18,9 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableBookUnitsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellDTO;
+import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
@@ -33,6 +37,8 @@ class BookSellerImplTest {
 	@Mock private SalableBookRepository repo;
 	
 	private static final int UNITS = 50;
+	private static final int SELL_UNITS = 10;
+	private static final int ZERO_UNITS = 0;
 	private static final Long O_ALQUIMISTA_ID = 1L;
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long ROCCO_ID = 1L;
@@ -80,8 +86,31 @@ class BookSellerImplTest {
 		.units(UNITS)
 		.build();
 	
+	private static final SalableBook O_ALQUIMISTA_0_UNITS = SalableBook.builder()
+		.id(O_ALQUIMISTA_ID)
+		.author(PAULO_COELHO)	
+		.title(O_ALQUIMISTA_TITLE)
+		.genre(Genre.FANTASY)
+		.isbn(O_ALQUIMISTA_ISBN)
+		.publisher(ROCCO_PUBLISHER)
+		.price(O_ALQUIMISTA_PRICE)
+		.units(ZERO_UNITS)
+		.build();
+	
+	private static final BookSellDTO BOOK_SELL_DTO = BookSellDTO.builder()
+		.bookId(O_ALQUIMISTA_ID)	
+		.units(SELL_UNITS)
+		.build();
+	
+	private static final List<BookSellDTO> BOOK_SELL_DTO_LIST = List.of(BOOK_SELL_DTO);
+	
+	private static final BookSellListDTO BOOK_SELL_LIST_DTO = BookSellListDTO
+		.builder()
+		.sellList(BOOK_SELL_DTO_LIST)
+		.build();
+	
 	@Test
-	@DisplayName("Deve realizar venda de 'SalableBook' com sucesso e retornar cálculo do total a pagar")
+	@DisplayName("Deve realizar venda de livro com sucesso e retornar total à pagar")
 	void sellBook_returnsBigDecimal() {
 		when(repo.findById(anyLong()))
 			.thenReturn(Optional.of(O_ALQUIMISTA));
@@ -101,6 +130,30 @@ class BookSellerImplTest {
 		assertThrows(
 			SalableBookNotFoundException.class,
 			() -> bookSellerImpl.sellBook(O_ALQUIMISTA_ID, UNITS));
+		verify(repo, times(1)).findById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve realizar venda de múltiplos livros com sucesso e retornar total à pagar")
+	void sellBooks_returnsBigDecimal() {
+		when(repo.findById(anyLong()))
+			.thenReturn(Optional.of(O_ALQUIMISTA));
+		BigDecimal sell = bookSellerImpl.sellBooks(BOOK_SELL_LIST_DTO);
+		assertNotNull(sell);
+		assertEquals(
+			O_ALQUIMISTA_PRICE.multiply(BigDecimal.valueOf(SELL_UNITS)), 
+			sell);
+		verify(repo, times(1)).findById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'InsuficientSalableBookUnitsException' ao tentar realizar venda com unidades insuficientes")
+	void sellBooks_throwsInsuficientSalableBookUnitsException() {
+		when(repo.findById(anyLong()))
+			.thenReturn(Optional.of(O_ALQUIMISTA_0_UNITS));
+		assertThrows(
+			InsuficientSalableBookUnitsException.class,
+			() -> bookSellerImpl.sellBooks(BOOK_SELL_LIST_DTO));
 		verify(repo, times(1)).findById(anyLong());
 	}
 }

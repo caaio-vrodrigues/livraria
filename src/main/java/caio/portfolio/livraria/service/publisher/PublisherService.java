@@ -90,4 +90,9 @@ public class PublisherService {
 		return repo.findById(id).orElseThrow(() -> 
 			new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id));
 	}
+
+	public Boolean deletePublisherById(Long id) {
+		// TODO
+		return null;
+	}
 }

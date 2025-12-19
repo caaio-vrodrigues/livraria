@@ -90,4 +90,11 @@ public class AuthorService {
 		return repo.findById(id).orElseThrow(() ->
 			new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações"));
 	}
+
+	public Boolean deleteAuthorById(Long id) {
+		if(!repo.existsById(id)) 
+			throw new AuthorNotFoundException("Não foi possível encontrar um autor com 'id': '"+id+"' para realizar atualizações");
+		repo.deleteById(id);
+		return true;
+	}
 }

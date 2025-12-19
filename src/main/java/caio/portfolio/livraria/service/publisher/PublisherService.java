@@ -92,7 +92,9 @@ public class PublisherService {
 	}
 
 	public Boolean deletePublisherById(Long id) {
-		// TODO
-		return null;
+		if(!repo.existsById(id)) 
+			throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
+		repo.deleteById(id);
+		return true;
 	}
 }

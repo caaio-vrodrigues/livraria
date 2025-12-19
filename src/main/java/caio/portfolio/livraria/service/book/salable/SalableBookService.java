@@ -175,7 +175,9 @@ public class SalableBookService {
 
 	@Transactional
 	public Boolean deleteSalableBookById(Long id) {
-		// TODO 
-		return null;
+		if(!repo.existsById(id)) 
+			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'id': '"+id+"'");
+		repo.deleteById(id);
+		return true;
 	}
 }

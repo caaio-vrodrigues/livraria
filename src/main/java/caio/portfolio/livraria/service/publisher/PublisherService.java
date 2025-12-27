@@ -54,20 +54,20 @@ public class PublisherService {
 	public ResponsePublisherDTO getResponsePublisherDTOByFullAddress(String fullAddress) {
 		return responsePublisherDTOCreator
 			.toResponsePublisherDTO(repo.findByFullAddress(fullAddress).orElseThrow(() ->
-				new PublisherNotFoundException("Não possível encontrar uma editora com 'fullAddress': "+fullAddress)));
+				new PublisherNotFoundException("Não foi possível encontrar editora com 'fullAddress': "+fullAddress)));
 	}
 
 	@Transactional(readOnly=true)
 	public ResponsePublisherDTO getResponsePublisherDTOById(Long id) {
 		return responsePublisherDTOCreator
 			.toResponsePublisherDTO(repo.findById(id).orElseThrow(() -> 
-				new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id)));
+				new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id)));
 	}
 
 	@Transactional
 	public ResponsePublisherDTO updatePublisher(Long id, UpdatePublisherDTO dto) {
 		Publisher currentPublisher = repo.findById(id).orElseThrow(() ->
-			new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id));
+			new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id));
 		Publisher updatedPublisher = Publisher.builder()
 			.id(currentPublisher.getId())
 			.name(publisherUpdateValidator.validateName(
@@ -88,12 +88,12 @@ public class PublisherService {
 	@Transactional(readOnly=true)
 	public Publisher getPublisherById(Long id) {
 		return repo.findById(id).orElseThrow(() -> 
-			new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id));
+			new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id));
 	}
 
 	public Boolean deletePublisherById(Long id) {
 		if(!repo.existsById(id)) 
-			throw new PublisherNotFoundException("Não possível encontrar uma editora com 'id': "+id);
+			throw new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id);
 		repo.deleteById(id);
 		return true;
 	}

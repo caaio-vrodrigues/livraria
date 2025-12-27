@@ -367,10 +367,9 @@ class SalableBookServiceIntegrationTest {
 	@Sql("/sql/author/insert_author_list.sql")
 	@Sql("/sql/book/salable/insert_salable_book_list.sql")
 	@DisplayName("Deve atualizar livro com novos valores e retornar 'ResponseSalableBookDTO'")
-	void updateSalableBookByTitleAndAuthor_returnsResponseSalableBookDTO() {
+	void updateSalableBookById_returnsResponseSalableBookDTO() {
 		ResponseSalableBookDTO responseSalableBookDTO = salableBookService
-			.updateSalableBookByTitleAndAuthor(
-				PAULO_COELHO_ID, O_ALQUIMISTA_TITLE, UPDATE_SALABLE_BOOK_DTO);
+			.updateSalableBookById(O_ALQUIMISTA_ID, UPDATE_SALABLE_BOOK_DTO);
 		assertNotNull(responseSalableBookDTO);
 		assertEquals(NEW_TITLE, responseSalableBookDTO.getTitle());
 		assertEquals(NEW_ISBN, responseSalableBookDTO.getIsbn());
@@ -378,17 +377,6 @@ class SalableBookServiceIntegrationTest {
 		assertEquals(NEW_PRICE, responseSalableBookDTO.getPrice());
 		assertEquals(CAIO_VINICIUS_RODRIGUES.getId(), responseSalableBookDTO.getAuthorId());
 		assertEquals(GLOBAL_BOOKS_ID, responseSalableBookDTO.getPublisherId());
-	}
-	
-	@Test
-	@Sql("/sql/country/insert_country_list.sql")
-	@Sql("/sql/publisher/insert_publisher_list.sql")
-	@DisplayName("Deve propagar corretamente 'AuthorNotFoundException' ao tentar atualização de livro")
-	void updateSalableBookByTitleAndAuthor_throwsAuthorNotFoundException() {
-		assertThrows(
-			AuthorNotFoundException.class,
-			() -> salableBookService.updateSalableBookByTitleAndAuthor(
-					PAULO_COELHO_ID, O_ALQUIMISTA_TITLE, UPDATE_SALABLE_BOOK_DTO));
 	}
 	
 	@Test

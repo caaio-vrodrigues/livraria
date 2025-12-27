@@ -128,7 +128,7 @@ public class SalableBookService {
 	}
 
 	@Transactional
-	public ResponseSalableBookDTO updateSalableBookByTitleAndAuthor(
+	public ResponseSalableBookDTO updateSalableBookById(
 		Long id, UpdateSalableBookDTO dto
 	){
 		SalableBook bookToUpdate = repo.findById(id).orElseThrow(() ->

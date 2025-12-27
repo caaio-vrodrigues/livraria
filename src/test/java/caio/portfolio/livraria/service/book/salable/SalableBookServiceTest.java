@@ -495,10 +495,8 @@ class SalableBookServiceTest {
 	
 	@Test
 	@DisplayName("Deve atualizar livro com novos valores e retornar 'ResponseSalableBookDTO'")
-	void updateSalableBookByTitleAndAuthor_returnsResponseSalableBookDTO() {
-		when(authorService.getAuthorById(anyLong()))
-			.thenReturn(PAULO_COELHO);
-		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
+	void updateSalableBookById_returnsResponseSalableBookDTO() {
+		when(repo.findById(anyLong()))
 			.thenReturn(Optional.of(O_ALQUIMISTA));
 		when(salableBookUpdateValidator.validateTitleAndAuthor(
 				anyString() ,anyString(), any(Author.class), anyLong()))
@@ -525,8 +523,7 @@ class SalableBookServiceTest {
 				.toResponseSalableBookDTO(any(SalableBook.class)))
 			.thenReturn(UPDATED_RESPONSE_BOOK_DTO);
 		ResponseSalableBookDTO responseSalableBookDTO = salableBookService
-			.updateSalableBookByTitleAndAuthor(
-				PAULO_COELHO_ID, O_ALQUIMISTA_TITLE, UPDATE_SALABLE_BOOK_DTO);
+			.updateSalableBookById(O_ALQUIMISTA_ID, UPDATE_SALABLE_BOOK_DTO);
 		assertNotNull(responseSalableBookDTO);
 		assertEquals(NEW_TITLE, responseSalableBookDTO.getTitle());
 		assertEquals(NEW_ISBN, responseSalableBookDTO.getIsbn());
@@ -534,8 +531,7 @@ class SalableBookServiceTest {
 		assertEquals(NEW_PRICE, responseSalableBookDTO.getPrice());
 		assertEquals(CAIO_VINICIUS_RODRIGUES.getId(), responseSalableBookDTO.getAuthorId());
 		assertEquals(GLOBAL_BOOKS_ID, responseSalableBookDTO.getPublisherId());
-		verify(authorService, times(1)).getAuthorById(anyLong());
-		verify(repo, times(1)).findByTitleAndAuthor(anyString(), any(Author.class));
+		verify(repo, times(1)).findById(anyLong());
 		verify(salableBookUpdateValidator, times(1))
 			.validateTitleAndAuthor(
 				anyString() ,anyString(), any(Author.class), anyLong());
@@ -552,37 +548,6 @@ class SalableBookServiceTest {
 		verify(salableBookSaverAndConcurrencyHandleImpl, times(1))
 			.saveAndHandleConcurrency(any(SalableBook.class));
 		verify(responseSalableBookDTOCreator, times(1))
-			.toResponseSalableBookDTO(any(SalableBook.class));
-	}
-	
-	@Test
-	@DisplayName("Deve propagar corretamente 'AuthorNotFoundException' ao tentar atualização de livro")
-	void updateSalableBookByTitleAndAuthor_throwsAuthorNotFoundException() {
-		when(authorService.getAuthorById(anyLong()))
-			.thenThrow(AuthorNotFoundException.class);
-		assertThrows(
-			AuthorNotFoundException.class,
-			() -> salableBookService.updateSalableBookByTitleAndAuthor(
-					PAULO_COELHO_ID, O_ALQUIMISTA_TITLE, UPDATE_SALABLE_BOOK_DTO));
-		verify(authorService, times(1)).getAuthorById(anyLong());
-		verify(repo, never())
-			.findByTitleAndAuthor(anyString(), any(Author.class));
-		verify(salableBookUpdateValidator, never())
-			.validateTitleAndAuthor(
-				anyString() ,anyString(), any(Author.class), anyLong());
-		verify(salableBookUpdateValidator, never())
-			.validateGenre(any(Genre.class), any(Genre.class));
-		verify(salableBookUpdateValidator, never())
-			.validatePublisher(any(Publisher.class), anyLong());
-		verify(salableBookUpdateValidator, never())
-			.validateIsbn(anyString(), anyString());
-		verify(salableBookUpdateValidator, never())
-			.validatePrice(any(BigDecimal.class), any(BigDecimal.class));
-		verify(salableBookUpdateValidator, never())
-			.validateUnits(anyInt(), anyInt());
-		verify(salableBookSaverAndConcurrencyHandleImpl, never())
-			.saveAndHandleConcurrency(any(SalableBook.class));
-		verify(responseSalableBookDTOCreator, never())
 			.toResponseSalableBookDTO(any(SalableBook.class));
 	}
 	

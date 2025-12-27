@@ -32,7 +32,8 @@ public class PublisherController {
 	public ResponseEntity<ResponsePublisherDTO> newPublisher(
 		@Valid @RequestBody CreatePublisherDTO dto
 	) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.createPublisher(dto));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(service.createPublisher(dto));
 	}
 	
 	@GetMapping
@@ -48,7 +49,9 @@ public class PublisherController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ResponsePublisherDTO> searchPublisherById(@PathVariable Long id){
+	public ResponseEntity<ResponsePublisherDTO> searchPublisherById(
+		@PathVariable Long id
+	){
 		return ResponseEntity.ok(service.getResponsePublisherDTOById(id));
 	}
 	

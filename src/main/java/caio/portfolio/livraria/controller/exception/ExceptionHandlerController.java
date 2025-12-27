@@ -43,14 +43,18 @@ public class ExceptionHandlerController {
 	private static final String DETAILS = "details";
 	
 	@SuppressWarnings("removal")
-	private List<String> extractValidationErrors(HandlerMethodValidationException e) {
+	private List<String> extractValidationErrors(
+		HandlerMethodValidationException e
+	){
 	    return e.getAllValidationResults().stream()
 	        .flatMap(result -> result.getResolvableErrors().stream())
 	        .map(error -> error.getDefaultMessage())
 	        .toList();
 	}
 	
-	private List<String> extractBindingResults(MethodArgumentNotValidException e){
+	private List<String> extractBindingResults(
+		MethodArgumentNotValidException e
+	){
 		return e.getBindingResult()
 			.getFieldErrors()
 			.stream()
@@ -58,7 +62,9 @@ public class ExceptionHandlerController {
 			.toList();
 	}
 	
-	private Map<String, Object> createErrorBody(HttpStatus status, String msg, String path, Object details){
+	private Map<String, Object> createErrorBody(
+		HttpStatus status, String msg, String path, Object details
+	){
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put(TIME_STAMP, LocalDateTime.now());
 		body.put(STATUS, status.value());

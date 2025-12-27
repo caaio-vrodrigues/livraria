@@ -15,6 +15,7 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
 import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
 import caio.portfolio.livraria.service.author.model.AuthorSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.author.model.AuthorUpdateValidator;
 import caio.portfolio.livraria.service.country.CountryService;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class AuthorService {
 	private final AuthorRepository repo;
 	private final ResponseAuthorDTOCreator responseAuthorDTOCreator;
 	private final AuthorSaverAndConcurrencyHandle saverAndConcurrencyHandle;
-	private final AuthorUpdateValidatorImpl authorupdateValidator;
+	private final AuthorUpdateValidator authorupdateValidator;
 	private final CountryService countryService;
 	
 	@Transactional

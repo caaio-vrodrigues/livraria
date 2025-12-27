@@ -86,7 +86,7 @@ public class SalableBookController {
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn));
 	}
 	
-	@PutMapping("/{authorId}")
+	@PutMapping("/{authorId}") // aqui...
 	public ResponseEntity<ResponseSalableBookDTO> editSalableBookByTitleAndAuthor(
 		@PathVariable Long authorId,
 		@RequestParam String title,

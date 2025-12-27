@@ -29,8 +29,11 @@ public class AuthorController {
 	private final AuthorService service;
 	
 	@PostMapping
-	public ResponseEntity<ResponseAuthorDTO> newAuthor(@Valid @RequestBody CreateAuthorDTO dto){
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.createAuthor(dto));
+	public ResponseEntity<ResponseAuthorDTO> newAuthor(
+		@Valid @RequestBody CreateAuthorDTO dto
+	){
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(service.createAuthor(dto));
 	}
 	
 	@GetMapping
@@ -39,12 +42,16 @@ public class AuthorController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ResponseAuthorDTO> findAuthorById(@PathVariable Long id){
+	public ResponseEntity<ResponseAuthorDTO> findAuthorById(
+		@PathVariable Long id
+	){
 		return ResponseEntity.ok(service.getResponseAuthorDTOById(id));
 	}
 	
 	@GetMapping("/alias")
-	public ResponseEntity<ResponseAuthorDTO> findAuthorAlias(@RequestParam String alias){
+	public ResponseEntity<ResponseAuthorDTO> findAuthorAlias(
+		@RequestParam String alias
+	){
 		return ResponseEntity.ok(service.getResponseAuthorDTOByAlias(alias));
 	}
 	

@@ -129,12 +129,10 @@ public class SalableBookService {
 
 	@Transactional
 	public ResponseSalableBookDTO updateSalableBookByTitleAndAuthor(
-		Long authorId, String title, UpdateSalableBookDTO dto
+		Long id, UpdateSalableBookDTO dto
 	){
-		Author currentAuthor = authorService.getAuthorById(authorId);
-		SalableBook bookToUpdate = repo
-			.findByTitleAndAuthor(title, currentAuthor)
-				.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'; 'authorId': '"+authorId+"'"));
+		SalableBook bookToUpdate = repo.findById(id).orElseThrow(() ->
+			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'id': '"+id+"'"));
 		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO = salableBookUpdateValidator
 			.validateTitleAndAuthor(
 				bookToUpdate.getTitle(), 

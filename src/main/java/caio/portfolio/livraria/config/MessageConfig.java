@@ -9,9 +9,9 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 public class MessageConfig {
 	
 	@Bean
-    public MessageSource messageSource() {
+    public MessageSource salableBookMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
+        messageSource.setBasename("classpath:message/salable_book_messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);
         return messageSource;

@@ -94,14 +94,6 @@ public class SalableBookController {
 		return ResponseEntity.ok(service.updateSalableBookById(id, dto));
 	}
 	
-	@PutMapping("/sell-book/{bookId}/{units}")
-	public ResponseEntity<BigDecimal> sellBook(
-		@PathVariable Long bookId, 
-		@PathVariable int units
-	){
-		return ResponseEntity.ok(service.sellBook(bookId, units));
-	}
-	
 	@PutMapping("/sell-books")
 	public ResponseEntity<BigDecimal> sellBooks(
 		@Valid @RequestBody BookSellListDTO bookListDTO

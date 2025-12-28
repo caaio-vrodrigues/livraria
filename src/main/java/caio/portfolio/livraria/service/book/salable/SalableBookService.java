@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
@@ -20,6 +19,7 @@ import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 import caio.portfolio.livraria.service.book.salable.model.BookSeller;
 import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
+import caio.portfolio.livraria.service.book.salable.model.SalableBookFinder;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookUniquenessValidator;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookUpdateValidator;
@@ -36,13 +36,13 @@ public class SalableBookService {
 	private final SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
 	private final SalableBookUniquenessValidator salableBookUniquenessValidator;
 	private final BookSeller bookSeller;
+	private final SalableBookFinder salableBookFinder;
 	private final AuthorService authorService;
 	private final PublisherService publisherService;
 
 	@Transactional
 	public ResponseSalableBookDTO createSalableBook(CreateSalableBookDTO dto) {
-		Author author = authorService
-			.getAuthorById(dto.getAuthorId());
+		Author author = authorService.getAuthorById(dto.getAuthorId());
 		salableBookUniquenessValidator
 			.validateUniquenessOnCreate(author, dto.getTitle());
 		Publisher publisher = publisherService
@@ -71,58 +71,53 @@ public class SalableBookService {
 
 	@Transactional(readOnly=true)
 	public ResponseSalableBookDTO getResponseSalableBookDTOById(Long id) {
-		return responseSalableBookDTOCreator.toResponseSalableBookDTO(repo.findById(id)
-			.orElseThrow(() -> new SalableBookNotFoundException("Não foi possível encontrar livro com 'id': '"+id+"'")));
+		return responseSalableBookDTOCreator
+			.toResponseSalableBookDTO(salableBookFinder.findById(id));
 	}
 
 	@Transactional(readOnly=true)
-	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByAuthorId(Long authorId) {
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByAuthorId(
+		Long authorId
+	){
 		Author author = authorService.getAuthorById(authorId);
-		List<SalableBook> bookList = repo.findByAuthor(author);
-		if(bookList.isEmpty()) 
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o autor: '"+author.getFullName()+"'");
-		return bookList.stream()
+		return salableBookFinder.findByAuthor(author).stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
-
+	
 	@Transactional(readOnly=true)
-	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByPublisherId(Long publisherId) {
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByPublisherId(
+		Long publisherId
+	){
 		Publisher publisher = publisherService.getPublisherById(publisherId);
-		List<SalableBook> bookList = repo.findByPublisher(publisher);
-		if(bookList.isEmpty()) 
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para a editora: '"+publisher.getName()+"'");
-		return bookList.stream()
+		return salableBookFinder.findByPublisher(publisher).stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
 
 	@Transactional(readOnly=true)
-	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByTitle(String title) {
-		List<SalableBook> bookList = repo.findByTitle(title);
-		if(bookList.isEmpty())
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'title': '"+title+"'");
-		return bookList.stream()
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByTitle(
+		String title
+	){
+		return salableBookFinder.findByTitle(title).stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
 
 	@Transactional(readOnly=true)
-	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByGenre(Genre genre) {
-		List<SalableBook> bookList = repo.findByGenre(genre);
-		if(bookList.isEmpty())
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'genre': '"+genre.name()+"'");
-		return bookList.stream()
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByGenre(
+		Genre genre
+	){
+		return salableBookFinder.findByGenre(genre).stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
 
 	@Transactional(readOnly=true)
-	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByIsbn(String isbn) {
-		List<SalableBook> bookList = repo.findByIsbn(isbn);
-		if(bookList.isEmpty())
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'isbn': '"+isbn+"'");
-		return bookList.stream()
+	public List<ResponseSalableBookDTO> getResponseSalableBookDTOByIsbn(
+		String isbn
+	){
+		return salableBookFinder.findByIsbn(isbn).stream()
 			.map(responseSalableBookDTOCreator::toResponseSalableBookDTO)
 			.toList();
 	}
@@ -131,8 +126,7 @@ public class SalableBookService {
 	public ResponseSalableBookDTO updateSalableBookById(
 		Long id, UpdateSalableBookDTO dto
 	){
-		SalableBook bookToUpdate = repo.findById(id).orElseThrow(() ->
-			new SalableBookNotFoundException("Não foi possível encontrar livro para o 'id': '"+id+"'"));
+		SalableBook bookToUpdate = salableBookFinder.findById(id);
 		TitleAndAuthorUpdateDTO titleAndAuthorUpdateDTO = salableBookUpdateValidator
 			.validateTitleAndAuthor(
 				bookToUpdate.getTitle(), 
@@ -140,7 +134,9 @@ public class SalableBookService {
 				bookToUpdate.getAuthor(), 
 				dto.getAuthorId());
 		salableBookUniquenessValidator.validateUniquenessOnUpdate(
-			titleAndAuthorUpdateDTO, bookToUpdate.getTitle(), bookToUpdate.getAuthor().getId());
+			titleAndAuthorUpdateDTO, 
+			bookToUpdate.getTitle(), 
+			bookToUpdate.getAuthor().getId());
 		SalableBook updatedSalableBook = SalableBook.builder()
 			.id(bookToUpdate.getId())
 			.title(titleAndAuthorUpdateDTO.getTitle())
@@ -160,11 +156,6 @@ public class SalableBookService {
 			.toResponseSalableBookDTO(salableBookSaverAndConcurrencyHandleImpl
 				.saveAndHandleConcurrency(updatedSalableBook));
 	}
-	
-	@Transactional 
-	public BigDecimal sellBook(Long bookId, int units){
-		return bookSeller.sellBook(bookId, units);
-	}
 
 	@Transactional
 	public BigDecimal sellBooks(BookSellListDTO bookListDTO) {
@@ -173,8 +164,7 @@ public class SalableBookService {
 
 	@Transactional
 	public Boolean deleteSalableBookById(Long id) {
-		if(!repo.existsById(id)) 
-			throw new SalableBookNotFoundException("Não foi possível encontrar livro para o 'id': '"+id+"'");
+		salableBookFinder.existsById(id);
 		repo.deleteById(id);
 		return true;
 	}

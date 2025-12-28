@@ -552,29 +552,6 @@ class SalableBookServiceTest {
 	}
 	
 	@Test
-	@DisplayName("Deve realizar venda de livro e retornar total à pagar")
-	void sellBook_returnsBigDecimal() {
-		when(bookSeller.sellBook(anyLong(), anyInt()))
-			.thenReturn(TOTAL_TO_PAY);
-		BigDecimal totalToPay = salableBookService
-			.sellBook(O_ALQUIMISTA.getId(), 2);
-		assertNotNull(totalToPay);
-		assertEquals(
-			O_ALQUIMISTA_PRICE.multiply(BigDecimal.valueOf(2)), 
-			totalToPay);
-	}
-	
-	@Test
-	@DisplayName("Deve propagar corretamente 'InsuficientSalableBookUnitsException' ao tentar venda de livro com unidades insuficientes")
-	void sellBook_throwsInsuficientSalableBookUnitsException() {
-		when(bookSeller.sellBook(anyLong(), anyInt()))
-			.thenThrow(InsuficientSalableBookUnitsException.class);
-		assertThrows(
-			InsuficientSalableBookUnitsException.class,
-			() -> salableBookService.sellBook(O_ALQUIMISTA.getId(), 2));
-	}
-	
-	@Test
 	@DisplayName("Deve realizar venda de múltiplos livros e retornar total à pagar")
 	void sellBooks_returnsBigdecimal() {
 		when(bookSeller.sellBooks(any(BookSellListDTO.class)))

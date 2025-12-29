@@ -23,4 +23,20 @@ public class CountryExceptionCreatorImpl implements CountryExceptionCreator {
 				LocaleContextHolder.getLocale())
 			);
 	}
+
+	@Override
+	public IllegalArgumentException createIllegalArgumentExceptionByBlank() {
+		return new IllegalArgumentException(countryMessageSource.getMessage(
+			"illegal.argument.blank.iso",
+			new Object[] {},
+			LocaleContextHolder.getLocale()));
+	}
+
+	@Override
+	public IllegalArgumentException createIllegalArgumentExceptionByInvalid(String isoAlpha2Code) {
+		return new IllegalArgumentException(countryMessageSource.getMessage(
+			"illegal.argument.invalid.iso",
+			new Object[] {isoAlpha2Code},
+			LocaleContextHolder.getLocale()));
+	}
 }

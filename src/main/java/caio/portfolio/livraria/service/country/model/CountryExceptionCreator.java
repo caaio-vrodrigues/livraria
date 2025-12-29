@@ -4,4 +4,6 @@ import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryExcepti
 
 public interface CountryExceptionCreator {
 	ConcurrentCountryException createConcurrentCountryException(String isoAlpha2Code);
+	IllegalArgumentException createIllegalArgumentExceptionByBlank();
+	IllegalArgumentException createIllegalArgumentExceptionByInvalid(String isoAlpha2Code);
 }

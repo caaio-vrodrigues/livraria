@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import caio.portfolio.livraria.service.country.model.CountryExceptionCreator;
 import caio.portfolio.livraria.service.country.model.CountryValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +14,17 @@ import lombok.RequiredArgsConstructor;
 public class CountryValidatorImpl implements CountryValidator {
 	
 	private final Set<String> validIsoCodes;
+	private final CountryExceptionCreator countryExceptionCreator;
 
 	@Override
 	public String processIsoAlpha2Code(String isoAlpha2Code) {
 		boolean isIsoAlpha2CodeNullOrBlank = isoAlpha2Code == null || isoAlpha2Code.isBlank();
-		if(isIsoAlpha2CodeNullOrBlank) throw new IllegalArgumentException("O campo 'isoAlpha2Code' não pode estar vazio");
+		if(isIsoAlpha2CodeNullOrBlank) throw countryExceptionCreator
+			.createIllegalArgumentExceptionByBlank();
 		String normalizedIsoAlpha2Code = isoAlpha2Code.trim().toUpperCase();
 		boolean validIsoAlpha2Code = validIsoCodes.contains(normalizedIsoAlpha2Code);
-		if(!validIsoAlpha2Code) throw new IllegalArgumentException("O código '"+isoAlpha2Code+"' não corresponde a um código válido.");
+		if(!validIsoAlpha2Code) throw countryExceptionCreator
+			.createIllegalArgumentExceptionByInvalid(normalizedIsoAlpha2Code);
 		return normalizedIsoAlpha2Code;
 	}
 

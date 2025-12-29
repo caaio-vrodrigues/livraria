@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author;
+package caio.portfolio.livraria.service.author.implementation.save;
 
 import java.util.Optional;
 
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.model.AuthorExceptionCreator;
-import caio.portfolio.livraria.service.author.model.AuthorSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
+import caio.portfolio.livraria.service.author.model.save.AuthorSaverAndConcurrencyHandle;
 import lombok.RequiredArgsConstructor;
 
 @Component

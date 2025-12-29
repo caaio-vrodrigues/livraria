@@ -31,8 +31,9 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDT
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.model.AuthorSaverAndConcurrencyHandle;
-import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
+import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
+import caio.portfolio.livraria.service.author.model.create.ResponseAuthorDTOCreator;
+import caio.portfolio.livraria.service.author.model.save.AuthorSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.country.CountryService;
 
 @ExtendWith(MockitoExtension.class)

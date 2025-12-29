@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author;
+package caio.portfolio.livraria.service.author.implementation.find;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.model.AuthorFinder;
+import caio.portfolio.livraria.service.author.model.find.AuthorFinder;
 import lombok.RequiredArgsConstructor;
 
 @Component

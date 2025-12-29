@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
+import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)

@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
+import caio.portfolio.livraria.service.author.implementation.create.ResponseAuthorDTOCreatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ResponseAuthorDTOCreatorImplTest {

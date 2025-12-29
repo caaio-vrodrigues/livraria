@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author;
+package caio.portfolio.livraria.service.author.implementation.create;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
-import caio.portfolio.livraria.service.author.model.AuthorExceptionCreator;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
 import lombok.RequiredArgsConstructor;
 
 @Component

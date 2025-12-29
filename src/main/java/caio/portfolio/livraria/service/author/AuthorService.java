@@ -11,11 +11,11 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.model.ResponseAuthorDTOCreator;
-import caio.portfolio.livraria.service.author.model.AuthorExceptionCreator;
-import caio.portfolio.livraria.service.author.model.AuthorFinder;
-import caio.portfolio.livraria.service.author.model.AuthorSaverAndConcurrencyHandle;
-import caio.portfolio.livraria.service.author.model.AuthorUpdateValidator;
+import caio.portfolio.livraria.service.author.model.find.AuthorFinder;
+import caio.portfolio.livraria.service.author.model.save.AuthorSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.author.model.validate.AuthorUpdateValidator;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
+import caio.portfolio.livraria.service.author.model.create.ResponseAuthorDTOCreator;
 import caio.portfolio.livraria.service.country.CountryService;
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author;
+package caio.portfolio.livraria.service.author.implementation.validate;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.model.AuthorExceptionCreator;
-import caio.portfolio.livraria.service.author.model.AuthorUpdateValidator;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
+import caio.portfolio.livraria.service.author.model.validate.AuthorUpdateValidator;
 import caio.portfolio.livraria.service.country.CountryService;
 import lombok.RequiredArgsConstructor;
 

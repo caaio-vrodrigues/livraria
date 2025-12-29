@@ -22,6 +22,7 @@ import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
+import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
 import caio.portfolio.livraria.service.country.CountryService;
 
 @ExtendWith(MockitoExtension.class)

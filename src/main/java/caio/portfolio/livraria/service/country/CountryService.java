@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
 import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.model.CountryFinder;
 import caio.portfolio.livraria.service.country.model.CountryValidator;
 import caio.portfolio.livraria.service.country.model.CreateOrFindCountryResolver;
 import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
@@ -24,6 +24,7 @@ public class CountryService {
 	private final CountryValidator countryValidator;
 	private final ResponseCountryDTOCreator responseCountryDTOCreator;
 	private final CreateOrFindCountryResolver createOrFindCountryResolver;
+	private final CountryFinder countryFinder;
 	
 	@Transactional
 	public CountryResultImplDTO createOrFindCountry(CreateCountryDTO createCountryDTO) {
@@ -46,21 +47,18 @@ public class CountryService {
 	@Transactional(readOnly=true)
 	public ResponseCountryDTO getCountryByIsoAlpha2Code(String isoAlpha2Code) {
 		String validIsoAlpha2Code = countryValidator.processIsoAlpha2Code(isoAlpha2Code);
-		return responseCountryDTOCreator
-			.toResponseCountryDTO(repo.findByIsoAlpha2Code(validIsoAlpha2Code)
-				.orElseThrow(() -> new CountryNotFoundException("País não encontrado para o 'isoAlpha2Code': "+isoAlpha2Code)));
+		Country country = countryFinder.findByIsoAlpha2Code(validIsoAlpha2Code);
+		return responseCountryDTOCreator.toResponseCountryDTO(country);
 	}
 	
 	@Transactional(readOnly=true)
 	public ResponseCountryDTO getResponseCountryDTOById(Integer id){
-		return responseCountryDTOCreator
-			.toResponseCountryDTO(repo.findById(id).orElseThrow(() -> 
-    			new CountryNotFoundException("País não encontrado para o 'id': "+id)));
+		Country country = countryFinder.findById(id);
+		return responseCountryDTOCreator.toResponseCountryDTO(country);
 	}
 	
 	@Transactional(readOnly=true)
 	public Country getCountryById(Integer id) {
-		return repo.findById(id).orElseThrow(() -> 
-			new CountryNotFoundException("País não encontrado para o 'id': "+id));
+		return countryFinder.findById(id);
 	}
 }

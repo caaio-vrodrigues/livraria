@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable.model;
+package caio.portfolio.livraria.service.book.salable.model.sell;
 
 import java.math.BigDecimal;
 

@@ -19,6 +19,7 @@ import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyE
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
+import caio.portfolio.livraria.service.book.salable.implementation.validate.SalableBookUniquenessValidatorImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)

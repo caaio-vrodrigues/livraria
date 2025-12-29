@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.sell;
 
 import java.math.BigDecimal;
 
@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
-import caio.portfolio.livraria.service.book.salable.model.BookSeller;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookFinder;
+import caio.portfolio.livraria.service.book.salable.model.find.SalableBookFinder;
+import caio.portfolio.livraria.service.book.salable.model.sell.BookSeller;
 import lombok.RequiredArgsConstructor;
 
 @Component

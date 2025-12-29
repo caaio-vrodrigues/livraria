@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.save;
 
 import java.util.Optional;
 
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookExceptionCreator;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.book.salable.model.create.SalableBookExceptionCreator;
+import caio.portfolio.livraria.service.book.salable.model.save.SalableBookSaverAndConcurrencyHandle;
 import lombok.RequiredArgsConstructor;
 
 @Component

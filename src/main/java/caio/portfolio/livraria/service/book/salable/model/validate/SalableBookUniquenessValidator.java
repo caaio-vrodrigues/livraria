@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable.model;
+package caio.portfolio.livraria.service.book.salable.model.validate;
 
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;

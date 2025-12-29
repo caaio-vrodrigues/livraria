@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.find;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookFinder;
+import caio.portfolio.livraria.service.book.salable.model.find.SalableBookFinder;
 import lombok.RequiredArgsConstructor;
 
 @Component

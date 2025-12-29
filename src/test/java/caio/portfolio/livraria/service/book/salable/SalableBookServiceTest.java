@@ -41,11 +41,11 @@ import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
-import caio.portfolio.livraria.service.book.salable.model.BookSeller;
-import caio.portfolio.livraria.service.book.salable.model.ResponseSalableBookDTOCreator;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookSaverAndConcurrencyHandle;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookUniquenessValidator;
-import caio.portfolio.livraria.service.book.salable.model.SalableBookUpdateValidator;
+import caio.portfolio.livraria.service.book.salable.model.create.ResponseSalableBookDTOCreator;
+import caio.portfolio.livraria.service.book.salable.model.save.SalableBookSaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.book.salable.model.sell.BookSeller;
+import caio.portfolio.livraria.service.book.salable.model.validate.SalableBookUniquenessValidator;
+import caio.portfolio.livraria.service.book.salable.model.validate.SalableBookUpdateValidator;
 import caio.portfolio.livraria.service.publisher.PublisherService;
 
 @ExtendWith(MockitoExtension.class)

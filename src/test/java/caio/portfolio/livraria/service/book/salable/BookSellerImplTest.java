@@ -29,6 +29,7 @@ import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
+import caio.portfolio.livraria.service.book.salable.implementation.sell.BookSellerImpl;
 
 @ExtendWith(MockitoExtension.class)
 class BookSellerImplTest {

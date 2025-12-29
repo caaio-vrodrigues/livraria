@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable.model;
+package caio.portfolio.livraria.service.book.salable.model.find;
 
 import java.util.List;
 

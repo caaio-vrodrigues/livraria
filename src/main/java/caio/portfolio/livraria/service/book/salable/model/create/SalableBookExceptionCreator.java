@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable.model;
+package caio.portfolio.livraria.service.book.salable.model.create;
 
 import caio.portfolio.livraria.exception.custom.book.salable.ConcurrentSalableBookException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;

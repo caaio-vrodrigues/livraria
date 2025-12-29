@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable.model;
+package caio.portfolio.livraria.service.book.salable.model.save;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 

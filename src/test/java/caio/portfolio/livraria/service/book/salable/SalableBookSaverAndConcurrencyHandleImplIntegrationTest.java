@@ -21,6 +21,7 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.model.enums.Genre;
+import caio.portfolio.livraria.service.book.salable.implementation.save.SalableBookSaverAndConcurrencyHandleImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)

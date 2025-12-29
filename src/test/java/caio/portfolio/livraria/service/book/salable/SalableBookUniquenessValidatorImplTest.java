@@ -25,6 +25,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
+import caio.portfolio.livraria.service.book.salable.implementation.validate.SalableBookUniquenessValidatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class SalableBookUniquenessValidatorImplTest {

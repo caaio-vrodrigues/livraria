@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
+import caio.portfolio.livraria.service.book.salable.model.SalableBookExceptionCreator;
 import caio.portfolio.livraria.service.book.salable.model.SalableBookUniquenessValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class SalableBookUniquenessValidatorImpl implements SalableBookUniquenessValidator {
 	
 	private final SalableBookRepository repo;
+	private final SalableBookExceptionCreator salableBookExceptionCreator;
 	
 	@Override
 	public void validateUniquenessOnUpdate(
@@ -26,15 +27,17 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 	){
 		boolean isDifferentTitleOrAuthor = !titleAndAuthorUpdateDTO.getTitle()
 				.equals(title) || 
-			!titleAndAuthorUpdateDTO.getAuthor().getId()
+			!titleAndAuthorUpdateDTO.getAuthor()
+				.getId()
 				.equals(authorId);
 		if(isDifferentTitleOrAuthor) {
-			Optional<SalableBook> existingBookOptional = repo
-				.findByTitleAndAuthor(
-					titleAndAuthorUpdateDTO.getTitle(), 
-					titleAndAuthorUpdateDTO.getAuthor());
-			if(existingBookOptional.isPresent()) 
-				throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+titleAndAuthorUpdateDTO.getTitle()+"' já existe pelo autor: '"+titleAndAuthorUpdateDTO.getAuthor().getFullName()+"'");
+			Optional<SalableBook> existingBookOptional = repo.findByTitleAndAuthor(
+				titleAndAuthorUpdateDTO.getTitle(), 
+				titleAndAuthorUpdateDTO.getAuthor());
+			if(existingBookOptional.isPresent())
+				throw salableBookExceptionCreator.createSalableBookAlreadyExistsException(
+					titleAndAuthorUpdateDTO.getAuthor().getFullName(), 
+					titleAndAuthorUpdateDTO.getTitle());
 		}
 	}
 
@@ -43,6 +46,8 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 		Optional<SalableBook> salableBookOptional = repo
 			.findByTitleAndAuthor(title, author);
 		if(salableBookOptional.isPresent()) 
-			throw new SalableBookAlreadyExistsException("Não foi possível realizar a operação. Livro: '"+salableBookOptional.get().getTitle()+"' já existe");
+			throw salableBookExceptionCreator.createSalableBookAlreadyExistsException(
+				author.getFullName(), 
+				title);
 	}
 }

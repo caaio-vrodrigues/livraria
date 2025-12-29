@@ -22,7 +22,10 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 	
 	@Override
 	public TitleAndAuthorUpdateDTO validateTitleAndAuthor(
-		String title, String newTitle, Author author, Long newAuthorId
+		String title, 
+		String newTitle, 
+		Author author, 
+		Long newAuthorId
 	){
 		boolean containsTitleAndIsDifferent = newTitle != null && 
 			!title.equals(newTitle);
@@ -41,7 +44,8 @@ public class SalableBookUpdateValidatorImpl implements SalableBookUpdateValidato
 
 	@Override
 	public Publisher validatePublisher(
-		Publisher currentPublisher, Long newPublisherId
+		Publisher currentPublisher, 
+		Long newPublisherId
 	){
 		boolean containsPublisherAndIsDifferent = newPublisherId != null && 
 			!currentPublisher.getId().equals(newPublisherId);

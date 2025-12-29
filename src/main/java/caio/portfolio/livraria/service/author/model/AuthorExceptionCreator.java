@@ -5,7 +5,12 @@ import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
 
 public interface AuthorExceptionCreator {
-	ConcurrentAuthorException createConcurrentAuthorException(String authorFullName);
-	AuthorAlreadyExistsException createAuthorAlreadyExistsException(String alias, String authorFullName);
 	AuthorNotFoundException createAuthorNotFoundException(Long id);
+	
+	ConcurrentAuthorException createConcurrentAuthorException(
+		String authorFullName);
+	
+	AuthorAlreadyExistsException createAuthorAlreadyExistsException(
+		String alias,
+		String authorFullName);
 }

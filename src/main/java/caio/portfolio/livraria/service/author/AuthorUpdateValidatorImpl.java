@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
+import caio.portfolio.livraria.service.author.model.AuthorExceptionCreator;
 import caio.portfolio.livraria.service.author.model.AuthorUpdateValidator;
 import caio.portfolio.livraria.service.country.CountryService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthorUpdateValidatorImpl implements AuthorUpdateValidator {
 	
 	private final AuthorRepository repo;
+	private final AuthorExceptionCreator authorExceptionCreator;
 	private final CountryService countryService;
 
 	@Override
@@ -25,15 +26,22 @@ public class AuthorUpdateValidatorImpl implements AuthorUpdateValidator {
 		boolean containsAliasAndIsDifferent = aliasToUpdate != null && 
 			!existingAlias.equals(aliasToUpdate);
 		if(containsAliasAndIsDifferent) {
-			Optional<Author> authorUsingExpectedAlias = repo.findByAlias(aliasToUpdate);
-			if(authorUsingExpectedAlias.isPresent()) throw new AuthorAlreadyExistsException("'alias': '"+aliasToUpdate+"' já está sendo utilizado pelo autor: '"+authorUsingExpectedAlias.get().getFullName()+"'");
+			Optional<Author> authorUsingExpectedAlias = repo
+				.findByAlias(aliasToUpdate);
+			if(authorUsingExpectedAlias.isPresent()) throw authorExceptionCreator
+				.createAuthorAlreadyExistsException(
+					aliasToUpdate, 
+					authorUsingExpectedAlias.get().getFullName());
 			return aliasToUpdate;
 		}
 		return existingAlias;
 	}
 
 	@Override
-	public String validateFullName(String existingFullName, String fullNameToUpdate) {
+	public String validateFullName(
+		String existingFullName, 
+		String fullNameToUpdate
+	){
 		boolean containsFullNameAndIsDifferent = fullNameToUpdate != null && 
 			!existingFullName.equals(fullNameToUpdate);
 		if(containsFullNameAndIsDifferent) return fullNameToUpdate;
@@ -41,7 +49,10 @@ public class AuthorUpdateValidatorImpl implements AuthorUpdateValidator {
 	}
 
 	@Override
-	public LocalDate validateBirthday(LocalDate existingBirthday, LocalDate birthdayToUpdate) {
+	public LocalDate validateBirthday(
+		LocalDate existingBirthday, 
+		LocalDate birthdayToUpdate
+	){
 		boolean containsBirthdayAndIsDifferent = birthdayToUpdate != null && 
 			!existingBirthday.equals(birthdayToUpdate);
 		if(containsBirthdayAndIsDifferent) return birthdayToUpdate;
@@ -49,10 +60,14 @@ public class AuthorUpdateValidatorImpl implements AuthorUpdateValidator {
 	}
 
 	@Override
-	public Country validateCountry(Country existingCountry, Integer countryIdToUpdate) {
-		boolean containsCountryIdAndIsDifferent = countryIdToUpdate != null && 
+	public Country validateCountry(
+		Country existingCountry, 
+		Integer countryIdToUpdate
+	){
+		boolean containsCountryIdAndIsDifferent = countryIdToUpdate != null &&
 			!existingCountry.getId().equals(countryIdToUpdate);
-		if(containsCountryIdAndIsDifferent) return countryService.getCountryById(countryIdToUpdate);
+		if(containsCountryIdAndIsDifferent) 
+			return countryService.getCountryById(countryIdToUpdate);
 		return existingCountry;
 	}
 }

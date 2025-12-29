@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
+import caio.portfolio.livraria.service.country.model.CountryExceptionCreator;
 import caio.portfolio.livraria.service.country.model.CountrySaverAndConcurrencyHandle;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class CountrySaverAndConcurrencyHandleImpl implements CountrySaverAndConcurrencyHandle {
 	
 	private final CountryRepository repo;
+	private final CountryExceptionCreator countryExceptionCreator;
 
 	@Override
 	public Country saveAndDealingConcurrency(Country country) {
@@ -25,7 +26,9 @@ public class CountrySaverAndConcurrencyHandleImpl implements CountrySaverAndConc
 		catch(DataIntegrityViolationException e) {
 			Optional<Country> concurrentlyCreatedCountry = repo
 				.findByIsoAlpha2Code(country.getIsoAlpha2Code());
-			if(concurrentlyCreatedCountry.isEmpty()) throw new ConcurrentCountryException("Falha ao tentar criar país com 'isoAlpha2Code': "+country.getIsoAlpha2Code());
+			if(concurrentlyCreatedCountry.isEmpty()) 
+				throw countryExceptionCreator
+					.createConcurrentCountryException(country.getIsoAlpha2Code());
 			return concurrentlyCreatedCountry.get();
 		}
 	}

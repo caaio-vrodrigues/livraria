@@ -16,4 +16,13 @@ public class MessageConfig {
         messageSource.setAlwaysUseMessageFormat(true);
         return messageSource;
     }
+	
+	@Bean
+    public MessageSource countryMessageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:message/country_messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setAlwaysUseMessageFormat(true);
+        return messageSource;
+    }
 }

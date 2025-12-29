@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.find;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
-import caio.portfolio.livraria.service.country.model.CountryFinder;
+import caio.portfolio.livraria.service.country.model.find.CountryFinder;
 import lombok.RequiredArgsConstructor;
 
 @Component

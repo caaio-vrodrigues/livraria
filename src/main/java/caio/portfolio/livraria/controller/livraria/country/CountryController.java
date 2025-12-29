@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.service.country.CountryService;
-import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class CountryController {
 	@PostMapping
 	public ResponseEntity<ResponseCountryDTO> createOrFindCountry(
 		@Valid @RequestBody CreateCountryDTO dto
-	) {
+	){
 		CountryResultImplDTO result = service.createOrFindCountry(dto);
 	    if(result.wasCreated()) return ResponseEntity.status(HttpStatus.CREATED)
 	    	.body(result.getCountry());
@@ -44,7 +44,7 @@ public class CountryController {
 	@GetMapping("iso/{isoAlpha2Code}")
 	public ResponseEntity<ResponseCountryDTO> findCountryByIsoAlpha2Code(
 		@PathVariable String isoAlpha2Code
-	) {
+	){
 		return ResponseEntity.ok(service.getCountryByIsoAlpha2Code(isoAlpha2Code));
 	}
 	
@@ -53,7 +53,7 @@ public class CountryController {
 		@PathVariable 
 		@Positive(message="ID deve ser um número maior que '0'") 
 		Integer id
-	) {
+	){
 		return ResponseEntity.ok(service.getResponseCountryDTOById(id));
 	}
 }

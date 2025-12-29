@@ -1,7 +1,7 @@
-package caio.portfolio.livraria.service.country.dto;
+package caio.portfolio.livraria.service.country.dto.implementation;
 
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
-import caio.portfolio.livraria.service.country.model.CountryResult;
+import caio.portfolio.livraria.service.country.dto.model.CountryResult;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

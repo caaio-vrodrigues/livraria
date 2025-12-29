@@ -12,13 +12,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import caio.portfolio.livraria.service.country.implementation.validate.CountryValidatorImpl;
+import caio.portfolio.livraria.service.country.model.create.CountryExceptionCreator;
 
 @ExtendWith(MockitoExtension.class)
 class CountryValidatorImplTest {
 	
-	@InjectMocks 
-	private CountryValidatorImpl validator;
+	@InjectMocks private CountryValidatorImpl validator;
+	@Mock private CountryExceptionCreator countryExceptionCreator;
 	
 	private static final String RAW_BRAZIL_CODE = "br ";
 	private static final String BRAZIL_NAME = "Brazil";
@@ -38,7 +42,7 @@ class CountryValidatorImplTest {
 		CODES_LIST.add(VALID_ITALY_CODE);
 		CODES_LIST.add(VALID_ARGENTINA_CODE);
 		CODES_LIST.add(VALID_FRANCE_CODE);
-		validator = new CountryValidatorImpl(CODES_LIST);
+		validator = new CountryValidatorImpl(CODES_LIST, countryExceptionCreator);
 	}
 	
 	@Test

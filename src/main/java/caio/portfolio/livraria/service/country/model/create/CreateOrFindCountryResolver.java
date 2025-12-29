@@ -1,6 +1,6 @@
-package caio.portfolio.livraria.service.country.model;
+package caio.portfolio.livraria.service.country.model.create;
 
-import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
 
 public interface CreateOrFindCountryResolver {
 	CountryResultImplDTO returnResultWithExistentCountry(String isoAlpha2Code);

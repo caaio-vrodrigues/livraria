@@ -1,10 +1,12 @@
 package caio.portfolio.livraria.service.country.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
 
 class CountryResultImplDTOTest {
 	

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country.model;
+package caio.portfolio.livraria.service.country.model.create;
 
 import caio.portfolio.livraria.exception.custom.country.ConcurrentCountryException;
 

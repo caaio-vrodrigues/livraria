@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.create;
 
 import java.util.Optional;
 
@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
-import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
-import caio.portfolio.livraria.service.country.model.CountryValidator;
-import caio.portfolio.livraria.service.country.model.CreateOrFindCountryResolver;
-import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
-import caio.portfolio.livraria.service.country.model.CountrySaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.model.create.CreateOrFindCountryResolver;
+import caio.portfolio.livraria.service.country.model.create.ResponseCountryDTOCreator;
+import caio.portfolio.livraria.service.country.model.save.CountrySaverAndConcurrencyHandle;
+import caio.portfolio.livraria.service.country.model.validate.CountryValidator;
 import lombok.RequiredArgsConstructor;
 
 @Component

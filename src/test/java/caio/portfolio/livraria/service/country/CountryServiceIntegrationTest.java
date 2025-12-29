@@ -21,7 +21,7 @@ import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
-import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
 
 @DirtiesContext(classMode=DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest

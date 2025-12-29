@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country.model;
+package caio.portfolio.livraria.service.country.model.save;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 

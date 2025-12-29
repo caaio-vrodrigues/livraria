@@ -9,11 +9,11 @@ import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.CreateCountryDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
 import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
-import caio.portfolio.livraria.service.country.dto.CountryResultImplDTO;
-import caio.portfolio.livraria.service.country.model.CountryFinder;
-import caio.portfolio.livraria.service.country.model.CountryValidator;
-import caio.portfolio.livraria.service.country.model.CreateOrFindCountryResolver;
-import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
+import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
+import caio.portfolio.livraria.service.country.model.create.CreateOrFindCountryResolver;
+import caio.portfolio.livraria.service.country.model.create.ResponseCountryDTOCreator;
+import caio.portfolio.livraria.service.country.model.find.CountryFinder;
+import caio.portfolio.livraria.service.country.model.validate.CountryValidator;
 import lombok.RequiredArgsConstructor;
 
 @Service

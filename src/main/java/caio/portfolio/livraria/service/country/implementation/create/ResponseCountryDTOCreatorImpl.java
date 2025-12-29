@@ -1,10 +1,10 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.create;
 
 import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
-import caio.portfolio.livraria.service.country.model.ResponseCountryDTOCreator;
+import caio.portfolio.livraria.service.country.model.create.ResponseCountryDTOCreator;
 
 @Component
 public class ResponseCountryDTOCreatorImpl implements ResponseCountryDTOCreator {

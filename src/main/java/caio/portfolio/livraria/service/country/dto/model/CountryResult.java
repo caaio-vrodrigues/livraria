@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country.model;
+package caio.portfolio.livraria.service.country.dto.model;
 
 public interface CountryResult {
 	public boolean wasCreated();

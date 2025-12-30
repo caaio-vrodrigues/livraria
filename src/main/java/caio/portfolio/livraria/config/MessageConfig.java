@@ -10,7 +10,8 @@ public class MessageConfig {
 	
 	@Bean
     public MessageSource salableBookMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = 
+        	new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:message/salable_book_messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);
@@ -19,7 +20,8 @@ public class MessageConfig {
 	
 	@Bean
     public MessageSource countryMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = 
+        	new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:message/country_messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);
@@ -28,7 +30,8 @@ public class MessageConfig {
 	
 	@Bean
     public MessageSource authorMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = 
+        	new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:message/author_messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);
@@ -37,7 +40,8 @@ public class MessageConfig {
 	
 	@Bean
     public MessageSource publisherMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = 
+        	new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:message/publisher_messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);

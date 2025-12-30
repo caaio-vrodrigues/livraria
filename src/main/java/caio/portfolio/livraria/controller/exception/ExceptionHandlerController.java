@@ -63,7 +63,10 @@ public class ExceptionHandlerController {
 	}
 	
 	private Map<String, Object> createErrorBody(
-		HttpStatus status, String msg, String path, Object details
+		HttpStatus status, 
+		String msg, 
+		String path, 
+		Object details
 	){
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put(TIME_STAMP, LocalDateTime.now());

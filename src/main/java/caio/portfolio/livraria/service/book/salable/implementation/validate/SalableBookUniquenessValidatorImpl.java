@@ -31,13 +31,15 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 				.getId()
 				.equals(authorId);
 		if(isDifferentTitleOrAuthor) {
-			Optional<SalableBook> existingBookOptional = repo.findByTitleAndAuthor(
-				titleAndAuthorUpdateDTO.getTitle(), 
-				titleAndAuthorUpdateDTO.getAuthor());
+			Optional<SalableBook> existingBookOptional = repo
+				.findByTitleAndAuthor(
+					titleAndAuthorUpdateDTO.getTitle(), 
+					titleAndAuthorUpdateDTO.getAuthor());
 			if(existingBookOptional.isPresent())
-				throw salableBookExceptionCreator.createSalableBookAlreadyExistsException(
-					titleAndAuthorUpdateDTO.getAuthor().getFullName(), 
-					titleAndAuthorUpdateDTO.getTitle());
+				throw salableBookExceptionCreator
+					.createSalableBookAlreadyExistsException(
+						titleAndAuthorUpdateDTO.getAuthor().getFullName(), 
+						titleAndAuthorUpdateDTO.getTitle());
 		}
 	}
 
@@ -46,8 +48,9 @@ public class SalableBookUniquenessValidatorImpl implements SalableBookUniqueness
 		Optional<SalableBook> salableBookOptional = repo
 			.findByTitleAndAuthor(title, author);
 		if(salableBookOptional.isPresent()) 
-			throw salableBookExceptionCreator.createSalableBookAlreadyExistsException(
-				author.getFullName(), 
-				title);
+			throw salableBookExceptionCreator
+				.createSalableBookAlreadyExistsException(
+					author.getFullName(), 
+					title);
 	}
 }

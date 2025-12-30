@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.CreatePublisherDTO;
@@ -14,6 +13,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.PublisherExceptionCreator;
 import caio.portfolio.livraria.service.publisher.model.PublisherSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import caio.portfolio.livraria.service.publisher.model.ResponsePublisherDTOCreator;
@@ -27,13 +27,14 @@ public class PublisherService {
 	private final ResponsePublisherDTOCreator responsePublisherDTOCreator;
 	private final PublisherUpdateValidator publisherUpdateValidator;
 	private final PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
+	private final PublisherExceptionCreator publisherExceptionCreator;
 	private final CountryService countryService;
 
 	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
 		Optional<Publisher> existingPublisherOptional = repo.findByFullAddress(dto.getFullAddress());
-		if(existingPublisherOptional.isPresent()) 
-			throw new PublisherAlreadyExistsException("Não foi possível criar nova editora. Editora com 'fullAddress': "+dto.getFullAddress()+" já existe");
+		if(existingPublisherOptional.isPresent()) throw publisherExceptionCreator
+			.createPublisherAlreadyExistsException(dto.getFullAddress());
 		Publisher newPublisher = Publisher.builder()
 			.name(dto.getName())
 			.fullAddress(dto.getFullAddress())
@@ -92,8 +93,8 @@ public class PublisherService {
 	}
 
 	public Boolean deletePublisherById(Long id) {
-		if(!repo.existsById(id)) 
-			throw new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id);
+		if(!repo.existsById(id)) throw publisherExceptionCreator
+			.createPublisherNotFoundException(id);
 		repo.deleteById(id);
 		return true;
 	}

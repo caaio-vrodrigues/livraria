@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.PublisherExceptionCreator;
 import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class PublisherUpdateValidatorImpl implements PublisherUpdateValidator {
 	
 	private final PublisherRepository repo;
+	private final PublisherExceptionCreator publisherExceptionCreator;
 	private final CountryService countryService;
 	
 	@Override
@@ -44,7 +45,8 @@ public class PublisherUpdateValidatorImpl implements PublisherUpdateValidator {
 			Optional<Publisher> publisherOptionalByFullAddress = repo
 				.findByFullAddress(newAddress);
 			if(publisherOptionalByFullAddress.isPresent()) 
-				throw new PublisherAlreadyExistsException("Falha na atualização, 'fullAddress': "+newAddress+" já está em uso pela editora: "+publisherOptionalByFullAddress.get().getName());
+				throw publisherExceptionCreator
+					.createPublisherAlreadyExistsException(newAddress);
 			return newAddress;
 		}
 		return currentAddress;

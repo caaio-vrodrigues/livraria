@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.CreatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePublisherDTO;
@@ -14,6 +13,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublish
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
 import caio.portfolio.livraria.service.publisher.model.PublisherExceptionCreator;
+import caio.portfolio.livraria.service.publisher.model.PublisherFinder;
 import caio.portfolio.livraria.service.publisher.model.PublisherSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
 import caio.portfolio.livraria.service.publisher.model.ResponsePublisherDTOCreator;
@@ -28,13 +28,16 @@ public class PublisherService {
 	private final PublisherUpdateValidator publisherUpdateValidator;
 	private final PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
 	private final PublisherExceptionCreator publisherExceptionCreator;
+	private final PublisherFinder publisherFinder;
 	private final CountryService countryService;
 
 	@Transactional
 	public ResponsePublisherDTO createPublisher(CreatePublisherDTO dto) {
-		Optional<Publisher> existingPublisherOptional = repo.findByFullAddress(dto.getFullAddress());
-		if(existingPublisherOptional.isPresent()) throw publisherExceptionCreator
-			.createPublisherAlreadyExistsException(dto.getFullAddress());
+		Optional<Publisher> existingPublisherOptional = repo
+			.findByFullAddress(dto.getFullAddress());
+		if(existingPublisherOptional.isPresent()) 
+			throw publisherExceptionCreator
+				.createPublisherAlreadyExistsException(dto.getFullAddress());
 		Publisher newPublisher = Publisher.builder()
 			.name(dto.getName())
 			.fullAddress(dto.getFullAddress())
@@ -52,23 +55,26 @@ public class PublisherService {
 	}
 	
 	@Transactional(readOnly=true)
-	public ResponsePublisherDTO getResponsePublisherDTOByFullAddress(String fullAddress) {
+	public ResponsePublisherDTO getResponsePublisherDTOByFullAddress(
+		String fullAddress
+	){
 		return responsePublisherDTOCreator
-			.toResponsePublisherDTO(repo.findByFullAddress(fullAddress).orElseThrow(() ->
-				new PublisherNotFoundException("Não foi possível encontrar editora com 'fullAddress': "+fullAddress)));
+			.toResponsePublisherDTO(publisherFinder
+				.findByFullAddress(fullAddress));
 	}
 
 	@Transactional(readOnly=true)
 	public ResponsePublisherDTO getResponsePublisherDTOById(Long id) {
 		return responsePublisherDTOCreator
-			.toResponsePublisherDTO(repo.findById(id).orElseThrow(() -> 
-				new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id)));
+			.toResponsePublisherDTO(publisherFinder.findById(id));
 	}
 
 	@Transactional
-	public ResponsePublisherDTO updatePublisher(Long id, UpdatePublisherDTO dto) {
-		Publisher currentPublisher = repo.findById(id).orElseThrow(() ->
-			new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id));
+	public ResponsePublisherDTO updatePublisher(
+		Long id, 
+		UpdatePublisherDTO dto
+	){
+		Publisher currentPublisher = publisherFinder.findById(id);
 		Publisher updatedPublisher = Publisher.builder()
 			.id(currentPublisher.getId())
 			.name(publisherUpdateValidator.validateName(
@@ -88,13 +94,13 @@ public class PublisherService {
 	
 	@Transactional(readOnly=true)
 	public Publisher getPublisherById(Long id) {
-		return repo.findById(id).orElseThrow(() -> 
-			new PublisherNotFoundException("Não foi possível encontrar editora com 'id': "+id));
+		return publisherFinder.findById(id);
 	}
 
 	public Boolean deletePublisherById(Long id) {
-		if(!repo.existsById(id)) throw publisherExceptionCreator
-			.createPublisherNotFoundException(id);
+		if(!repo.existsById(id)) 
+			throw publisherExceptionCreator
+				.createPublisherNotFoundException(id);
 		repo.deleteById(id);
 		return true;
 	}

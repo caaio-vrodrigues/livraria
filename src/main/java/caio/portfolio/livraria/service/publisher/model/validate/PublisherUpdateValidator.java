@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.model;
+package caio.portfolio.livraria.service.publisher.model.validate;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 

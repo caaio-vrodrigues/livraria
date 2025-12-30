@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher;
+package caio.portfolio.livraria.service.publisher.implementation.find;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
-import caio.portfolio.livraria.service.publisher.model.PublisherFinder;
+import caio.portfolio.livraria.service.publisher.model.find.PublisherFinder;
 import lombok.RequiredArgsConstructor;
 
 @Component

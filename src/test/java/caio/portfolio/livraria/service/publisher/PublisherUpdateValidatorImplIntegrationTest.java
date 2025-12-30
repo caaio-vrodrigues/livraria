@@ -17,6 +17,7 @@ import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
+import caio.portfolio.livraria.service.publisher.implementation.validate.PublisherUpdateValidatorImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

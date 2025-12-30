@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.model;
+package caio.portfolio.livraria.service.publisher.model.find;
 
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 

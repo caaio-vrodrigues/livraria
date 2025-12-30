@@ -23,6 +23,7 @@ import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.implementation.validate.PublisherUpdateValidatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class PublisherUpdateValidatorImplTest {

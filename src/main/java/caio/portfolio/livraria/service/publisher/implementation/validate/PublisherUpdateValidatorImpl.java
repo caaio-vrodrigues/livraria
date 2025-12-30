@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher;
+package caio.portfolio.livraria.service.publisher.implementation.validate;
 
 import java.util.Optional;
 
@@ -8,8 +8,8 @@ import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
-import caio.portfolio.livraria.service.publisher.model.PublisherExceptionCreator;
-import caio.portfolio.livraria.service.publisher.model.PublisherUpdateValidator;
+import caio.portfolio.livraria.service.publisher.model.create.PublisherExceptionCreator;
+import caio.portfolio.livraria.service.publisher.model.validate.PublisherUpdateValidator;
 import lombok.RequiredArgsConstructor;
 
 @Component

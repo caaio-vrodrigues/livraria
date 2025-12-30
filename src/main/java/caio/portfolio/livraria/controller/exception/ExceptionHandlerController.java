@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.AssertionFailure;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,10 +31,13 @@ import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException
 import caio.portfolio.livraria.exception.custom.publisher.ConcurrentPublisherException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
+import caio.portfolio.livraria.exception.model.ExceptionHandlerMessageCreator;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class ExceptionHandlerController {
+	
+	@Autowired private ExceptionHandlerMessageCreator exceptionHandlerMessageCreator;
 
 	private static final String TIME_STAMP = "timestamp";
 	private static final String STATUS = "status";
@@ -88,7 +92,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Quantidade de livros em estoque insuficiente para realizar venda"
+	        exceptionHandlerMessageCreator.insuficientSalableBookUnitsCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -103,7 +107,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.NOT_FOUND,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível encontrar um livro para o argumento fornecido"
+	        exceptionHandlerMessageCreator.salableBookNotFoundCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
@@ -118,7 +122,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível criar um novo livro por violação de concorrência"
+	        exceptionHandlerMessageCreator.concurrentSalableBookCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -133,7 +137,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Violação de unicidade ao tentar criar novo livro"
+	        exceptionHandlerMessageCreator.salableBookAlreadyExistsCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -148,7 +152,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.NOT_FOUND,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível encontrar uma editora para o argumento fornecido"
+	        exceptionHandlerMessageCreator.publisherNotFoundCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
@@ -163,7 +167,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível criar uma nova editora por violação de concorrência"
+	        exceptionHandlerMessageCreator.concurrentPublisherCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -178,7 +182,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Violação de unicidade ao tentar criar nova editora"
+	        exceptionHandlerMessageCreator.publisherAlreadyExistsCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -193,7 +197,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.BAD_REQUEST,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Corpo da requisição ilegível ou malformado. Verifique a sintaxe."
+	        exceptionHandlerMessageCreator.messageNotReadableCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
@@ -208,7 +212,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível criar um novo autor por violação de concorrência"
+	        exceptionHandlerMessageCreator.concurrentAuthorCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -223,7 +227,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.NOT_FOUND,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Não foi possível encontrar um autor para o argumento fornecido"
+	        exceptionHandlerMessageCreator.authorNotFoundCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
@@ -238,7 +242,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Violação de unicidade ao tentar criar novo autor"
+	        exceptionHandlerMessageCreator.authorAlreadyExistsCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -253,7 +257,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.CONFLICT,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Falha ao tentar salvar país devido a concorrência durante persistência de dados"
+	        exceptionHandlerMessageCreator.concurrentCountryCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -266,7 +270,7 @@ public class ExceptionHandlerController {
 	) {
 		Map<String, Object> body = createErrorBody(
 			HttpStatus.BAD_REQUEST,
-			"Erro de validação nos parâmetros",
+			exceptionHandlerMessageCreator.validationCreateMsg(),
 			httpRequest.getRequestURI(),
 			extractValidationErrors(e)
 	    );
@@ -283,7 +287,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.NOT_FOUND,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "O país solicitado não foi encontrado no sistema"
+	        exceptionHandlerMessageCreator.countryNotFoundCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
@@ -298,7 +302,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.BAD_REQUEST,
 	        e.getMessage(),
 	        httpRequest.getRequestURI(),
-	        "Argumento inválido fornecido na requisição"
+	        exceptionHandlerMessageCreator.illegalArgumentCreateMsg()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
@@ -311,7 +315,7 @@ public class ExceptionHandlerController {
 	){
 	    Map<String, Object> body = createErrorBody(
 	        HttpStatus.BAD_REQUEST,
-	        "Erro de validação nos campos da requisição",
+	        exceptionHandlerMessageCreator.methodArgumentNotValidCreateMsg(),
 	        httpRequest.getRequestURI(),
 	        extractBindingResults(e)
 	    );
@@ -326,7 +330,7 @@ public class ExceptionHandlerController {
 	){
 	    Map<String, Object> body = createErrorBody(
 	        HttpStatus.BAD_REQUEST,
-	        "Formato de requisição inválido ou dados incorretos. Verifique o JSON enviado",
+	        exceptionHandlerMessageCreator.httpMessageConversionCreateMsg(),
 	        httpRequest.getRequestURI(),
 	        null
 	    );
@@ -341,7 +345,7 @@ public class ExceptionHandlerController {
     ){
         Map<String, Object> body = createErrorBody(
             HttpStatus.NOT_FOUND,
-            "O recurso solicitado não foi encontrado. Verifique o caminho da URL.",
+            exceptionHandlerMessageCreator.noResourceFoundCreateMsg(),
             httpRequest.getRequestURI(),
             null
         );
@@ -356,7 +360,7 @@ public class ExceptionHandlerController {
     ){
         Map<String, Object> body = createErrorBody(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "Ocorreu um erro interno inesperado durante a persistência de dados. Por favor, contate o suporte.",
+            exceptionHandlerMessageCreator.assertionFailureCreateMsg(),
             httpRequest.getRequestURI(),
             null
         );

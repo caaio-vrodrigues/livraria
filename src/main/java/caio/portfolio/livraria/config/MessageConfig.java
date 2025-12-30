@@ -47,4 +47,14 @@ public class MessageConfig {
         messageSource.setAlwaysUseMessageFormat(true);
         return messageSource;
     }
+	
+	@Bean
+    public MessageSource exceptionHandlerMessageSource() {
+        ReloadableResourceBundleMessageSource messageSource = 
+        	new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:message/exception_handler_messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setAlwaysUseMessageFormat(true);
+        return messageSource;
+    }
 }

@@ -28,7 +28,9 @@ public class CountryController {
 	
 	@PostMapping
 	public ResponseEntity<ResponseCountryDTO> createOrFindCountry(
-		@Valid @RequestBody CreateCountryDTO dto
+		@Valid 
+		@RequestBody 
+		CreateCountryDTO dto
 	){
 		CountryResultImplDTO result = service.createOrFindCountry(dto);
 	    if(result.wasCreated()) return ResponseEntity.status(HttpStatus.CREATED)
@@ -43,7 +45,8 @@ public class CountryController {
 	
 	@GetMapping("iso/{isoAlpha2Code}")
 	public ResponseEntity<ResponseCountryDTO> findCountryByIsoAlpha2Code(
-		@PathVariable String isoAlpha2Code
+		@PathVariable 
+		String isoAlpha2Code
 	){
 		return ResponseEntity.ok(service.getCountryByIsoAlpha2Code(isoAlpha2Code));
 	}
@@ -51,7 +54,7 @@ public class CountryController {
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponseCountryDTO> findCountryById(
 		@PathVariable 
-		@Positive(message="ID deve ser um número maior que '0'") 
+		@Positive(message="{id.grather.than.zero}")
 		Integer id
 	){
 		return ResponseEntity.ok(service.getResponseCountryDTOById(id));

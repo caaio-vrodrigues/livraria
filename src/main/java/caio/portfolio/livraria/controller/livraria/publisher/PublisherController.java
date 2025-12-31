@@ -19,6 +19,7 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.service.publisher.PublisherService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +31,9 @@ public class PublisherController {
 	
 	@PostMapping
 	public ResponseEntity<ResponsePublisherDTO> newPublisher(
-		@Valid @RequestBody CreatePublisherDTO dto
+		@Valid 
+		@RequestBody 
+		CreatePublisherDTO dto
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(service.createPublisher(dto));
@@ -43,28 +46,39 @@ public class PublisherController {
 	
 	@GetMapping("/full-address")
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherByFullAddress(
-		@RequestParam String fullAddress
+		@RequestParam 
+		String fullAddress
 	) {
-		return ResponseEntity.ok(service.getResponsePublisherDTOByFullAddress(fullAddress));
+		return ResponseEntity.ok(service
+			.getResponsePublisherDTOByFullAddress(fullAddress));
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherById(
-		@PathVariable Long id
+		@PathVariable 
+		@Positive(message="id.grather.than.zero")
+		Long id
 	){
 		return ResponseEntity.ok(service.getResponsePublisherDTOById(id));
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponsePublisherDTO> editPublisher(
-		@PathVariable Long id,
-		@RequestBody UpdatePublisherDTO dto
+		@PathVariable
+		@Positive(message="id.grather.than.zero")
+		Long id,
+		@RequestBody 
+		UpdatePublisherDTO dto
 	) {
 		return ResponseEntity.ok(service.updatePublisher(id, dto));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Boolean> deletePublisherById(@PathVariable Long id){
+	public ResponseEntity<Boolean> deletePublisherById(
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id
+	){
 		return ResponseEntity.ok(service.deletePublisherById(id));
 	}
 }

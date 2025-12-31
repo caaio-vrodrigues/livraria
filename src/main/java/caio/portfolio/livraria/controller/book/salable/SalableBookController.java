@@ -22,6 +22,7 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSala
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.book.salable.SalableBookService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,7 +34,9 @@ public class SalableBookController {
 	
 	@PostMapping
 	public ResponseEntity<ResponseSalableBookDTO> newSalableBook(
-		@Valid @RequestBody CreateSalableBookDTO dto
+		@Valid 
+		@RequestBody
+		CreateSalableBookDTO dto
 	){
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(service.createSalableBook(dto));
@@ -46,63 +49,83 @@ public class SalableBookController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponseSalableBookDTO> findResponseSalableBookDTOById(
-		@PathVariable Long id
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOById(id));
 	}
 	
 	@GetMapping("/author/{authorId}")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByAuthorId(
-		@PathVariable Long authorId
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long authorId
 	){
-		return ResponseEntity.ok(service.getResponseSalableBookDTOByAuthorId(authorId));
+		return ResponseEntity.ok(service
+			.getResponseSalableBookDTOByAuthorId(authorId));
 	}
 	
 	@GetMapping("/publisher/{publisherId}")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByPublisherId(
-		@PathVariable Long publisherId
+		@PathVariable
+		@Positive(message="{id.grather.than.zero}")
+		Long publisherId
 	){
-		return ResponseEntity.ok(service.getResponseSalableBookDTOByPublisherId(publisherId));
+		return ResponseEntity.ok(service
+			.getResponseSalableBookDTOByPublisherId(publisherId));
 	}
 	
 	@GetMapping("/title")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByTitle(
-		@RequestParam String title
+		@RequestParam 
+		String title
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title));
 	}
 	
 	@GetMapping("/genre")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByGenre(
-		@RequestParam Genre genre
+		@RequestParam 
+		Genre genre
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByGenre(genre));
 	}
 	
 	@GetMapping("/isbn/{isbn}")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByIsbn(
-		@PathVariable String isbn
+		@PathVariable 
+		String isbn
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn));
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponseSalableBookDTO> editSalableBookById(
-		@PathVariable Long id,
-		@RequestBody UpdateSalableBookDTO dto
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id,
+		@RequestBody 
+		UpdateSalableBookDTO dto
 	){
 		return ResponseEntity.ok(service.updateSalableBookById(id, dto));
 	}
 	
 	@PutMapping("/sell-books")
 	public ResponseEntity<BigDecimal> sellBooks(
-		@Valid @RequestBody BookSellListDTO bookListDTO
+		@Valid 
+		@RequestBody 
+		BookSellListDTO bookListDTO
 	){
 		return ResponseEntity.ok(service.sellBooks(bookListDTO));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Boolean> deleteSalableBookById(@PathVariable Long id){
+	public ResponseEntity<Boolean> deleteSalableBookById(
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id
+	){
 		return ResponseEntity.ok(service.deleteSalableBookById(id));
 	}
 }

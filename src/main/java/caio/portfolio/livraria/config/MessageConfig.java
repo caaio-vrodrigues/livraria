@@ -9,50 +9,19 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 public class MessageConfig {
 	
 	@Bean
-    public MessageSource salableBookMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-        	new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:message/salable_book_messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setAlwaysUseMessageFormat(true);
-        return messageSource;
-    }
-	
-	@Bean
-    public MessageSource countryMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-        	new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:message/country_messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setAlwaysUseMessageFormat(true);
-        return messageSource;
-    }
-	
-	@Bean
-    public MessageSource authorMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-        	new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:message/author_messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setAlwaysUseMessageFormat(true);
-        return messageSource;
-    }
-	
-	@Bean
-    public MessageSource publisherMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-        	new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:message/publisher_messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setAlwaysUseMessageFormat(true);
-        return messageSource;
-    }
-	
-	@Bean
-    public MessageSource exceptionHandlerMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = 
-        	new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:message/exception_handler_messages");
+    public MessageSource messageSource() {
+		ReloadableResourceBundleMessageSource messageSource = 
+			new ReloadableResourceBundleMessageSource();
+		messageSource.setBasenames(
+			"classpath:message/salable_book_messages",
+			"classpath:message/salable_book_messages",
+			"classpath:message/country_messages",
+			"classpath:message/author_messages",
+			"classpath:message/publisher_messages",
+			"classpath:message/exception_handler_messages",
+			"classpath:message/controller_messages",
+			"classpath:ValidationMessages"
+		);
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setAlwaysUseMessageFormat(true);
         return messageSource;

@@ -19,6 +19,7 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDT
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.service.author.AuthorService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +31,9 @@ public class AuthorController {
 	
 	@PostMapping
 	public ResponseEntity<ResponseAuthorDTO> newAuthor(
-		@Valid @RequestBody CreateAuthorDTO dto
+		@Valid 
+		@RequestBody 
+		CreateAuthorDTO dto
 	){
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(service.createAuthor(dto));
@@ -43,28 +46,39 @@ public class AuthorController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponseAuthorDTO> findAuthorById(
-		@PathVariable Long id
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id
 	){
 		return ResponseEntity.ok(service.getResponseAuthorDTOById(id));
 	}
 	
 	@GetMapping("/alias")
 	public ResponseEntity<ResponseAuthorDTO> findAuthorAlias(
-		@RequestParam String alias
+		@RequestParam 
+		String alias
 	){
 		return ResponseEntity.ok(service.getResponseAuthorDTOByAlias(alias));
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponseAuthorDTO> editAuthorById(
-		@PathVariable Long id,
-		@Valid @RequestBody UpdateAuthorDTO dto
+		@PathVariable
+		@Positive(message="{id.grather.than.zero}")
+		Long id,
+		@Valid 
+		@RequestBody 
+		UpdateAuthorDTO dto
 	){
 		return ResponseEntity.ok(service.updateAuthor(id, dto));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Boolean> deleteAuthorById(@PathVariable Long id) {
+	public ResponseEntity<Boolean> deleteAuthorById(
+		@PathVariable 
+		@Positive(message="{id.grather.than.zero}")
+		Long id
+	){
 		return ResponseEntity.ok(service.deleteAuthorById(id));
 	}
 }

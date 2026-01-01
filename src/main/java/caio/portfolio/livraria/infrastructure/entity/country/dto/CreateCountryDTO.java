@@ -13,7 +13,7 @@ import lombok.Getter;
 public class CreateCountryDTO {
 
 	@JsonDeserialize(using=TrimmedStringDeserializer.class)
-	@NotBlank(message="O campo 'isoAlpha2Code' não pode estar vazio")
+	@NotBlank(message="{isoAlpha2Code.notBlank}")
 	@Size(min=2, max=2)
 	private final String isoAlpha2Code;
 }

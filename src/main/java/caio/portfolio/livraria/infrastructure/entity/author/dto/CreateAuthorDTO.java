@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,15 +12,16 @@ import lombok.Getter;
 @Builder
 public class CreateAuthorDTO {
 	
-	@NotBlank(message="O campo 'alias' não pode estar vazio")
+	@NotBlank(message="{alias.notBlank}")
 	private final String alias;
 
-	@NotBlank(message="O campo 'fullName' não pode estar vazio")
+	@NotBlank(message="{fullName.notBlank}")
 	private final String fullName;
 	
-	@NotNull(message="O campo 'birthday' não pode ser nulo")
+	@NotNull(message="{birthday.notNull}")
 	private final LocalDate birthday;
 	
-	@NotNull(message="O campo 'countryId' não pode ser nulo")
+	@NotNull(message="{countryId.notNull}")
+	@Positive(message="{countryId.grather.than.zero}")
 	private final Integer countryId;
 }

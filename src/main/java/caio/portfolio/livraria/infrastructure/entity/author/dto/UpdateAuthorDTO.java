@@ -19,12 +19,16 @@ public class UpdateAuthorDTO {
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private final LocalDate birthday;
 	
-	@Positive(message ="id deve ser um valor maior que 0")
+	@Positive(message="{countryId.grather.than.zero}")
 	private final Integer countryId;
 	
-	@Pattern(regexp="^(?!\s*$).+", message="alias não pode ser vazio ou conter apenas espaços em branco, se presente")
+	@Pattern(
+		regexp="^(?!\s*$).+", 
+		message="{alias.notBlank}")
 	private final String alias;
 	
-	@Pattern(regexp="^(?!\s*$).+", message="fullName não pode ser vazio ou conter apenas espaços em branco, se presente")
+	@Pattern(
+		regexp="^(?!\s*$).+", 
+		message="{fullName.notBlank}")
 	private final String fullName;
 }

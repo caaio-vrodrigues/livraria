@@ -14,11 +14,11 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class CreateSalableBookDTO extends CreateBookDTO {
 
-	@Min(value=0, message="O campo 'price' não pode ser menor que 0")
-	@NotNull(message="O campo 'price' não pode ser nulo")
+	@Min(value=0, message="{price.positive.number}")
+	@NotNull(message="{price.notNull}")
 	private final BigDecimal price;
 	
-	@Min(value=0, message="O campo 'units' não pode ser menor que 0")
-	@NotNull(message="O campo 'units' não pode ser nulo")
+	@Min(value=0, message="{units.positive.number}")
+	@NotNull(message="{units.notNull}")
 	private final Integer units;
 }

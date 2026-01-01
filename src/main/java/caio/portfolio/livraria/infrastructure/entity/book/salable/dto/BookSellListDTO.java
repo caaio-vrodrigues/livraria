@@ -14,6 +14,6 @@ import lombok.extern.jackson.Jacksonized;
 public class BookSellListDTO {
 
 	@Valid
-	@NotEmpty(message ="A lista de livros vendidos não pode estar vazia")
+	@NotEmpty(message="{sellList.notEmpty}")
 	private List<BookSellDTO> sellList;
 }

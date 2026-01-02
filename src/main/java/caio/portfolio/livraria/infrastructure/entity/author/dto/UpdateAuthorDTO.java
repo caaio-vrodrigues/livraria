@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import caio.portfolio.livraria.serialization.LocalDateDesserializer;
+import caio.portfolio.livraria.serialization.TrimmedStringDeserializer;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
@@ -25,10 +26,12 @@ public class UpdateAuthorDTO {
 	@Pattern(
 		regexp="^(?!\s*$).+", 
 		message="{alias.notBlank}")
+	@JsonDeserialize(using=TrimmedStringDeserializer.class)
 	private final String alias;
 	
 	@Pattern(
 		regexp="^(?!\s*$).+", 
 		message="{fullName.notBlank}")
+	@JsonDeserialize(using=TrimmedStringDeserializer.class)
 	private final String fullName;
 }

@@ -20,6 +20,7 @@ public class MessageConfig {
 			"classpath:message/publisher_messages",
 			"classpath:message/exception_handler_messages",
 			"classpath:message/controller_messages",
+			"classpath:message/serialization_messages",
 			"classpath:ValidationMessages"
 		);
         messageSource.setDefaultEncoding("UTF-8");

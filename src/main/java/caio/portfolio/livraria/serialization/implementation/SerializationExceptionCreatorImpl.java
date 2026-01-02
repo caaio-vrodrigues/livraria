@@ -18,7 +18,7 @@ public class SerializationExceptionCreatorImpl implements SerializationException
 	@Override
 	public InputMismatchException createInputMismatchException() {
 		return new InputMismatchException(messageSource.getMessage(
-			"input_mismatch_notBlank", 
+			"input.mismatch.notBlank", 
 			new Object[] {},
 			LocaleContextHolder.getLocale()));
 	}
@@ -26,7 +26,7 @@ public class SerializationExceptionCreatorImpl implements SerializationException
 	@Override
 	public InputMismatchException createInputMismatchException(String value) {
 		return new InputMismatchException(messageSource.getMessage(
-			"input_mismatch_invalid_format", 
+			"input.mismatch.invalid.format", 
 			new Object[] {value},
 			LocaleContextHolder.getLocale()));
 	}

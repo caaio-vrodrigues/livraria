@@ -58,7 +58,8 @@ public class AuthorController {
 		@RequestParam 
 		String alias
 	){
-		return ResponseEntity.ok(service.getResponseAuthorDTOByAlias(alias));
+		return ResponseEntity.ok(service
+			.getResponseAuthorDTOByAlias(alias.trim()));
 	}
 	
 	@PutMapping("/{id}")

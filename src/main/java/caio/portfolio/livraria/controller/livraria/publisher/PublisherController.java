@@ -34,7 +34,7 @@ public class PublisherController {
 		@Valid 
 		@RequestBody 
 		CreatePublisherDTO dto
-	) {
+	){
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(service.createPublisher(dto));
 	}
@@ -48,15 +48,15 @@ public class PublisherController {
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherByFullAddress(
 		@RequestParam 
 		String fullAddress
-	) {
+	){
 		return ResponseEntity.ok(service
-			.getResponsePublisherDTOByFullAddress(fullAddress));
+			.getResponsePublisherDTOByFullAddress(fullAddress.trim()));
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ResponsePublisherDTO> searchPublisherById(
 		@PathVariable 
-		@Positive(message="id.grather.than.zero")
+		@Positive(message="{id.grather.than.zero}")
 		Long id
 	){
 		return ResponseEntity.ok(service.getResponsePublisherDTOById(id));
@@ -65,11 +65,12 @@ public class PublisherController {
 	@PutMapping("/{id}")
 	public ResponseEntity<ResponsePublisherDTO> editPublisher(
 		@PathVariable
-		@Positive(message="id.grather.than.zero")
+		@Positive(message="{id.grather.than.zero}")
 		Long id,
+		@Valid 
 		@RequestBody 
 		UpdatePublisherDTO dto
-	) {
+	){
 		return ResponseEntity.ok(service.updatePublisher(id, dto));
 	}
 	

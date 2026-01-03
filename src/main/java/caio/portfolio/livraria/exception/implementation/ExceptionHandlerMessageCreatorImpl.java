@@ -164,4 +164,12 @@ public class ExceptionHandlerMessageCreatorImpl implements ExceptionHandlerMessa
 			new Object[]{},
 			LocaleContextHolder.getLocale());
 	}
+
+	@Override
+	public String missingParameterCreateMsg(String parameterName) {
+		return exceptionHandlerMessageSource.getMessage(
+			"missing.parameter",
+			new Object[]{parameterName},
+			LocaleContextHolder.getLocale());
+	}
 }

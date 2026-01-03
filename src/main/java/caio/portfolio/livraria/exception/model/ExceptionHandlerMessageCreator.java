@@ -20,4 +20,5 @@ public interface ExceptionHandlerMessageCreator {
 	String concurrentSalableBookCreateMsg();
 	String salableBookNotFoundCreateMsg();
 	String insuficientSalableBookUnitsCreateMsg();
+	String missingParameterCreateMsg(String parameterName);
 }

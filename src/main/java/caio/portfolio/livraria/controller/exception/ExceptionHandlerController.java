@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -195,9 +196,10 @@ public class ExceptionHandlerController {
 	){
 	    Map<String, Object> body = createErrorBody(
 	        HttpStatus.BAD_REQUEST,
-	        e.getMessage(),
+	        exceptionHandlerMessageCreator
+	        	.messageNotReadableCreateMsg(),
 	        httpRequest.getRequestURI(),
-	        exceptionHandlerMessageCreator.messageNotReadableCreateMsg()
+	        e.getMessage()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
@@ -332,7 +334,7 @@ public class ExceptionHandlerController {
 	        HttpStatus.BAD_REQUEST,
 	        exceptionHandlerMessageCreator.httpMessageConversionCreateMsg(),
 	        httpRequest.getRequestURI(),
-	        null
+	        e.getMessage()
 	    );
 	    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 	}
@@ -365,5 +367,21 @@ public class ExceptionHandlerController {
             null
         );
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+	
+	 @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleMissingServletRequestParameterException(
+        MissingServletRequestParameterException e,
+        HttpServletRequest httpRequest
+    ){
+        Map<String, Object> body = createErrorBody(
+            HttpStatus.BAD_REQUEST,
+            exceptionHandlerMessageCreator
+        		.missingParameterCreateMsg(e.getParameterName()),
+            httpRequest.getRequestURI(),
+            e.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

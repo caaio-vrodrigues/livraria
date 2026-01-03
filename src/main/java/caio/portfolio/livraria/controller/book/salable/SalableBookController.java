@@ -22,6 +22,7 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.UpdateSala
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.book.salable.SalableBookService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
@@ -79,25 +80,27 @@ public class SalableBookController {
 	@GetMapping("/title")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByTitle(
 		@RequestParam 
+		@NotBlank(message="{title.param.notBlank}")
 		String title
 	){
-		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title));
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByTitle(title.trim()));
 	}
 	
 	@GetMapping("/genre")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByGenre(
-		@RequestParam 
+		@RequestParam
 		Genre genre
 	){
 		return ResponseEntity.ok(service.getResponseSalableBookDTOByGenre(genre));
 	}
 	
-	@GetMapping("/isbn/{isbn}")
+	@GetMapping("/isbn")
 	public ResponseEntity<List<ResponseSalableBookDTO>> findResponseSalableBookDTOByIsbn(
-		@PathVariable 
+		@RequestParam
+		@NotBlank(message="{isbn.param.notBlank}")
 		String isbn
 	){
-		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn));
+		return ResponseEntity.ok(service.getResponseSalableBookDTOByIsbn(isbn.trim()));
 	}
 	
 	@PutMapping("/{id}")
@@ -105,13 +108,14 @@ public class SalableBookController {
 		@PathVariable 
 		@Positive(message="{id.grather.than.zero}")
 		Long id,
+		@Valid
 		@RequestBody 
 		UpdateSalableBookDTO dto
 	){
 		return ResponseEntity.ok(service.updateSalableBookById(id, dto));
 	}
 	
-	@PutMapping("/sell-books")
+	@PutMapping("/sell-books")// aqui....................................................
 	public ResponseEntity<BigDecimal> sellBooks(
 		@Valid 
 		@RequestBody 

@@ -2,7 +2,6 @@ package caio.portfolio.livraria.service.book.salable;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +18,7 @@ import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
 import caio.portfolio.livraria.service.book.salable.model.create.ResponseSalableBookDTOCreator;
+import caio.portfolio.livraria.service.book.salable.model.create.SalableBookExceptionCreator;
 import caio.portfolio.livraria.service.book.salable.model.find.SalableBookFinder;
 import caio.portfolio.livraria.service.book.salable.model.save.SalableBookSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.book.salable.model.sell.BookSeller;
@@ -36,6 +36,7 @@ public class SalableBookService {
 	private final SalableBookUpdateValidator salableBookUpdateValidator;
 	private final SalableBookSaverAndConcurrencyHandle salableBookSaverAndConcurrencyHandleImpl;
 	private final SalableBookUniquenessValidator salableBookUniquenessValidator;
+	private final SalableBookExceptionCreator salableBookExceptionCreator;
 	private final BookSeller bookSeller;
 	private final SalableBookFinder salableBookFinder;
 	private final AuthorService authorService;
@@ -160,30 +161,14 @@ public class SalableBookService {
 
 	@Transactional
 	public BigDecimal sellBooks(BookSellListDTO bookListDTO) {
-		BigDecimal totalToPay = bookSeller.sellBooks(bookListDTO);
-		bookListDTO.getSellList().stream()
-			.forEach(bookDTO -> {
-				Optional<SalableBook> book = repo.findById(bookDTO.getBookId());
-				if(book.isPresent()) {
-					SalableBook bookUpdated = SalableBook.builder()
-						.id(book.get().getId())
-						.title(book.get().getTitle())
-						.genre(book.get().getGenre())
-						.author(book.get().getAuthor())
-						.publisher(book.get().getPublisher())
-						.isbn(book.get().getIsbn())
-						.price(book.get().getPrice())
-						.units(book.get().getUnits() - bookDTO.getUnits())
-						.build();
-					repo.saveAndFlush(bookUpdated);
-				}
-			});
-		return totalToPay;
+		return bookSeller.sellBooks(bookListDTO);
 	}
 
 	@Transactional
 	public Boolean deleteSalableBookById(Long id) {
-		salableBookFinder.existsById(id);
+		if(!salableBookFinder.existsById(id))
+			throw salableBookExceptionCreator
+				.createSalableBookNotFoundException(id);
 		repo.deleteById(id);
 		return true;
 	}

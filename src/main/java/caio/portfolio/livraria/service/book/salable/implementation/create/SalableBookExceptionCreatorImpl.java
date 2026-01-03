@@ -5,7 +5,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.exception.custom.book.salable.ConcurrentSalableBookException;
+import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableBookUnitsException;
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookAlreadyExistsException;
+import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.service.book.salable.model.create.SalableBookExceptionCreator;
 import lombok.RequiredArgsConstructor;
 
@@ -36,5 +38,27 @@ public class SalableBookExceptionCreatorImpl implements SalableBookExceptionCrea
 	        new Object[]{title},
 	        LocaleContextHolder.getLocale());
 	    return new ConcurrentSalableBookException(msg);
+	}
+
+	@Override
+	public SalableBookNotFoundException createSalableBookNotFoundException(
+		Long id
+	){
+		String msg = salableBookMessageSource.getMessage(
+	        "book.not.found.id",
+	        new Object[]{id},
+	        LocaleContextHolder.getLocale());
+		return new SalableBookNotFoundException(msg);
+	}
+
+	@Override
+	public InsuficientSalableBookUnitsException createInsuficientSalableBookUnitsException(
+		int units
+	){
+		String msg = salableBookMessageSource.getMessage(
+	        "insuficient.book.units",
+	        new Object[]{units},
+	        LocaleContextHolder.getLocale());
+		return new InsuficientSalableBookUnitsException(msg);
 	}
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
+import caio.portfolio.livraria.service.book.salable.model.create.SalableBookExceptionCreator;
 import caio.portfolio.livraria.service.book.salable.model.find.SalableBookFinder;
 import caio.portfolio.livraria.service.book.salable.model.sell.BookSeller;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,17 @@ import lombok.RequiredArgsConstructor;
 public class BookSellerImpl implements BookSeller {
 
 	private final SalableBookFinder salableBookFinder;
+	private final SalableBookExceptionCreator salableBookExceptionCreator;
 
 	@Override
 	public BigDecimal sellBook(Long bookId, int units) {
 		SalableBook book = salableBookFinder.findById(bookId);
+		try{
+			book.decreaseUnits(units);
+		}catch(IllegalArgumentException e) {
+			throw salableBookExceptionCreator
+				.createInsuficientSalableBookUnitsException(book.getUnits()); 
+		}
 		return BigDecimal.valueOf(units)
 			.multiply(book.getPrice());
 	}

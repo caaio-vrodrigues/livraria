@@ -1,9 +1,13 @@
 package caio.portfolio.livraria.service.country;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
@@ -27,6 +30,7 @@ import caio.portfolio.livraria.infrastructure.repository.CountryRepository;
 import caio.portfolio.livraria.service.country.dto.implementation.CountryResultImplDTO;
 import caio.portfolio.livraria.service.country.model.create.CreateOrFindCountryResolver;
 import caio.portfolio.livraria.service.country.model.create.ResponseCountryDTOCreator;
+import caio.portfolio.livraria.service.country.model.find.CountryFinder;
 import caio.portfolio.livraria.service.country.model.validate.CountryValidator;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +39,7 @@ class CountryServiceTest {
 	@Mock private ResponseCountryDTOCreator responseCountryDTOCreator;
 	@Mock private CountryRepository repo;
 	@Mock private CountryValidator countryValidator; 
+	@Mock private CountryFinder countryFinder;
 	@Mock private CreateOrFindCountryResolver createOrFindCountryResolver;
 	@InjectMocks private CountryService service;
 
@@ -88,64 +93,80 @@ class CountryServiceTest {
 	@Test
 	@DisplayName("Deve retornar país ao buscar com 'id' existente")
 	void getCountryById_returnsCountry() {
-		when(repo.findById(1)).thenReturn(Optional.of(BRAZIL));
-		when(responseCountryDTOCreator.toResponseCountryDTO(BRAZIL))
+		when(countryFinder.findById(anyInt()))
+			.thenReturn(BRAZIL);
+		when(responseCountryDTOCreator.toResponseCountryDTO(any(Country.class)))
 			.thenReturn(RESPONSE_BRAZILDTO);
-		ResponseCountryDTO result = service.getResponseCountryDTOById(1);
+		ResponseCountryDTO result = service.getResponseCountryDTOById(BRAZIL_ID);
 		assertNotNull(result);
-		assertEquals(1, result.getId());
+		assertEquals(BRAZIL_ID, result.getId());
+		assertEquals(BRAZIL_NAME, result.getName());
+		verify(countryFinder, times(1))
+			.findById(anyInt());
+		verify(responseCountryDTOCreator, times(1))
+			.toResponseCountryDTO(any(Country.class));
 	 }
 	 
 	@Test
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'id' não existente")
 	void getCountryById_returnsException() {
-		when(repo.findById(NON_EXISTING_ID))
-			.thenReturn(Optional.empty());
+		when(countryFinder.findById(anyInt()))
+			.thenThrow(CountryNotFoundException.class);
 		assertThrows(
 			CountryNotFoundException.class,
-            () -> service.getCountryById(100));
+            () -> service.getCountryById(NON_EXISTING_ID));
+		verify(countryFinder, times(1)).findById(NON_EXISTING_ID);
 	}
 	 
 	@Test
 	@DisplayName("Deve retornar país ao buscar com 'isoAlpha2Code' existente")
 	void getCountryByIsoAlpha2Code_returnsCountry() {
-		when(countryValidator.processIsoAlpha2Code(RAW_BRAZIL_CODE))
+		when(countryValidator.processIsoAlpha2Code(anyString()))
 			.thenReturn(VALID_BRAZIL_CODE);
-		when(repo.findByIsoAlpha2Code(VALID_BRAZIL_CODE))
-			.thenReturn(Optional.of(BRAZIL));
-		when(responseCountryDTOCreator.toResponseCountryDTO(BRAZIL))
+		when(countryFinder.findByIsoAlpha2Code(anyString()))
+			.thenReturn(BRAZIL);
+		when(responseCountryDTOCreator.toResponseCountryDTO(any(Country.class)))
 			.thenReturn(RESPONSE_BRAZILDTO);
-		ResponseCountryDTO result = service
-			.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE);
+		ResponseCountryDTO reponseBrazilDTO = service
+			.getCountryByIsoAlpha2Code(VALID_BRAZIL_CODE);
 		assertEquals(
 			VALID_BRAZIL_CODE, 
-			result.getIsoAlpha2Code());
+			reponseBrazilDTO.getIsoAlpha2Code());
 		assertEquals(
 			BRAZIL_NAME, 
-			result.getName());
+			reponseBrazilDTO.getName());
+		verify(countryValidator, times(1))
+			.processIsoAlpha2Code(anyString());
+		verify(countryFinder, times(1))
+			.findByIsoAlpha2Code(anyString());
+		verify(responseCountryDTOCreator, times(1))
+			.toResponseCountryDTO(any(Country.class));
 	}
 	 
 	@Test
 	@DisplayName("Deve retornar 'CountryNotFoundException' ao buscar com 'isoAlpha2Code' não existente")
 	void getCountryByIsoAlpha2Code_returnsException() {
-		when(countryValidator.processIsoAlpha2Code(RAW_BRAZIL_CODE))
+		when(countryValidator.processIsoAlpha2Code(anyString()))
 			.thenReturn(VALID_BRAZIL_CODE);
-	    when(repo.findByIsoAlpha2Code(VALID_BRAZIL_CODE))
-	    	.thenReturn(Optional.empty());
+		when(countryFinder.findByIsoAlpha2Code(anyString()))
+			.thenThrow(CountryNotFoundException.class);
 	    assertThrows(
 	    	CountryNotFoundException.class,
             () -> service.getCountryByIsoAlpha2Code(RAW_BRAZIL_CODE)
         );
+	    verify(countryValidator, times(1))
+			.processIsoAlpha2Code(anyString());
+		verify(countryFinder, times(1))
+			.findByIsoAlpha2Code(anyString());
 	}
 	 
 	@Test
 	@DisplayName("Deve retornar lista de dto's de países quando existem países cadastrados")
 	void getAllCountries_returnsResponseCountryDTOList() {
 		when(repo.findAll()).thenReturn(COUNTRIES_LIST);
-		when(responseCountryDTOCreator.toResponseCountryDTO(BRAZIL))
-     		.thenReturn(RESPONSE_BRAZILDTO);
-		when(responseCountryDTOCreator.toResponseCountryDTO(IRELAND))
-        	.thenReturn(RESPONSE_IRELANDDTO);
+		when(responseCountryDTOCreator.toResponseCountryDTO(any(Country.class)))
+			.thenReturn(RESPONSE_BRAZILDTO)
+			.thenReturn(RESPONSE_IRELANDDTO);
 		List<ResponseCountryDTO> result = service.getAllCountries();
 		assertNotNull(result);
 		assertEquals(2, result.size());
@@ -155,6 +176,9 @@ class CountryServiceTest {
 		assertEquals(
 			VALID_IRELAND_CODE, 
 			result.get(1).getIsoAlpha2Code());
+		verify(repo, times(1)).findAll();
+		verify(responseCountryDTOCreator, times(2))
+			.toResponseCountryDTO(any(Country.class));
 	}
 	 
 	@Test
@@ -165,15 +189,16 @@ class CountryServiceTest {
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 		assertEquals(0, result.size());
+		verify(repo, times(1)).findAll();
 	}
 	 
 	@Test
 	@DisplayName("Deve retornar país existente quando 'isoAlpha2Code' já está cadastrado")
 	void createOrFindCountry_returnsExistingCountry() {
-	    when(countryValidator.processIsoAlpha2Code(RAW_BRAZIL_CODE))
+	    when(countryValidator.processIsoAlpha2Code(anyString()))
 	        .thenReturn(VALID_BRAZIL_CODE);
 	    when(createOrFindCountryResolver
-	    	.returnResultWithExistentCountry(Mockito.anyString()))
+	    	.returnResultWithExistentCountry(anyString()))
     			.thenReturn(COUNTRY_RESULT_DTO);
 	    CountryResultImplDTO result = service
 	    	.createOrFindCountry(CREATE_COUNTRYDTO);
@@ -185,15 +210,19 @@ class CountryServiceTest {
 	    	BRAZIL_NAME, 
 	    	result.getCountry().getName());
 	    assertFalse(result.isCreated());
+	    verify(countryValidator, times(1))
+	    	.processIsoAlpha2Code(anyString());
+	    verify(createOrFindCountryResolver, times(1))
+	    	.returnResultWithExistentCountry(anyString());
 	}
 	 
 	@Test
 	@DisplayName("Deve criar novo país quando 'isoAlpha2Code' não existe")
 	void createOrFindCountry_createNewCountry() {
-	    when(countryValidator.processIsoAlpha2Code(RAW_BRAZIL_CODE))
+	    when(countryValidator.processIsoAlpha2Code(anyString()))
 	        .thenReturn(VALID_BRAZIL_CODE);
 	    when(createOrFindCountryResolver
-	    	.returnResultWithNewCountry(Mockito.anyString()))
+	    	.returnResultWithNewCountry(anyString()))
 				.thenReturn(COUNTRY_RESULT_DTO);
 	    CountryResultImplDTO result = service
 	    	.createOrFindCountry(CREATE_COUNTRYDTO);
@@ -204,5 +233,9 @@ class CountryServiceTest {
 	    assertEquals(
 	    	BRAZIL_NAME, 
 	    	result.getCountry().getName());
+	    verify(countryValidator, times(1))
+	    	.processIsoAlpha2Code(anyString());
+	    verify(createOrFindCountryResolver, times(1))
+	    	.returnResultWithExistentCountry(anyString());
 	}
 }

@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.country.dto.ResponseCountryDTO;
-import caio.portfolio.livraria.service.country.implementation.create.ResponseCountryDTOCreatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ResponseCountryDTOCreatorImplTest {

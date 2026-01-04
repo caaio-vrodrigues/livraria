@@ -1,27 +1,22 @@
 package caio.portfolio.livraria.service.country.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-import java.util.Locale;
+@SpringBootTest
+@AutoConfigureTestDatabase(replace=Replace.ANY)
+@DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)
+class CountryExceptionCreatorImplIntegrationTest {
 
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
-
-@ExtendWith(MockitoExtension.class)
-class CountryExceptionCreatorImplTest {
-
-	@InjectMocks private CountryExceptionCreatorImpl countryExceptionCreatorImpl;
-	@Mock private MessageSource countryMessageSource;
+	@Autowired private CountryExceptionCreatorImpl countryExceptionCreatorImpl;
 	
 	private static final String BRAZIL_CODE = "BR";
 	private static final String INVALID_CODE = "UR";
@@ -32,60 +27,30 @@ class CountryExceptionCreatorImplTest {
 	@Test
 	@DisplayName("Deve lançar 'ConcurrentCountryException' ao tentar salvar país em cenário concorrente")
 	void createConcurrentCountryException() {
-		when(countryMessageSource
-			.getMessage(
-				anyString(), 
-				any(Object[].class), 
-				any(Locale.class)))
-			.thenReturn(CONCURRENT_COUNTRY_EXCEPTION_MESSAGE);
 		assertEquals(
 			CONCURRENT_COUNTRY_EXCEPTION_MESSAGE, 
 			countryExceptionCreatorImpl
 				.createConcurrentCountryException(BRAZIL_CODE)
 					.getLocalizedMessage());
-		verify(countryMessageSource, times(1)).getMessage(
-			anyString(), 
-			any(Object[].class), 
-			any(Locale.class));
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' por argumento vazio")
 	void createIllegalArgumentExceptionByBlank() {
-		when(countryMessageSource
-			.getMessage(
-				anyString(), 
-				any(Object[].class), 
-				any(Locale.class)))
-			.thenReturn(ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_BLANK);
 		assertEquals(
 			ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_BLANK, 
 			countryExceptionCreatorImpl
 				.createIllegalArgumentExceptionByBlank()
 					.getLocalizedMessage());
-		verify(countryMessageSource, times(1)).getMessage(
-			anyString(), 
-			any(Object[].class), 
-			any(Locale.class));
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' por argumento inválido")
 	void createIllegalArgumentExceptionByInvalid() {
-		when(countryMessageSource
-			.getMessage(
-				anyString(), 
-				any(Object[].class), 
-				any(Locale.class)))
-			.thenReturn(ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_INVALID_CODE);
 		assertEquals(
 			ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_INVALID_CODE, 
 			countryExceptionCreatorImpl
 				.createIllegalArgumentExceptionByInvalid(INVALID_CODE)
 					.getLocalizedMessage());
-		verify(countryMessageSource, times(1)).getMessage(
-			anyString(), 
-			any(Object[].class), 
-			any(Locale.class));
 	}
 }

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.validate;
 
 import java.util.HashSet;
 import java.util.Set;

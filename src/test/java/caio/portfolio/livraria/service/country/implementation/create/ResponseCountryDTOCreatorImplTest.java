@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.create;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;

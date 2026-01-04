@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.country;
+package caio.portfolio.livraria.service.country.implementation.validate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;

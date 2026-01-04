@@ -15,7 +15,9 @@ public class CountryExceptionCreatorImpl implements CountryExceptionCreator {
 	private final MessageSource countryMessageSource;
 	
 	@Override
-	public ConcurrentCountryException createConcurrentCountryException(String isoAlpha2Code) {
+	public ConcurrentCountryException createConcurrentCountryException(
+		String isoAlpha2Code
+	){
 		return new ConcurrentCountryException(
 			countryMessageSource.getMessage(
 				"concurret.country.iso", 
@@ -33,7 +35,9 @@ public class CountryExceptionCreatorImpl implements CountryExceptionCreator {
 	}
 
 	@Override
-	public IllegalArgumentException createIllegalArgumentExceptionByInvalid(String isoAlpha2Code) {
+	public IllegalArgumentException createIllegalArgumentExceptionByInvalid(
+		String isoAlpha2Code
+	){
 		return new IllegalArgumentException(countryMessageSource.getMessage(
 			"illegal.argument.invalid.iso",
 			new Object[] {isoAlpha2Code},

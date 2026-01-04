@@ -20,7 +20,7 @@ import caio.portfolio.livraria.service.country.model.validate.CountryValidator;
 @AutoConfigureTestDatabase(replace=Replace.ANY)
 class CountryValidatorImplIntegrationTest {
 
-	@Autowired CountryValidator validator;
+	@Autowired private CountryValidator validator;
 	
 	private static final String BRAZIL_NAME = "Brazil";
 	private static final String VALID_BRAZIL_CODE = "BR";

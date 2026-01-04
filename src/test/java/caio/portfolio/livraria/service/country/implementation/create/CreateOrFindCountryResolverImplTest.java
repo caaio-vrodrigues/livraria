@@ -81,6 +81,7 @@ class CreateOrFindCountryResolverImplTest {
 			.thenReturn(Optional.empty());
 		assertNull(createOrFindCountryResolverImpl
 			.returnResultWithExistentCountry(NON_EXISTENT_COUNTRY_CODE));
+		verify(repo, times(1)).findByIsoAlpha2Code(anyString());
 	}
 	
 	@Test

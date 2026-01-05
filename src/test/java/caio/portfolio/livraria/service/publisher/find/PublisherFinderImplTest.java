@@ -36,7 +36,7 @@ class PublisherFinderImplTest {
 	
 	private static final Long ROCCO_ID = 1L;
 	private static final String ROCCO_NAME = "Rocco";
-	private static final String ROCCO_END = "Rua do Passeio, 38, 11º andar, Centro, Rio de Janeiro - RJ";
+	private static final String ROCCO_END = "Rua do Passeio, 38, 11º andar, no Passeio Corporate";
 	private static final String PUBLISHER_NOT_FOUND_ADDRESS_MSG = "Não foi possível encontrar editora com `fullAddress`: `"+ROCCO_END+"`";
 	private static final String PUBLISHER_NOT_FOUND_ID_MSG = "Não foi possível encontrar editora com `id`: `"+ROCCO_ID+"`";
 	private static final String BRAZIL_NAME = "Brazil";

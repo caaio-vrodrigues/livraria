@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher;
+package caio.portfolio.livraria.service.publisher.validate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

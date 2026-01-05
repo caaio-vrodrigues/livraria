@@ -105,7 +105,7 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'id' de um país diferente para retornar novo 'Country'")
 	void validateCountry_returnsNewCountry() {
-		when(countryService.getCountryById(ITALY_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenReturn(ITALY);
 		Country validatedCountry = publisherUpdateValidatorImpl
 			.validateCountry(
@@ -168,7 +168,7 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'Country' atual e 'countryId' não existente para lançar 'CountryNotFoundException'")
 	void validateCountry_throwsCountryNotFoundException() {
-		when(countryService.getCountryById(INVALID_COUNTRY_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenThrow(new CountryNotFoundException("Não foi possível encontrar um país para o 'id' fornecido"));
 		assertThrows(
 			CountryNotFoundException.class, 
@@ -182,13 +182,15 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e valor diferente para retornar novo 'fullAddress'")
 	void validateFullAddress_returnsNewFullAddress() {
-		when(repo.findByFullAddress(ROCCO_NEW_FULL_ADDRESS)).thenReturn(Optional.empty());
+		when(repo.findByFullAddress(anyString()))
+			.thenReturn(Optional.empty());
 		String updatedFullAddress = publisherUpdateValidatorImpl
-			.validateFullAddress(ROCCO_PUBLISHER.getFullAddress(), ROCCO_NEW_FULL_ADDRESS);
+			.validateFullAddress(
+				ROCCO_PUBLISHER.getFullAddress(), 
+				ROCCO_NEW_FULL_ADDRESS);
 		assertNotNull(updatedFullAddress);
 		assertEquals(ROCCO_NEW_FULL_ADDRESS, updatedFullAddress);
-		verify(repo)
-			.findByFullAddress(anyString());
+		verify(repo).findByFullAddress(anyString());
 	}
 	
 	@Test
@@ -211,8 +213,8 @@ class PublisherUpdateValidatorImplTest {
 	void validateFullAddress_nullArgument_returnsCurrentFullAddress() {
 		String updatedFullAddress = publisherUpdateValidatorImpl
 			.validateFullAddress(
-				ROCCO_PUBLISHER.getFullAddress(), 
-				null);
+					ROCCO_PUBLISHER.getFullAddress(), 
+					null);
 		assertNotNull(updatedFullAddress);
 		assertEquals(
 			ROCCO_PUBLISHER.getFullAddress(), 
@@ -224,14 +226,13 @@ class PublisherUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber 'fullAddress' atual e valor já existente para lançar 'PublisherAlreadyExistsException'")
 	void validateFullAddress_throwsPublisherAlreadyExistsException() {
-		when(repo.findByFullAddress(GLOBAL_BOOKS_FULL_ADDRESS))
+		when(repo.findByFullAddress(anyString()))
 			.thenThrow(new PublisherAlreadyExistsException("'fullAddress' em uso"));
 		assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> publisherUpdateValidatorImpl.validateFullAddress(
 					ROCCO_PUBLISHER.getFullAddress(), 
 					GLOBAL_BOOKS_FULL_ADDRESS));
-		verify(repo)
-			.findByFullAddress(anyString());
+		verify(repo).findByFullAddress(anyString());
 	}
 }

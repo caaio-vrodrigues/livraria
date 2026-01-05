@@ -3,6 +3,7 @@ package caio.portfolio.livraria.service.publisher;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -215,5 +216,21 @@ class PublisherServiceIntegrationTest {
 		assertThrows(
 			PublisherNotFoundException.class, 
 			() -> service.updatePublisher(ROCCO_ID, UPDATE_ROCCO_DTO));
+	}
+	
+	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/publisher/insert_publisher_list.sql")
+	@DisplayName("Deve deletar editora por 'id' com sucesso e retornar true")
+	void deletePublisherById_returnsTrue() {
+		assertTrue(service.deletePublisherById(ROCCO_ID));
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'PublisherNotFoundException' ao tentar deletar por 'id'")
+	void deletePublisherById_throwsPublisherNotFoundException() {
+		assertThrows(
+			PublisherNotFoundException.class,
+			() -> service.deletePublisherById(ROCCO_ID));
 	}
 }

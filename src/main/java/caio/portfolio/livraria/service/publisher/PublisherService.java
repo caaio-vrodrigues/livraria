@@ -97,6 +97,7 @@ public class PublisherService {
 		return publisherFinder.findById(id);
 	}
 
+	@Transactional
 	public Boolean deletePublisherById(Long id) {
 		if(!repo.existsById(id)) 
 			throw publisherExceptionCreator

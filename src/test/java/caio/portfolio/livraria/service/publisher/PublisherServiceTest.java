@@ -33,7 +33,9 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePubli
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.UpdatePublisherDTO;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
 import caio.portfolio.livraria.service.country.CountryService;
+import caio.portfolio.livraria.service.publisher.model.create.PublisherExceptionCreator;
 import caio.portfolio.livraria.service.publisher.model.create.ResponsePublisherDTOCreator;
+import caio.portfolio.livraria.service.publisher.model.find.PublisherFinder;
 import caio.portfolio.livraria.service.publisher.model.save.PublisherSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.publisher.model.validate.PublisherUpdateValidator;
 
@@ -46,6 +48,8 @@ class PublisherServiceTest {
 	@Mock private ResponsePublisherDTOCreator responsePublisherDTOCreator;
 	@Mock private PublisherUpdateValidator publisherUpdateValidator;
 	@Mock private PublisherSaverAndConcurrencyHandle publisherSaverAndConcurrencyHandle;
+	@Mock private PublisherExceptionCreator publisherExceptionCreator;
+	@Mock private PublisherFinder publisherFinder;
 	
 	private static final Long ROCCO_ID = 1L;
 	private static final Long GLOBAL_BOOKS_ID = 2L;
@@ -58,6 +62,8 @@ class PublisherServiceTest {
 	private static final String ROCCO_FULL_ADDRESS = "Rua do Passeio, 38, 11º andar, no Passeio Corporate";
 	private static final String GLOBAL_BOOKS_FULL_ADDRESS = "123 Main Street, New York, USA";
 	private static final String ROCCO_NEW_FULL_ADDRESS = "Rua do Passeio, 888, 8º andar, no Passeio Corporate";
+	private static final String PUBLISHER_ALREADY_EXISTS_MSG = "Endereço de editora já em uso";
+	private static final String PUBLISHER_NOT_FOUND_MSG = "Editora não encontrada";
 	private static final Integer BRAZIL_ID = 1;
 	private static final Integer USA_ID = 2;
 	
@@ -137,15 +143,15 @@ class PublisherServiceTest {
 	@Test
 	@DisplayName("Deve receber um 'CreatePublisherDTO' e retornar um 'ResponsePublisherDTO' após criação")
 	void createPublisher_returnsResponsePublisherDTO() {
-		when(repo.findByFullAddress(ROCCO_FULL_ADDRESS))
+		when(repo.findByFullAddress(anyString()))
 			.thenReturn(Optional.empty());
-		when(countryService.getCountryById(BRAZIL_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenReturn(BRAZIL);
 		when(publisherSaverAndConcurrencyHandle
 				.saveAndHandlePublisherConcurrency(any(Publisher.class)))
 			.thenReturn(ROCCO_PUBLISHER);
 		when(responsePublisherDTOCreator
-				.toResponsePublisherDTO(ROCCO_PUBLISHER))
+				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO);
 		ResponsePublisherDTO responsePublisherDTO = service
 			.createPublisher(CREATE_ROCCO_DTO);
@@ -171,27 +177,25 @@ class PublisherServiceTest {
 	@Test
 	@DisplayName("Deve receber um 'CreatePublisherDTO' e lançar 'PublisherAlreadyExistsException' por 'fullAddress' já em uso")
 	void createPublisher_throwsPublisherAlreadyExistsException() {
-		when(repo.findByFullAddress(ROCCO_FULL_ADDRESS))
+		when(repo.findByFullAddress(anyString()))
 			.thenReturn(Optional.of(ROCCO_PUBLISHER));
+		when(publisherExceptionCreator
+				.createPublisherAlreadyExistsException(anyString()))
+			.thenReturn(new PublisherAlreadyExistsException(PUBLISHER_ALREADY_EXISTS_MSG));
 		assertThrows(
 			PublisherAlreadyExistsException.class, 
 			() -> service.createPublisher(CREATE_ROCCO_DTO));
-		verify(repo)
-			.findByFullAddress(anyString());
-		verify(countryService, never())
-			.getCountryById(anyInt());
-		verify(repo, never())
-			.saveAndFlush(any(Publisher.class));
-		verify(responsePublisherDTOCreator, never())
-			.toResponsePublisherDTO(any(Publisher.class));
+		verify(repo, times(1)).findByFullAddress(anyString());
+		verify(publisherExceptionCreator, times(1))
+			.createPublisherAlreadyExistsException(anyString());
 	}
 	
 	@Test
 	@DisplayName("Deve receber um 'CreatePublisherDTO' e lançar 'ConcurrentPublisherException' por violação de concorrência")
 	void createPublisher_throwsConcurrentPublisherException() {
-		when(repo.findByFullAddress(ROCCO_FULL_ADDRESS))
+		when(repo.findByFullAddress(anyString()))
 			.thenReturn(Optional.empty());
-		when(countryService.getCountryById(BRAZIL_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenReturn(BRAZIL);
 		when(publisherSaverAndConcurrencyHandle
 				.saveAndHandlePublisherConcurrency(any(Publisher.class)))
@@ -208,8 +212,7 @@ class PublisherServiceTest {
 	@Test
 	@DisplayName("Deve retornar lista de 'ResponsePublisherDTO' ao chamar método")
 	void getAllPublishers_returnsResponsePublisherDTOList() {
-		when(repo.findAll())
-			.thenReturn(PUBLISHER_LIST);
+		when(repo.findAll()).thenReturn(PUBLISHER_LIST);
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO, RESPONSE_GLOBAL_BOOKS_DTO);
@@ -227,8 +230,7 @@ class PublisherServiceTest {
 	@Test
 	@DisplayName("Deve retornar lista vazia ao chamar método")
 	void getAllPublishers_returnsEmptyList() {
-		when(repo.findAll())
-			.thenReturn(List.of());
+		when(repo.findAll()).thenReturn(List.of());
 		List<ResponsePublisherDTO> responsePublisherDTOListResult = service.getAllResponsePublisherDTOs();
 		assertEquals(0, responsePublisherDTOListResult.size());
 		verify(repo).findAll();
@@ -239,8 +241,8 @@ class PublisherServiceTest {
 	@Test
 	@DisplayName("Deve receber 'fullAddress' para buscar editora e retornar 'ResponsePublisherDTO'")
 	void getPublisherByFullAddress_returnsResponsePublisherDTO() {
-		when(repo.findByFullAddress(ROCCO_FULL_ADDRESS))
-			.thenReturn(Optional.of(ROCCO_PUBLISHER));
+		when(publisherFinder.findByFullAddress(anyString()))
+			.thenReturn(ROCCO_PUBLISHER);
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO);
@@ -259,31 +261,29 @@ class PublisherServiceTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getCountry().getId(), 
 			responsePublisherDTO.getCountryId());
-		verify(repo)
+		verify(publisherFinder, times(1))
 			.findByFullAddress(anyString());
-		verify(responsePublisherDTOCreator)
+		verify(responsePublisherDTOCreator, times(1))
 			.toResponsePublisherDTO(any(Publisher.class));
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'fullAddress' para buscar editora e lançar 'PublisherNotFoundException' por não encontrar")
 	void getPublisherByFullAddress_throwsPublisherNotFoundException() {
-		when(repo.findByFullAddress(ROCCO_FULL_ADDRESS))
-			.thenReturn(Optional.empty());
+		when(publisherFinder.findByFullAddress(anyString()))
+			.thenThrow(PublisherNotFoundException.class);
 		assertThrows(
 			PublisherNotFoundException.class,
 			() -> service.getResponsePublisherDTOByFullAddress(ROCCO_FULL_ADDRESS));
-		verify(repo)
+		verify(publisherFinder, times(1))
 			.findByFullAddress(anyString());
-		verify(responsePublisherDTOCreator, never())
-			.toResponsePublisherDTO(any(Publisher.class));
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'id' para buscar editora e retornar 'ResponsePublisherDTO'")
 	void getPublisherById_returnsResponsePublisherDTO() {
-		when(repo.findById(ROCCO_ID))
-			.thenReturn(Optional.of(ROCCO_PUBLISHER));
+		when(publisherFinder.findById(anyLong()))
+			.thenReturn(ROCCO_PUBLISHER);
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
 			.thenReturn(RESPONSE_ROCCO_DTO);
@@ -302,31 +302,29 @@ class PublisherServiceTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getCountry().getId(), 
 			responsePublisherDTO.getCountryId());
-		verify(repo)
+		verify(publisherFinder, times(1))
 			.findById(anyLong());
-		verify(responsePublisherDTOCreator)
+		verify(responsePublisherDTOCreator, times(1))
 			.toResponsePublisherDTO(any(Publisher.class));
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'id' para buscar editora e lançar 'PublisherNotFoundException' por não encontrar")
 	void getPublisherById_throwsPublisherNotFoundException() {
-		when(repo.findById(ROCCO_ID))
-			.thenReturn(Optional.empty());
+		when(publisherFinder.findById(anyLong()))
+			.thenThrow(PublisherNotFoundException.class);
 		assertThrows(
 			PublisherNotFoundException.class,
 			() -> service.getResponsePublisherDTOById(ROCCO_ID));
-		verify(repo)
+		verify(publisherFinder, times(1))
 			.findById(anyLong());
-		verify(responsePublisherDTOCreator, never())
-			.toResponsePublisherDTO(any(Publisher.class));
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'id' de editora existente e 'UpdatePublisherDTO' para atualização e retorno de 'ResponsePublisherDTO'")
 	void updatePublisher_returnsResponsePublisherDTO() {
-		when(repo.findById(ROCCO_ID))
-			.thenReturn(Optional.of(ROCCO_PUBLISHER));
+		when(publisherFinder.findById(anyLong()))
+			.thenReturn(ROCCO_PUBLISHER);
 		when(publisherUpdateValidator
 				.validateName(anyString(), anyString()))
 			.thenReturn(ROCCO_NAME);
@@ -336,7 +334,8 @@ class PublisherServiceTest {
 		when(publisherUpdateValidator
 				.validateFullAddress(anyString(), anyString()))
 			.thenReturn(ROCCO_NEW_FULL_ADDRESS);
-		when(publisherSaverAndConcurrencyHandle.saveAndHandlePublisherConcurrency(any(Publisher.class)))
+		when(publisherSaverAndConcurrencyHandle
+				.saveAndHandlePublisherConcurrency(any(Publisher.class)))
 			.thenReturn(UPDATED_ROCCO_PUBLISHER);
 		when(responsePublisherDTOCreator
 				.toResponsePublisherDTO(any(Publisher.class)))
@@ -357,33 +356,54 @@ class PublisherServiceTest {
 		assertEquals(
 			ROCCO_PUBLISHER.getCountry().getId(), 
 			responsePublisherDTO.getCountryId());
-		verify(publisherUpdateValidator)
+		verify(publisherFinder, times(1))
+			.findById(anyLong());
+		verify(publisherUpdateValidator, times(1))
 			.validateName(anyString(), anyString());
-		verify(publisherUpdateValidator)
+		verify(publisherUpdateValidator, times(1))
 			.validateCountry(BRAZIL, null);
-		verify(publisherUpdateValidator)
+		verify(publisherUpdateValidator, times(1))
 			.validateFullAddress(anyString(), anyString());
-		verify(responsePublisherDTOCreator)
+		verify(publisherSaverAndConcurrencyHandle, times(1))
+			.saveAndHandlePublisherConcurrency(any(Publisher.class));
+		verify(responsePublisherDTOCreator, times(1))
 			.toResponsePublisherDTO(any(Publisher.class));
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'id' de editora não existente e lançar 'PublisherNotFoundException'")
 	void updatePublisher_throwsPublisherNotFoundException() {
-		when(repo.findById(ROCCO_ID))
-			.thenReturn(Optional.empty());
+		when(publisherFinder.findById(anyLong()))
+			.thenThrow(PublisherNotFoundException.class);
 		assertThrows(
 			PublisherNotFoundException.class, 
 			() -> service.updatePublisher(ROCCO_ID, UPDATE_ROCCO_DTO));
-		verify(repo).findById(anyLong());
-		verify(publisherUpdateValidator, never())
-			.validateName(anyString(), anyString());
-		verify(publisherUpdateValidator, never())
-			.validateCountry(BRAZIL, null);
-		verify(publisherUpdateValidator, never())
-			.validateFullAddress(anyString(), anyString());
-		verify(repo, never()).saveAndFlush(any(Publisher.class));
-		verify(responsePublisherDTOCreator, never())
-			.toResponsePublisherDTO(any(Publisher.class));
+		verify(publisherFinder, times(1))
+			.findById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve deletar editora por 'id' com sucesso e retornar true")
+	void deletePublisherById_returnsTrue() {
+		when(repo.existsById(anyLong()))
+			.thenReturn(true);
+		assertTrue(service.deletePublisherById(ROCCO_ID));
+		verify(repo, times(1)).deleteById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'PublisherNotFoundException' ao tentar deletar por 'id'")
+	void deletePublisherById_throwsPublisherNotFoundException() {
+		when(repo.existsById(anyLong()))
+			.thenReturn(false);
+		when(publisherExceptionCreator
+				.createPublisherNotFoundException(anyLong()))
+			.thenReturn(new PublisherNotFoundException(PUBLISHER_NOT_FOUND_MSG));
+		assertThrows(
+			PublisherNotFoundException.class,
+			() -> service.deletePublisherById(ROCCO_ID));
+		verify(repo, times(1)).existsById(anyLong());
+		verify(publisherExceptionCreator, times(1))
+			.createPublisherNotFoundException(anyLong());
 	}
 }

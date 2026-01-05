@@ -21,7 +21,7 @@ public class PublisherExceptionCreatorImpl implements PublisherExceptionCreator 
 		String publisherName
 	){
 		String msg = publisherMessageSource.getMessage(
-			"concurrent", 
+			"publisher.concurrent", 
 			new Object[]{publisherName},
 			LocaleContextHolder.getLocale());
 		return new ConcurrentPublisherException(msg);

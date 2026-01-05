@@ -86,7 +86,7 @@ class PublisherSaverAndConcurrencyHandleImplTest {
 	}
 	
 	@Test
-	@DisplayName("Deve retornar editora existente após falha ao tentar salvar nova editora")
+	@DisplayName("Deve lançar 'ConcurrentPublisherException' após falha ao tentar salvar nova editora")
 	void saveAndHandlePublisherConcurrency_throwsConcurrentPublisherException() {
 		when(repo.saveAndFlush(any(Publisher.class)))
 			.thenThrow(DataIntegrityViolationException.class);

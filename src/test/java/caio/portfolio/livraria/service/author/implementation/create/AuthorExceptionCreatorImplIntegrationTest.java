@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author.create;
+package caio.portfolio.livraria.service.author.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,7 +14,6 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
-import caio.portfolio.livraria.service.author.implementation.create.AuthorExceptionCreatorImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

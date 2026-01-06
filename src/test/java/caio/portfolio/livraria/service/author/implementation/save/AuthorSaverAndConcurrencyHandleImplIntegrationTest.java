@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author.save;
+package caio.portfolio.livraria.service.author.implementation.save;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +17,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
-import caio.portfolio.livraria.service.author.implementation.save.AuthorSaverAndConcurrencyHandleImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

@@ -1,92 +1,57 @@
-package caio.portfolio.livraria.service.author.valid;
+package caio.portfolio.livraria.service.author.implementation.validate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyNoInteractions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.jdbc.Sql;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException;
-import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
-import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
-import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
-import caio.portfolio.livraria.service.country.CountryService;
 
-@ExtendWith(MockitoExtension.class)
-class AuthorUpdateValidatorImplTest {
-	
-	@InjectMocks AuthorUpdateValidatorImpl authorUpdateValidatorImpl;
-	@Mock private CountryService countryService;
-	@Mock private AuthorExceptionCreator authorExceptionCreator;
-	@Mock private AuthorRepository repo;
-	
-	private static final Long EXISTING_AUTHOR_ID = 2L;
-	private static final String NEW_ALIAS = "CVR";
-	private static final String EXISTING_AUTHOR_FULL_NAME = "Alessandro Del Piero";
+@SpringBootTest
+@DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace=Replace.ANY)
+class AuthorUpdateValidatorImplIntegrationTest {
+    
+    @Autowired private AuthorUpdateValidatorImpl authorUpdateValidatorImpl;
+    
+	private static final String NEW_ALIAS = "monteiro.lob";
 	private static final String AUTHOR_ALIAS = "Caio VR";
 	private static final String AUTHOR_FULLNAME = "Caio Vinicius Rodrigues";
 	private static final String AUTHOR_NEW_FULLNAME = "Caio V. Rodrigues";
-	private static final String AUTHOR_ALREADY_EXISTS_MSG = "Autor já existe";
 	private static final String BRAZIL_NAME = "Brazil";
-	private static final String ITALY_NAME = "Italy";
 	private static final String BRAZIL_CODE = "BR";
-	private static final String ITALY_CODE = "IT";
 	private static final Integer BRAZIL_ID = 1;
 	private static final Integer ITALY_ID = 2;
 	private static final Integer  NON_EXISTENT_COUNTRY_ID = 3;
 	private static final LocalDate AUTHOR_BIRTHDAY = LocalDate.of(1992, 03, 20);
 	private static final LocalDate NEW_BIRTHDAY = LocalDate.of(2008, 8, 10);
-	
-	private static final String COUNTRY_NOT_FOUND_MSG = "País com 'id': "+NON_EXISTENT_COUNTRY_ID+" não encontrado";
-	
-	private static final Country BRAZIL = Country.builder()
-		.id(BRAZIL_ID)
-		.isoAlpha2Code(BRAZIL_CODE)
-		.name(BRAZIL_NAME)
-		.build();
-	
-	private static final Country ITALY = Country.builder()
-		.id(ITALY_ID)
-		.name(ITALY_NAME)
-		.isoAlpha2Code(ITALY_CODE)
-		.build(); 
-	
-	private static final Author EXISTING_AUTHOR_WITH_NEW_ALIAS = Author
-		.builder()
-        .id(EXISTING_AUTHOR_ID)
-        .alias(NEW_ALIAS)
-        .fullName(EXISTING_AUTHOR_FULL_NAME)
-        .country(ITALY)
+    
+    private static final Country BRAZIL = Country.builder()
+        .id(BRAZIL_ID)
+        .isoAlpha2Code(BRAZIL_CODE)
+        .name(BRAZIL_NAME)
         .build();
-	
-	@Test
+
+    @Test
 	@DisplayName("Deve validar 'alias' diferente do atual e retorna-lo")
 	void validateAlias_returnsNewAlias(){
-		when(repo.findByAlias(anyString()))
-			.thenReturn(Optional.empty());
 		String updatedAlias = authorUpdateValidatorImpl
 			.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
 		assertNotNull(updatedAlias);
 		assertEquals(NEW_ALIAS, updatedAlias);
-		verify(repo, times(1))
-			.findByAlias(anyString());
 	}
 	
 	@Test
@@ -96,7 +61,6 @@ class AuthorUpdateValidatorImplTest {
 			.validateAlias(AUTHOR_ALIAS, AUTHOR_ALIAS);
 		assertNotNull(updatedAlias);
 		assertEquals(AUTHOR_ALIAS, updatedAlias);
-		verifyNoInteractions(repo);
 	}
 	
 	@Test
@@ -108,28 +72,17 @@ class AuthorUpdateValidatorImplTest {
 		assertEquals(
 			AUTHOR_ALIAS, 
 			updatedAlias);
-		verifyNoInteractions(repo); 
 	}
 	
 	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
     @DisplayName("Deve lançar 'AuthorAlreadyExistsException' se o novo 'alias' já estiver em uso")
     void validateAlias_throwsAuthorAlreadyExistsException() {
-		when(repo.findByAlias(anyString()))
-			.thenReturn(Optional.of(EXISTING_AUTHOR_WITH_NEW_ALIAS));
-		when(authorExceptionCreator
-			.createAuthorAlreadyExistsException(
-				anyString(), 
-				anyString()))
-			.thenReturn(new AuthorAlreadyExistsException(AUTHOR_ALREADY_EXISTS_MSG));
 		assertThrows(
 			AuthorAlreadyExistsException.class,
 			() -> authorUpdateValidatorImpl
         		.validateAlias(AUTHOR_ALIAS, NEW_ALIAS));
-		verify(repo, times(1)).findByAlias(anyString());
-		verify(authorExceptionCreator, times(1))
-			.createAuthorAlreadyExistsException(
-				anyString(), 
-				anyString());
 	}
 	
 	@Test
@@ -193,19 +146,16 @@ class AuthorUpdateValidatorImplTest {
 			.validateCountry(BRAZIL, BRAZIL_ID);
 		assertNotNull(updatedCountry);
 		assertEquals(BRAZIL_ID, updatedCountry.getId());
-		verifyNoInteractions(countryService);
 	}
 	
 	@Test
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve receber 'countryId' diferente do 'id' contido no país do autor e retornar país diferente do país do autor")
 	void validateCountry_returnsNewCountry() {
-		when(countryService.getCountryById(ITALY_ID)).thenReturn(ITALY);
 		Country updatedCountry = authorUpdateValidatorImpl
 			.validateCountry(BRAZIL, ITALY_ID);
 		assertNotNull(updatedCountry);
 		assertEquals(ITALY_ID, updatedCountry.getId());
-		verify(countryService, times(1))
-			.getCountryById(ITALY_ID);
 	}
 	
 	@Test
@@ -215,20 +165,14 @@ class AuthorUpdateValidatorImplTest {
 			.validateCountry(BRAZIL, null);
 		assertNotNull(updatedCountry);
 		assertEquals(BRAZIL_ID, updatedCountry.getId());
-		verifyNoInteractions(countryService);
 	}
 	
 	@Test
     @DisplayName("Deve lançar 'CountryNotFoundException' se o 'countryId' para atualização não for encontrado")
     void validateCountry_throwsCountryNotFoundException() {
-		when(countryService.getCountryById(anyInt()))
-			.thenThrow(new CountryNotFoundException(COUNTRY_NOT_FOUND_MSG));
-		CountryNotFoundException thrown = assertThrows(
-            CountryNotFoundException.class,
-            () -> authorUpdateValidatorImpl
-            	.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
-		assertTrue(thrown.getMessage().contains(" "+NON_EXISTENT_COUNTRY_ID));
-		verify(countryService, times(1))
-			.getCountryById(anyInt());
+		assertThrows(
+			CountryNotFoundException.class,
+			() -> authorUpdateValidatorImpl
+        		.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
 	}
 }

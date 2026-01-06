@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author.find;
+package caio.portfolio.livraria.service.author.implementation.find;
 
 import static org.mockito.Mockito.when;
 
@@ -26,7 +26,6 @@ import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.implementation.find.AuthorFinderImpl;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorFinderImplTest {

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author.save;
+package caio.portfolio.livraria.service.author.implementation.save;
 
 import static org.mockito.Mockito.when;
 
@@ -25,7 +25,6 @@ import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException
 import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
-import caio.portfolio.livraria.service.author.implementation.save.AuthorSaverAndConcurrencyHandleImpl;
 import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
 
 @ExtendWith(MockitoExtension.class)

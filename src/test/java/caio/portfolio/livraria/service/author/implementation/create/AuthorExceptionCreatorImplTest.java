@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author.create;
+package caio.portfolio.livraria.service.author.implementation.create;
 
 import static org.mockito.Mockito.when;
 
@@ -21,7 +21,6 @@ import org.springframework.context.MessageSource;
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
 import caio.portfolio.livraria.exception.custom.author.ConcurrentAuthorException;
-import caio.portfolio.livraria.service.author.implementation.create.AuthorExceptionCreatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorExceptionCreatorImplTest {

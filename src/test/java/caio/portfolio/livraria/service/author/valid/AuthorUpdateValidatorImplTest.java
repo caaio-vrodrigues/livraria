@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.author;
+package caio.portfolio.livraria.service.author.valid;
 
 import java.time.LocalDate;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.find;
+package caio.portfolio.livraria.service.publisher.implementation.find;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,7 +16,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
-import caio.portfolio.livraria.service.publisher.implementation.find.PublisherFinderImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

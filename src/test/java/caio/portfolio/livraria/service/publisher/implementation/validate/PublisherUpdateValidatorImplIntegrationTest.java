@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.validate;
+package caio.portfolio.livraria.service.publisher.implementation.validate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +17,6 @@ import caio.portfolio.livraria.exception.custom.country.CountryNotFoundException
 import caio.portfolio.livraria.exception.custom.publisher.PublisherAlreadyExistsException;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
-import caio.portfolio.livraria.service.publisher.implementation.validate.PublisherUpdateValidatorImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.find;
+package caio.portfolio.livraria.service.publisher.implementation.find;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,7 +25,6 @@ import caio.portfolio.livraria.exception.custom.publisher.PublisherNotFoundExcep
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.PublisherRepository;
-import caio.portfolio.livraria.service.publisher.implementation.find.PublisherFinderImpl;
 
 @ExtendWith(MockitoExtension.class)
 class PublisherFinderImplTest {

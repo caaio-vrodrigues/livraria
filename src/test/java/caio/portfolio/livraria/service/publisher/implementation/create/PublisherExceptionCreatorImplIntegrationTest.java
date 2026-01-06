@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.create;
+package caio.portfolio.livraria.service.publisher.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,8 +10,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-
-import caio.portfolio.livraria.service.publisher.implementation.create.PublisherExceptionCreatorImpl;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace=Replace.ANY)

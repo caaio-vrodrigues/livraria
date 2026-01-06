@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.create;
+package caio.portfolio.livraria.service.publisher.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.entity.publisher.dto.ResponsePublisherDTO;
-import caio.portfolio.livraria.service.publisher.implementation.create.ResponsePublisherDTOCreatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ResponsePublisherDTOCreatorImplTest {

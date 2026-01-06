@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.publisher.create;
+package caio.portfolio.livraria.service.publisher.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,8 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
-
-import caio.portfolio.livraria.service.publisher.implementation.create.PublisherExceptionCreatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 class PublisherExceptionCreatorImplTest {

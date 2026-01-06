@@ -15,6 +15,7 @@ import static org.mockito.Mockito.anyInt;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,9 @@ import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
 import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
 import caio.portfolio.livraria.service.author.model.create.ResponseAuthorDTOCreator;
+import caio.portfolio.livraria.service.author.model.find.AuthorFinder;
 import caio.portfolio.livraria.service.author.model.save.AuthorSaverAndConcurrencyHandle;
 import caio.portfolio.livraria.service.country.CountryService;
 
@@ -45,7 +48,8 @@ class AuthorServiceTest {
 	@Mock private AuthorRepository repo;
 	@Mock private ResponseAuthorDTOCreator responseAuthorDTOCreator;
 	@Mock private AuthorSaverAndConcurrencyHandle saverAndConcurrencyHandle;
-	
+	@Mock private AuthorExceptionCreator authorExceptionCreator;
+	@Mock private AuthorFinder authorFinder;
 	
 	private static final Long PAULO_COELHO_ID = 1L;
 	private static final Long CAIO_ID = 2L;
@@ -60,6 +64,10 @@ class AuthorServiceTest {
 	private static final Integer BRAZIL_ID = 1;
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
 	private static final LocalDate CAIO_BIRTHDAY = LocalDate.of(1992, 03, 20);
+	
+	private static final String AUTHOR_ALREADY_EXISTS_MSG = "`alias`: `"+PAULO_COLEHO_ALIAS+"` já está sendo utilizado pelo autor: `"+PAULO_COELHO_FULL_NAME+"`";
+	private static final String AUTHOR_NOT_FOUND_MSG = "Não foi possível encontrar um autor com `id`: `"+PAULO_COELHO_ID+"`";
+	private static final String AUTHOR_NOT_FOUND_MSG_ALIAS = "Não foi possível encontrar um autor com `alias`: `"+PAULO_COLEHO_ALIAS+"`";
 	
 	private static final Country BRAZIL = Country.builder()
 		.id(BRAZIL_ID)
@@ -140,14 +148,14 @@ class AuthorServiceTest {
 	@Test
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'ResponseAuthorDTO' após processo de criação e salvamento")
 	void createAuthor_returnsResponseAuthorDTO() {
-		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+		when(repo.findByAlias(anyString()))
 			.thenReturn(Optional.empty());
-		when(countryService.getCountryById(BRAZIL_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenReturn(BRAZIL);
 		when(saverAndConcurrencyHandle
 			.saveAndHandleConcurrentyAuthor(any(Author.class)))
 				.thenReturn(PAULO_COELHO);
-		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(responseAuthorDTOCreator.toResponseAuthorDTO(any(Author.class)))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
 		ResponseAuthorDTO pauloCoelhoResponse = authorService
 			.createAuthor(CREATE_PAULO_COELHO_DTO);
@@ -164,27 +172,43 @@ class AuthorServiceTest {
 		assertEquals(
 			PAULO_COELHO_ID, 
 			pauloCoelhoResponse.getId());
-		verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
-		verify(countryService).getCountryById(BRAZIL_ID);
-		verify(responseAuthorDTOCreator).toResponseAuthorDTO(PAULO_COELHO);
+		verify(repo, times(1))
+			.findByAlias(anyString());
+		verify(countryService, times(1))
+			.getCountryById(anyInt());
+		verify(saverAndConcurrencyHandle, times(1))
+			.saveAndHandleConcurrentyAuthor(any(Author.class));
+		verify(responseAuthorDTOCreator, times(1))
+			.toResponseAuthorDTO(PAULO_COELHO);
 	}
 	
 	@Test
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'AuthorAlreadyExistsException' após verificar autor já existente")
 	void createAuthor_throwsAuthorAlreadyExistsException() {
-		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+		when(repo.findByAlias(anyString()))
 			.thenReturn(Optional.of(PAULO_COELHO));
+		when(authorExceptionCreator
+			.createAuthorAlreadyExistsException(
+				anyString(), 
+				anyString()))
+			.thenReturn(new AuthorAlreadyExistsException(AUTHOR_ALREADY_EXISTS_MSG));
 		assertThrows(
 			AuthorAlreadyExistsException.class, 
 			() -> authorService.createAuthor(CREATE_PAULO_COELHO_DTO));
+		verify(repo, times(1))
+			.findByAlias(anyString());
+		verify(authorExceptionCreator, times(1))
+			.createAuthorAlreadyExistsException(
+				anyString(), 
+				anyString());
 	}
 	
 	@Test
     @DisplayName("Deve lançar 'ConcurrentAuthorException' ao tentar salvar autor")
     void createAuthor_throwsConcurrentAuthorException() {
-		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
+		when(repo.findByAlias(anyString()))
 			.thenReturn(Optional.empty());
-		when(countryService.getCountryById(BRAZIL_ID))
+		when(countryService.getCountryById(anyInt()))
 			.thenReturn(BRAZIL);
 		when(saverAndConcurrencyHandle
 			.saveAndHandleConcurrentyAuthor(any(Author.class)))
@@ -240,9 +264,10 @@ class AuthorServiceTest {
 	@Test
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'id'")
 	void getAuthorById_returnsResponseAuthorDTO() {
-		when(repo.findById(PAULO_COELHO_ID))
-			.thenReturn(Optional.of(PAULO_COELHO));
-		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(authorFinder.findById(anyLong()))
+			.thenReturn(PAULO_COELHO);
+		when(responseAuthorDTOCreator
+				.toResponseAuthorDTO(any(Author.class)))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
 		ResponseAuthorDTO responseAuthorDTO = authorService
 			.getResponseAuthorDTOById(PAULO_COELHO_ID);
@@ -259,30 +284,45 @@ class AuthorServiceTest {
 		assertEquals(
 			BRAZIL_ID, 
 			responseAuthorDTO.getCountryId());
-		verify(repo).findById(PAULO_COELHO_ID);
-		verify(responseAuthorDTOCreator)
-			.toResponseAuthorDTO(PAULO_COELHO);
+		verify(authorFinder, times(1))
+			.findById(anyLong());
+		verify(responseAuthorDTOCreator, times(1))
+			.toResponseAuthorDTO(any(Author.class));
+	}
+	
+	@Test
+	@DisplayName("Deve retornar autor ao buscar por 'id'")
+	void getAuthorById_returnsAuthor() {
+		when(authorFinder.findById(anyLong()))
+			.thenReturn(PAULO_COELHO);
+		Author pauloCoelho = authorService.getAuthorById(PAULO_COELHO_ID);
+		assertNotNull(pauloCoelho);
+		assertEquals(
+			PAULO_COLEHO_ALIAS,
+			pauloCoelho.getAlias());
+		verify(authorFinder, times(1))
+			.findById(anyLong());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'id'")
 	void getAuthorById_throwsAuthorNotFoundException() {
-		when(repo.findById(PAULO_COELHO_ID))
-			.thenReturn(Optional.empty());
+		when(authorFinder.findById(anyLong()))
+			.thenThrow(new AuthorNotFoundException(AUTHOR_NOT_FOUND_MSG));
 		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getAuthorById(PAULO_COELHO_ID));
-		verify(repo).findById(PAULO_COELHO_ID);
-		verify(responseAuthorDTOCreator, never())
-			.toResponseAuthorDTO(any(Author.class));
+		verify(authorFinder, times(1))
+			.findById(anyLong());
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'alias'")
 	void getAuthorByAlias_returnsResponseAuthorDTO() {
-		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
-			.thenReturn(Optional.of(PAULO_COELHO));
-		when(responseAuthorDTOCreator.toResponseAuthorDTO(PAULO_COELHO))
+		when(authorFinder.findByAlias(anyString()))
+			.thenReturn(PAULO_COELHO);
+		when(responseAuthorDTOCreator
+				.toResponseAuthorDTO(any(Author.class)))
 			.thenReturn(RESPONSE_PAULO_COELHO_DTO);
 		ResponseAuthorDTO author = authorService
 			.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS);
@@ -299,47 +339,51 @@ class AuthorServiceTest {
 		assertEquals(
 			BRAZIL_ID, 
 			author.getCountryId());
-		verify(repo).findByAlias(PAULO_COLEHO_ALIAS);
+		verify(authorFinder).findByAlias(anyString());
 		verify(responseAuthorDTOCreator)
-			.toResponseAuthorDTO(PAULO_COELHO);
+			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'alias'")
 	void getAuthorByAlias_throwsAuthorNotFoundException() {
-		when(repo.findByAlias(PAULO_COLEHO_ALIAS))
-			.thenReturn(Optional.empty());
+		when(authorFinder.findByAlias(anyString()))
+			.thenThrow(new AuthorNotFoundException(AUTHOR_NOT_FOUND_MSG_ALIAS));
 		assertThrows(
 			AuthorNotFoundException.class, 
 			() -> authorService.getResponseAuthorDTOByAlias(PAULO_COLEHO_ALIAS));
-		verify(repo).findByAlias(anyString());
-		verify(responseAuthorDTOCreator, never())
-			.toResponseAuthorDTO(any(Author.class));
+		verify(authorFinder, times(1))
+			.findByAlias(anyString());
 	}
 	
 	@Test
 	@DisplayName("Deve atualizar autor por 'id' e retornar 'ResponseAuthorDTO'")
 	void updateAuthor_returnsResponseAuthorDTO() {
-		when(repo.findById(PAULO_COELHO_ID))
-			.thenReturn(Optional.of(PAULO_COELHO));
-		when(authorupdateValidator.validateAlias(
-			PAULO_COLEHO_ALIAS, 
-			PAULO_COELHO_UPDATED_ALIAS))
-				.thenReturn(PAULO_COELHO_UPDATED_ALIAS);
-		when(authorupdateValidator.validateFullName(
-			PAULO_COELHO_FULL_NAME, 
-			PAULO_COELHO_UPDATED_FULL_NAME))
-				.thenReturn(PAULO_COELHO_UPDATED_FULL_NAME);
-		when(authorupdateValidator.validateBirthday(
-			PAULO_COELHO_BIRTHDAY, 
-			PAULO_COELHO_BIRTHDAY))
-				.thenReturn(PAULO_COELHO_BIRTHDAY);
-		when(authorupdateValidator.validateCountry(BRAZIL, null))
+		when(authorFinder.findById(anyLong()))
+			.thenReturn(PAULO_COELHO);
+		when(authorupdateValidator
+			.validateAlias(
+				anyString(), 
+				anyString()))
+			.thenReturn(PAULO_COELHO_UPDATED_ALIAS);
+		when(authorupdateValidator
+			.validateFullName(
+				anyString(), 
+				anyString()))
+			.thenReturn(PAULO_COELHO_UPDATED_FULL_NAME);
+		when(authorupdateValidator
+			.validateBirthday(
+				any(LocalDate.class), 
+				any(LocalDate.class)))
+			.thenReturn(PAULO_COELHO_BIRTHDAY);
+		when(authorupdateValidator
+				.validateCountry(BRAZIL, null))
 			.thenReturn(BRAZIL);
 		when(saverAndConcurrencyHandle
 				.saveAndHandleConcurrentyAuthor(any(Author.class)))
-					.thenReturn(PAULO_COELHO);
-		when(responseAuthorDTOCreator.toResponseAuthorDTO(UPDATED_PAULO_COELHO))
+			.thenReturn(PAULO_COELHO);
+		when(responseAuthorDTOCreator
+				.toResponseAuthorDTO(any(Author.class)))
 			.thenReturn(UPDATE_PAULO_COELHO_DTO);
 		ResponseAuthorDTO responseAuthorDTO = authorService
 			.updateAuthor(
@@ -361,38 +405,90 @@ class AuthorServiceTest {
 		assertEquals(
 			UPDATED_PAULO_COELHO.getCountry().getId(), 
 			responseAuthorDTO.getCountryId());
-		verify(repo).findById(PAULO_COELHO_ID);
-		verify(authorupdateValidator)
-			.validateAlias(anyString(), anyString());
-		verify(authorupdateValidator)
-			.validateFullName(anyString(), anyString());
-		verify(authorupdateValidator)
-			.validateBirthday(any(LocalDate.class), any(LocalDate.class));
-		verify(responseAuthorDTOCreator)
+		verify(authorFinder, times(1))
+			.findById(anyLong());
+		verify(authorupdateValidator, times(1))
+			.validateAlias(
+				anyString(),
+				anyString());
+		verify(authorupdateValidator, times(1))
+			.validateFullName(
+				anyString(), 
+				anyString());
+		verify(authorupdateValidator, times(1))
+			.validateBirthday(
+				any(LocalDate.class), 
+				any(LocalDate.class));
+		verify(authorupdateValidator, times(1))
+			.validateCountry(BRAZIL, null);
+		verify(responseAuthorDTOCreator, times(1))
+			.toResponseAuthorDTO(any(Author.class));
+		verify(saverAndConcurrencyHandle, times(1))
+			.saveAndHandleConcurrentyAuthor(any(Author.class));
+		verify(responseAuthorDTOCreator, times(1))
 			.toResponseAuthorDTO(any(Author.class));
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'AuthorNotFoundException' ao enviar 'id' não existente")
 	void updateAuthor_throwsAuthorNotFoundException() {
-		when(repo.findById(PAULO_COELHO_ID)).thenReturn(Optional.empty());
+		when(authorFinder.findById(anyLong()))
+			.thenThrow(new AuthorNotFoundException(AUTHOR_NOT_FOUND_MSG));
 		assertThrows(
-			AuthorNotFoundException.class , 
+			AuthorNotFoundException.class, 
 			() -> authorService.updateAuthor(
 				PAULO_COELHO_ID, 
 				UPDATE_PAULO_COELHO));
-		verify(repo).findById(anyLong());
+		verify(authorFinder, times(1))
+			.findById(anyLong());
 		verify(authorupdateValidator, never())
-			.validateAlias(anyString(), anyString());
+			.validateAlias(
+				anyString(), 
+				anyString());
 		verify(authorupdateValidator, never())
-			.validateFullName(anyString(), anyString());
+			.validateFullName(
+				anyString(), 
+				anyString());
 		verify(authorupdateValidator, never())
-			.validateBirthday(any(LocalDate.class), any(LocalDate.class));
+			.validateBirthday(
+				any(LocalDate.class), 
+				any(LocalDate.class));
 		verify(authorupdateValidator, never())
-			.validateCountry(any(Country.class), anyInt());
-		verify(repo, never()).saveAndFlush(any(Author.class));
-		verify(repo, never()).findByAlias(anyString());
+			.validateCountry(
+				any(Country.class), 
+				anyInt());
+		verify(repo, never())
+			.saveAndFlush(any(Author.class));
+		verify(repo, never())
+			.findByAlias(anyString());
 		verify(responseAuthorDTOCreator, never())
 			.toResponseAuthorDTO(any(Author.class));
+	}
+	
+	@Test
+	@DisplayName("Deve retornar 'true' após deletar autor com sucesso")
+	void deleteAuthorById_returnsTrue() {
+		when(repo.existsById(anyLong()))
+			.thenReturn(true);
+		assertTrue(authorService.deleteAuthorById(PAULO_COELHO_ID));
+		verify(repo, times(1))
+			.existsById(anyLong());
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'AuthorNotFoundException' após tentar deletar autor")
+	void deleteAuthorById_throwsAuthorNotFoundException() {
+		when(repo.existsById(anyLong()))
+			.thenReturn(false);
+		when(authorExceptionCreator
+				.createAuthorNotFoundException(anyLong()))
+			.thenThrow(new AuthorNotFoundException(AUTHOR_NOT_FOUND_MSG));
+		assertThrows(
+			AuthorNotFoundException.class,
+			() -> authorService.deleteAuthorById(PAULO_COELHO_ID));
+		verify(repo, times(1))
+			.existsById(anyLong());
+		verify(authorExceptionCreator, times(1))
+			.createAuthorNotFoundException(anyLong());
 	}
 }

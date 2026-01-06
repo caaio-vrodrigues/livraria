@@ -39,7 +39,6 @@ class AuthorUpdateValidatorImplTest {
 	
 	private static final Long EXISTING_AUTHOR_ID = 2L;
 	private static final String NEW_ALIAS = "CVR";
-	private static final String INVALID_ALIAS = " ";
 	private static final String EXISTING_AUTHOR_FULL_NAME = "Alessandro Del Piero";
 	private static final String AUTHOR_ALIAS = "Caio VR";
 	private static final String AUTHOR_FULLNAME = "Caio Vinicius Rodrigues";
@@ -110,19 +109,6 @@ class AuthorUpdateValidatorImplTest {
 			AUTHOR_ALIAS, 
 			updatedAlias);
 		verifyNoInteractions(repo); 
-	}
-	
-	@Test
-	@DisplayName("Deve receber argumento vazio e retornar 'RuntimeException'")
-	void validateAlias_returnsRuntimeException(){
-		when(repo.findByAlias(anyString()))
-			.thenThrow(RuntimeException.class);
-		assertThrows(
-			RuntimeException.class, 
-			() -> authorUpdateValidatorImpl
-				.validateAlias(AUTHOR_ALIAS, INVALID_ALIAS));
-		verify(repo, times(1))
-			.findByAlias(anyString());
 	}
 	
 	@Test

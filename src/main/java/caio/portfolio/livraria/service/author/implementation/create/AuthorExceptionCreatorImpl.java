@@ -21,7 +21,7 @@ public class AuthorExceptionCreatorImpl implements AuthorExceptionCreator {
 		String authorFullName
 	){
 		String msg = authorMessageSource.getMessage(
-			"concurrent", 
+			"concurrent.author", 
 			new Object[]{authorFullName},
 			LocaleContextHolder.getLocale());
 		return new ConcurrentAuthorException(msg);

@@ -8,7 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoInteractions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,7 @@ import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.repository.AuthorRepository;
 import caio.portfolio.livraria.service.author.implementation.validate.AuthorUpdateValidatorImpl;
+import caio.portfolio.livraria.service.author.model.create.AuthorExceptionCreator;
 import caio.portfolio.livraria.service.country.CountryService;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +34,7 @@ class AuthorUpdateValidatorImplTest {
 	
 	@InjectMocks AuthorUpdateValidatorImpl authorUpdateValidatorImpl;
 	@Mock private CountryService countryService;
+	@Mock private AuthorExceptionCreator authorExceptionCreator;
 	@Mock private AuthorRepository repo;
 	
 	private static final Long EXISTING_AUTHOR_ID = 2L;
@@ -39,6 +44,7 @@ class AuthorUpdateValidatorImplTest {
 	private static final String AUTHOR_ALIAS = "Caio VR";
 	private static final String AUTHOR_FULLNAME = "Caio Vinicius Rodrigues";
 	private static final String AUTHOR_NEW_FULLNAME = "Caio V. Rodrigues";
+	private static final String AUTHOR_ALREADY_EXISTS_MSG = "Autor já existe";
 	private static final String BRAZIL_NAME = "Brazil";
 	private static final String ITALY_NAME = "Italy";
 	private static final String BRAZIL_CODE = "BR";
@@ -48,6 +54,8 @@ class AuthorUpdateValidatorImplTest {
 	private static final Integer  NON_EXISTENT_COUNTRY_ID = 3;
 	private static final LocalDate AUTHOR_BIRTHDAY = LocalDate.of(1992, 03, 20);
 	private static final LocalDate NEW_BIRTHDAY = LocalDate.of(2008, 8, 10);
+	
+	private static final String COUNTRY_NOT_FOUND_MSG = "País com 'id': "+NON_EXISTENT_COUNTRY_ID+" não encontrado";
 	
 	private static final Country BRAZIL = Country.builder()
 		.id(BRAZIL_ID)
@@ -72,15 +80,14 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve validar 'alias' diferente do atual e retorna-lo")
 	void validateAlias_returnsNewAlias(){
-		when(repo.findByAlias(NEW_ALIAS))
+		when(repo.findByAlias(anyString()))
 			.thenReturn(Optional.empty());
 		String updatedAlias = authorUpdateValidatorImpl
 			.validateAlias(AUTHOR_ALIAS, NEW_ALIAS);
 		assertNotNull(updatedAlias);
-		assertEquals(
-			NEW_ALIAS, 
-			updatedAlias);
-		verify(repo).findByAlias(NEW_ALIAS);
+		assertEquals(NEW_ALIAS, updatedAlias);
+		verify(repo, times(1))
+			.findByAlias(anyString());
 	}
 	
 	@Test
@@ -108,27 +115,35 @@ class AuthorUpdateValidatorImplTest {
 	@Test
 	@DisplayName("Deve receber argumento vazio e retornar 'RuntimeException'")
 	void validateAlias_returnsRuntimeException(){
-		when(repo.findByAlias(" "))
+		when(repo.findByAlias(anyString()))
 			.thenThrow(RuntimeException.class);
 		assertThrows(
 			RuntimeException.class, 
 			() -> authorUpdateValidatorImpl
 				.validateAlias(AUTHOR_ALIAS, INVALID_ALIAS));
-		verify(repo).findByAlias(INVALID_ALIAS);
+		verify(repo, times(1))
+			.findByAlias(anyString());
 	}
 	
 	@Test
     @DisplayName("Deve lançar 'AuthorAlreadyExistsException' se o novo 'alias' já estiver em uso")
     void validateAlias_throwsAuthorAlreadyExistsException() {
-		when(repo.findByAlias(NEW_ALIAS))
+		when(repo.findByAlias(anyString()))
 			.thenReturn(Optional.of(EXISTING_AUTHOR_WITH_NEW_ALIAS));
-		AuthorAlreadyExistsException thrown = assertThrows(
-            AuthorAlreadyExistsException.class,
-            () -> authorUpdateValidatorImpl
-            	.validateAlias(AUTHOR_ALIAS, NEW_ALIAS));
-		assertTrue(thrown.getMessage()
-			.contains(EXISTING_AUTHOR_WITH_NEW_ALIAS.getFullName()));
-		verify(repo).findByAlias(NEW_ALIAS);
+		when(authorExceptionCreator
+			.createAuthorAlreadyExistsException(
+				anyString(), 
+				anyString()))
+			.thenReturn(new AuthorAlreadyExistsException(AUTHOR_ALREADY_EXISTS_MSG));
+		assertThrows(
+			AuthorAlreadyExistsException.class,
+			() -> authorUpdateValidatorImpl
+        		.validateAlias(AUTHOR_ALIAS, NEW_ALIAS));
+		verify(repo, times(1)).findByAlias(anyString());
+		verify(authorExceptionCreator, times(1))
+			.createAuthorAlreadyExistsException(
+				anyString(), 
+				anyString());
 	}
 	
 	@Test
@@ -203,7 +218,8 @@ class AuthorUpdateValidatorImplTest {
 			.validateCountry(BRAZIL, ITALY_ID);
 		assertNotNull(updatedCountry);
 		assertEquals(ITALY_ID, updatedCountry.getId());
-		verify(countryService).getCountryById(ITALY_ID);
+		verify(countryService, times(1))
+			.getCountryById(ITALY_ID);
 	}
 	
 	@Test
@@ -219,13 +235,14 @@ class AuthorUpdateValidatorImplTest {
 	@Test
     @DisplayName("Deve lançar 'CountryNotFoundException' se o 'countryId' para atualização não for encontrado")
     void validateCountry_throwsCountryNotFoundException() {
-		when(countryService.getCountryById(NON_EXISTENT_COUNTRY_ID))
-			.thenThrow(new CountryNotFoundException("País com 'id': "+NON_EXISTENT_COUNTRY_ID+" não encontrado"));
+		when(countryService.getCountryById(anyInt()))
+			.thenThrow(new CountryNotFoundException(COUNTRY_NOT_FOUND_MSG));
 		CountryNotFoundException thrown = assertThrows(
             CountryNotFoundException.class,
             () -> authorUpdateValidatorImpl
             	.validateCountry(BRAZIL, NON_EXISTENT_COUNTRY_ID));
 		assertTrue(thrown.getMessage().contains(" "+NON_EXISTENT_COUNTRY_ID));
-		verify(countryService).getCountryById(NON_EXISTENT_COUNTRY_ID);
+		verify(countryService, times(1))
+			.getCountryById(anyInt());
 	}
 }

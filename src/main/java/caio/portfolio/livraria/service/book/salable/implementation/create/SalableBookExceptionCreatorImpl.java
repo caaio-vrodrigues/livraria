@@ -34,7 +34,7 @@ public class SalableBookExceptionCreatorImpl implements SalableBookExceptionCrea
 	    String title
 	){
 	    String msg = salableBookMessageSource.getMessage(
-	        "concurrent",
+	        "concurrent.book",
 	        new Object[]{title},
 	        LocaleContextHolder.getLocale());
 	    return new ConcurrentSalableBookException(msg);

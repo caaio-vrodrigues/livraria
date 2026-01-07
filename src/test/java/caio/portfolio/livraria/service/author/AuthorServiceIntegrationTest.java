@@ -6,6 +6,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,11 @@ import org.springframework.test.context.jdbc.Sql;
 
 import caio.portfolio.livraria.exception.custom.author.AuthorAlreadyExistsException;
 import caio.portfolio.livraria.exception.custom.author.AuthorNotFoundException;
+import caio.portfolio.livraria.infrastructure.entity.author.Author;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.CreateAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.ResponseAuthorDTO;
 import caio.portfolio.livraria.infrastructure.entity.author.dto.UpdateAuthorDTO;
+import caio.portfolio.livraria.infrastructure.entity.country.Country;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -30,6 +34,8 @@ class AuthorServiceIntegrationTest {
 	@Autowired private AuthorService authorService;
 	
 	private static final Long PAULO_COELHO_ID = 1L;
+	private static final String BRAZIL_NAME = "Brazil";
+	private static final String BRAZIL_CODE = "BR";
 	private static final String PAULO_COLEHO_ALIAS = "O Mago";
 	private static final String PAULO_COELHO_UPDATED_ALIAS = "PC";
 	private static final String PAULO_COELHO_FULL_NAME = "Paulo Coelho";
@@ -37,21 +43,45 @@ class AuthorServiceIntegrationTest {
 	private static final Integer BRAZIL_ID = 1;
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
 	
-	private static final CreateAuthorDTO CREATE_PAULO_COELHO_DTO = CreateAuthorDTO.builder()
+	private static final Country BRAZIL = Country.builder()
+		.id(BRAZIL_ID)
+		.isoAlpha2Code(BRAZIL_CODE)
+		.name(BRAZIL_NAME)
+		.build(); 
+	
+	private static final Author PAULO_COELHO = Author.builder()
+		.id(PAULO_COELHO_ID)
+		.alias(PAULO_COLEHO_ALIAS)
+		.fullName(PAULO_COELHO_FULL_NAME)
+		.birthday(PAULO_COELHO_BIRTHDAY)
+		.country(BRAZIL)
+		.build();
+	
+	private static final CreateAuthorDTO CREATE_PAULO_COELHO_DTO = CreateAuthorDTO
+		.builder()
 		.alias(PAULO_COLEHO_ALIAS)
 		.fullName(PAULO_COELHO_FULL_NAME)
 		.birthday(PAULO_COELHO_BIRTHDAY)
 		.countryId(BRAZIL_ID)
 		.build();
 	
-	private static final UpdateAuthorDTO UPDATE_PAULO_COELHO = UpdateAuthorDTO.builder()
+	private static final UpdateAuthorDTO UPDATE_PAULO_COELHO = UpdateAuthorDTO
+		.builder()
 		.alias(PAULO_COELHO_UPDATED_ALIAS)
 		.fullName(PAULO_COELHO_UPDATED_FULL_NAME)
 		.birthday(PAULO_COELHO_BIRTHDAY)
 		.build();
 	
+	private static final Author UPDATED_PAULO_COELHO = Author.builder()
+		.id(PAULO_COELHO.getId())
+		.alias(UPDATE_PAULO_COELHO.getAlias())
+		.fullName(UPDATE_PAULO_COELHO.getFullName())
+		.birthday(UPDATE_PAULO_COELHO.getBirthday())
+		.country(PAULO_COELHO.getCountry())
+		.build();
+
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'ResponseAuthorDTO' após processo de criação e salvamento")
 	void createAuthor_returnsResponseAuthorDTO() {
 		ResponseAuthorDTO pauloCoelhoResponse = authorService
@@ -69,7 +99,7 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve receber 'CreateAuthorDTO' e retornar 'AuthorAlreadyExistsException' após verificar autor já existente")
 	void createAuthor_throwsAuthorAlreadyExistsException() {
@@ -79,7 +109,7 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar uma lista de 'ResponseAuthorDTO' ao chamar método sem argumentos")
 	void getAllAuthors_returnsResponseAuthorDTOList() {
@@ -102,7 +132,7 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'id'")
 	void getAuthorById_returnsResponseAuthorDTO() {
@@ -124,6 +154,18 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
+	@DisplayName("Deve retornar autor ao buscar por 'id'")
+	void getAuthorById_returnsAuthor() {
+		Author pauloCoelho = authorService.getAuthorById(PAULO_COELHO_ID);
+		assertNotNull(pauloCoelho);
+		assertEquals(
+			PAULO_COLEHO_ALIAS,
+			pauloCoelho.getAlias());
+	}
+	
+	@Test
 	@DisplayName("Deve retornar 'AuthorNotFoundException' ao buscar por 'id'")
 	void getAuthorById_throwsAuthorNotFoundException() {
 		assertThrows(
@@ -132,7 +174,7 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve retornar 'ResponseAuthorDTO' ao buscar por 'alias'")
 	void getAuthorByAlias_returnsResponseAuthorDTO() {
@@ -162,7 +204,7 @@ class AuthorServiceIntegrationTest {
 	}
 	
 	@Test
-	@Sql("/sql/country/insert_brazil.sql")
+	@Sql("/sql/country/insert_country_list.sql")
 	@Sql("/sql/author/insert_author_list.sql")
 	@DisplayName("Deve atualizar autor por 'id' e retornar 'ResponseAuthorDTO'")
 	void updateAuthor_returnsResponseAuthorDTO() {
@@ -172,19 +214,19 @@ class AuthorServiceIntegrationTest {
 				UPDATE_PAULO_COELHO);
 		assertNotNull(responseAuthorDTO);
 		assertEquals(
-			PAULO_COELHO_ID, 
+			UPDATED_PAULO_COELHO.getId(), 
 			responseAuthorDTO.getId());
 		assertEquals(
-			PAULO_COELHO_UPDATED_ALIAS, 
+			UPDATED_PAULO_COELHO.getAlias(), 
 			responseAuthorDTO.getAlias());
 		assertEquals(
-			PAULO_COELHO_UPDATED_FULL_NAME, 
+			UPDATED_PAULO_COELHO.getFullName(), 
 			responseAuthorDTO.getFullName());
 		assertEquals(
-			PAULO_COELHO_BIRTHDAY, 
+			UPDATED_PAULO_COELHO.getBirthday(), 
 			responseAuthorDTO.getBirthday());
 		assertEquals(
-			BRAZIL_ID, 
+			UPDATED_PAULO_COELHO.getCountry().getId(), 
 			responseAuthorDTO.getCountryId());
 	}
 	
@@ -192,9 +234,25 @@ class AuthorServiceIntegrationTest {
 	@DisplayName("Deve lançar 'AuthorNotFoundException' ao enviar 'id' não existente")
 	void updateAuthor_throwsAuthorNotFoundException() {
 		assertThrows(
-			AuthorNotFoundException.class , 
+			AuthorNotFoundException.class, 
 			() -> authorService.updateAuthor(
 				PAULO_COELHO_ID, 
 				UPDATE_PAULO_COELHO));
+	}
+	
+	@Test
+	@Sql("/sql/country/insert_country_list.sql")
+	@Sql("/sql/author/insert_author_list.sql")
+	@DisplayName("Deve retornar 'true' após deletar autor com sucesso")
+	void deleteAuthorById_returnsTrue() {
+		assertTrue(authorService.deleteAuthorById(PAULO_COELHO_ID));
+	}
+	
+	@Test
+	@DisplayName("Deve lançar 'AuthorNotFoundException' após tentar deletar autor")
+	void deleteAuthorById_throwsAuthorNotFoundException() {
+		assertThrows(
+			AuthorNotFoundException.class,
+			() -> authorService.deleteAuthorById(PAULO_COELHO_ID));
 	}
 }

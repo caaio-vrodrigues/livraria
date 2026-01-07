@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.save;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +21,6 @@ import caio.portfolio.livraria.infrastructure.entity.book.salable.SalableBook;
 import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.model.enums.Genre;
-import caio.portfolio.livraria.service.book.salable.implementation.save.SalableBookSaverAndConcurrencyHandleImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)

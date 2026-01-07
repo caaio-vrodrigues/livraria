@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.validate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +26,6 @@ import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.model.enums.Genre;
 import caio.portfolio.livraria.service.author.AuthorService;
 import caio.portfolio.livraria.service.book.salable.dto.TitleAndAuthorUpdateDTO;
-import caio.portfolio.livraria.service.book.salable.implementation.validate.SalableBookUpdateValidatorImpl;
 import caio.portfolio.livraria.service.publisher.PublisherService;
 
 @ExtendWith(MockitoExtension.class)

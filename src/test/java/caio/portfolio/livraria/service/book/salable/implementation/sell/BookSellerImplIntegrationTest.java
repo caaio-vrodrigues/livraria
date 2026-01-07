@@ -1,4 +1,4 @@
-package caio.portfolio.livraria.service.book.salable;
+package caio.portfolio.livraria.service.book.salable.implementation.sell;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +21,6 @@ import caio.portfolio.livraria.exception.custom.book.salable.InsuficientSalableB
 import caio.portfolio.livraria.exception.custom.book.salable.SalableBookNotFoundException;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellDTO;
 import caio.portfolio.livraria.infrastructure.entity.book.salable.dto.BookSellListDTO;
-import caio.portfolio.livraria.service.book.salable.implementation.sell.BookSellerImpl;
 
 @SpringBootTest
 @DirtiesContext(classMode=ClassMode.BEFORE_EACH_TEST_METHOD)

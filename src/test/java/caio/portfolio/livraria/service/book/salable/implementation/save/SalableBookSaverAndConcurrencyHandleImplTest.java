@@ -28,12 +28,14 @@ import caio.portfolio.livraria.infrastructure.entity.country.Country;
 import caio.portfolio.livraria.infrastructure.entity.publisher.Publisher;
 import caio.portfolio.livraria.infrastructure.repository.SalableBookRepository;
 import caio.portfolio.livraria.model.enums.Genre;
+import caio.portfolio.livraria.service.book.salable.model.create.SalableBookExceptionCreator;
 
 @ExtendWith(MockitoExtension.class)
 class SalableBookSaverAndConcurrencyHandleImplTest {
 	
 	@InjectMocks private SalableBookSaverAndConcurrencyHandleImpl salableBookSaverAndConcurrencyHandleImpl;
 	@Mock private SalableBookRepository repo;
+	@Mock private SalableBookExceptionCreator salableBookExceptionCreator;
 	
 	private static final int UNITS = 50;
 	private static final Long PAULO_COELHO_ID = 1L;
@@ -46,6 +48,8 @@ class SalableBookSaverAndConcurrencyHandleImplTest {
 	private static final String ROCCO_FULL_ADDRESS = "Rua do Passeio, 38, 11º andar, no Passeio Corporate";
 	private static final String O_ALQUIMISTA_ISBN = "abc123";
 	private static final String O_ALQUIMISTA_TITLE = "Current Title";
+	private static final String SALABLE_BOOK_ALREADY_EXISTS_MSG = "Não foi possível realizar a operação. Livro com `title`: `"+O_ALQUIMISTA_TITLE+"` e `author`: `"+PAULO_COELHO_FULL_NAME+"` já existe";
+	private static final String CONCURRENT_BOOK_MSG = "Não foi possível criar livro: `"+O_ALQUIMISTA_TITLE+"` por falha de concorrência. Verifique se o livro já existe ou tente novamente se necessário";
 	private static final Integer BRAZIL_ID = 1;
 	private static final LocalDate PAULO_COELHO_BIRTHDAY = LocalDate.of(1947, 8, 24);
 	private static final BigDecimal O_ALQUIMISTA_PRICE = BigDecimal.valueOf(39.5);
@@ -103,6 +107,9 @@ class SalableBookSaverAndConcurrencyHandleImplTest {
 			.thenThrow(DataIntegrityViolationException.class);
 		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.empty());
+		when(salableBookExceptionCreator
+				.createConcurrentSalableBookException(anyString()))
+			.thenReturn(new ConcurrentSalableBookException(CONCURRENT_BOOK_MSG));
 		assertThrows(
 			ConcurrentSalableBookException.class, 
 			() -> salableBookSaverAndConcurrencyHandleImpl
@@ -111,15 +118,22 @@ class SalableBookSaverAndConcurrencyHandleImplTest {
 			.saveAndFlush(any(SalableBook.class));
 		verify(repo, times(1))
 			.findByTitleAndAuthor(anyString(), any(Author.class));
+		verify(salableBookExceptionCreator, times(1))
+			.createConcurrentSalableBookException(anyString());
 	}
 	
 	@Test
-	@DisplayName("Deve lançar 'SalableBookAlreadyExistsException' ao tentar salvar em cenário concorrente")
+	@DisplayName("Deve lançar 'SalableBookAlreadyExistsException' ao tentar salvar livro")
 	void saveAndHandleConcurrency_throwsSalableBookAlreadyExistsException() {
 		when(repo.saveAndFlush(any(SalableBook.class)))
 			.thenThrow(DataIntegrityViolationException.class);
 		when(repo.findByTitleAndAuthor(anyString(), any(Author.class)))
 			.thenReturn(Optional.of(O_ALQUIMISTA));
+		when(salableBookExceptionCreator
+			.createSalableBookAlreadyExistsException(
+				anyString(), 
+				anyString()))
+			.thenReturn(new SalableBookAlreadyExistsException(SALABLE_BOOK_ALREADY_EXISTS_MSG));
 		assertThrows(
 			SalableBookAlreadyExistsException.class, 
 			() -> salableBookSaverAndConcurrencyHandleImpl
@@ -128,5 +142,9 @@ class SalableBookSaverAndConcurrencyHandleImplTest {
 			.saveAndFlush(any(SalableBook.class));
 		verify(repo, times(1))
 			.findByTitleAndAuthor(anyString(), any(Author.class));
+		verify(salableBookExceptionCreator, times(1))
+				.createSalableBookAlreadyExistsException(
+					anyString(), 
+					anyString());
 	}
 }

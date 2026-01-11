@@ -18,8 +18,7 @@ public class BookSellerImpl implements BookSeller {
 	private final SalableBookFinder salableBookFinder;
 	private final SalableBookExceptionCreator salableBookExceptionCreator;
 
-	@Override
-	public BigDecimal sellBook(Long bookId, int units) {
+	private BigDecimal sellBook(Long bookId, int units) {
 		SalableBook book = salableBookFinder.findById(bookId);
 		try{
 			book.decreaseUnits(units);

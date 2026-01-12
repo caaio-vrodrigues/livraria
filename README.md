@@ -121,7 +121,11 @@ Esta documentação detalha a API backend `Livraria`, um serviço completo para 
 
 ### 1. Visão Geral
 
-A aplicação `Livraria` é um serviço backend ainda em desenvolvimento utilizando Spring Boot. Atualmente, ela gerencia informações de países, permitindo o cadastro e consulta de países utilizando códigos ISO Alpha-2. O objetivo é fornecer uma base para um sistema de livraria robusto.
+A aplicação `Livraria` é um microserviço robusto, desenvolvido em Java com Spring Boot, projetado para gerenciar de forma abrangente as entidades essenciais para um sistema de livraria: países, editoras, autores e livros.
+
+Ela oferece funcionalidades completas de cadastro e consulta, como a gestão de países utilizando códigos ISO Alpha-2, que servem como base fundamental para as entidades `Publisher` (Editora) e `Author` (Autor). Essas entidades, por sua vez, estão diretamente vinculadas à entidade `SalableBook`, que representa os livros comercializáveis e disponíveis no sistema.
+
+O objetivo principal desta aplicação é estabelecer uma base sólida, escalável e bem-estruturada para futuras expansões, garantindo uma gestão eficiente e consistente das informações da livraria.
 
 ---
 

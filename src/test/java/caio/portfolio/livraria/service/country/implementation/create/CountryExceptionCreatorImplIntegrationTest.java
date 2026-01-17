@@ -1,6 +1,7 @@
 package caio.portfolio.livraria.service.country.implementation.create;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
@@ -17,40 +20,50 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 class CountryExceptionCreatorImplIntegrationTest {
 
 	@Autowired private CountryExceptionCreatorImpl countryExceptionCreatorImpl;
+	@Autowired private MessageSource countryMessageSource;
 	
 	private static final String BRAZIL_CODE = "BR";
 	private static final String INVALID_CODE = "UR";
-	private static final String CONCURRENT_COUNTRY_EXCEPTION_MESSAGE = "Falha ao tentar criar país com `isoAlpha2Code`: `"+BRAZIL_CODE+"`";
-	private static final String ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_BLANK = "O campo `isoAlpha2Code` não pode estar vazio";
-	private static final String ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_INVALID_CODE = "O código `"+INVALID_CODE+"` não corresponde a um código de país válido";
 	
 	@Test
 	@DisplayName("Deve lançar 'ConcurrentCountryException' ao tentar salvar país em cenário concorrente")
 	void createConcurrentCountryException() {
-		assertEquals(
-			CONCURRENT_COUNTRY_EXCEPTION_MESSAGE, 
-			countryExceptionCreatorImpl
-				.createConcurrentCountryException(BRAZIL_CODE)
-					.getLocalizedMessage());
+		String expectedMsg = countryMessageSource.getMessage(
+			"concurret.country.iso", 
+			new Object[] {BRAZIL_CODE},
+			LocaleContextHolder.getLocale());
+		String msg = countryExceptionCreatorImpl
+			.createConcurrentCountryException(BRAZIL_CODE)
+			.getLocalizedMessage();
+		assertNotNull(msg);
+		assertEquals(expectedMsg, msg);
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' por argumento vazio")
 	void createIllegalArgumentExceptionByBlank() {
-		assertEquals(
-			ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_BLANK, 
-			countryExceptionCreatorImpl
-				.createIllegalArgumentExceptionByBlank()
-					.getLocalizedMessage());
+		String expectedMsg = countryMessageSource.getMessage(
+			"illegal.argument.blank.iso",
+			new Object[] {},
+			LocaleContextHolder.getLocale());
+		String msg = countryExceptionCreatorImpl
+			.createIllegalArgumentExceptionByBlank()
+			.getLocalizedMessage();
+		assertNotNull(msg);
+		assertEquals(expectedMsg, msg);
 	}
 	
 	@Test
 	@DisplayName("Deve lançar 'IllegalArgumentException' por argumento inválido")
 	void createIllegalArgumentExceptionByInvalid() {
-		assertEquals(
-			ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE_BY_INVALID_CODE, 
-			countryExceptionCreatorImpl
-				.createIllegalArgumentExceptionByInvalid(INVALID_CODE)
-					.getLocalizedMessage());
+		String expectedMsg = countryMessageSource.getMessage(
+			"illegal.argument.invalid.iso",
+			new Object[] {INVALID_CODE},
+			LocaleContextHolder.getLocale());
+		String msg = countryExceptionCreatorImpl
+			.createIllegalArgumentExceptionByInvalid(INVALID_CODE)
+			.getLocalizedMessage();
+		assertNotNull(msg);
+		assertEquals(expectedMsg, msg);
 	}
 }
